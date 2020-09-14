@@ -32,6 +32,7 @@ export class ProductDivComponent implements OnInit {
   }
 
   add(item) {
+    
     if (!this.dbs.isOpen && !this.dbs.isAdmin) {
       this.dialog.open(StoreClosedDialogComponent);
       return;
@@ -57,7 +58,8 @@ export class ProductDivComponent implements OnInit {
         this.dbs.order[index]['quantity']++
       }
     }
-
+    localStorage.removeItem('dbsorder')
+    localStorage.setItem('dbsorder', JSON.stringify(this.dbs.order));
     this.dbs.total = [...this.dbs.order].map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
     this.dbs.sum.next([...this.dbs.order].map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0))
 
