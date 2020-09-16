@@ -1,7 +1,6 @@
 {
   "hosting": {
-    "site":"disto-productos",
-    "public": "dist/disto-productos",
+    "public": "dist/minimarket-boom",
     "ignore": [
       "firebase.json",
       "**/.*",

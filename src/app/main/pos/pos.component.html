@@ -1,0 +1,155 @@
+<div class="w3-margin-left w3-margin-right animated fadeInUp delay-2
+    componente-container">
+    <div style="padding: 0 3vw;">
+        <!-- <mat-divider style="margin-top: 0.5em"></mat-divider> -->
+
+        <div class="w3-margin-top formFieldRounded">
+
+            <ng-container *ngIf="productList$ | async; else loading">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5em">
+                    <div class="button-container">
+                        <button mat-mini-fab color="accent" (click)="addTicket()" style="height: 100%;" [disabled]="loading$ | async">
+                            <mat-icon>add_circle</mat-icon>
+                        </button>
+                    </div>
+
+                    <mat-form-field class="search" appearance="outline" style="padding-bottom: 0px" hintLabel="Al presionar ENTER agregará el primer item de la lista">
+                        <mat-label>Buscar/Escanear</mat-label>
+                        <mat-icon matPrefix>search</mat-icon>
+                        <input matInput type="text" [formControl]="search" placeholder="Escanear código o escribir nombre"
+                            autocomplete="off" (keyup.enter)="addProduct()" [matAutocomplete]="matCode" autofocus>
+                            <mat-autocomplete #matCode="matAutocomplete" autoActiveFirstOption
+                                               [displayWith]="showOption" optionSelected="addProduct()">
+                                <mat-option *ngFor="let option of options$ | async" [value]="option" (click)="addProduct()">
+                                    {{option.description}} | {{option.sku}}
+                                </mat-option>
+                            </mat-autocomplete>
+                    </mat-form-field>
+                </div>
+
+                <mat-tab-group [selectedIndex]="selected.value" (selectedIndexChange)="setTab($event)">
+                    <mat-tab *ngFor="let tab of dbs.tabs; let index = index">
+                        <ng-template mat-tab-label>
+
+                            <span>{{'T-' + (tab.index | number : '2.')}} <button class="w3-margin-right" mat-icon-button
+                                    (click)="removeTicket(index)" style="height: 100%;" [disabled]="loading$ | async">
+                                    <mat-icon>cancel</mat-icon>
+                                </button></span>
+
+                        </ng-template>
+                        <ng-template matTabContent>
+                            <div class="tab-container">
+                                <div style="display: flex; justify-content: start; align-items: center;">
+                                    <!-- <h4 class="w3-margin-right">Ticket {{tab.index | number : '2.'}}</h4> -->
+
+
+                                    <span class="fill"></span>
+
+                                    <button class="w3-margin-right w3-hide-small" mat-raised-button color="accent"
+                                        (click)="finishTicket()"
+                                        [disabled]="dbs.tabs[selected.value].productList.length < 1 || dbs.tabs[selected.value].status === 'Pagado'">
+                                        Cobrar
+                                    </button>
+
+                                    <button class="w3-margin-right w3-hide-large w3-hide-medium" mat-mini-fab
+                                        color="accent" (click)="finishTicket()"
+                                        [disabled]="dbs.tabs[selected.value].productList.length < 1 || dbs.tabs[selected.value].status === 'Pagado'"
+                                        style="height: 100%;">
+                                        <mat-icon>payment</mat-icon>
+                                    </button>
+
+
+                                    <ng-container *ngIf="dbs.tabs.length > 0">
+                                        <div color="primary" class="totalPrice">
+                                            <span>{{dbs.tabs[selected.value].total | currency:"S/."}}</span><br>
+                                            <span *ngIf="dbs.tabs[selected.value].status === 'Pagado'"
+                                                style="font-size: 14px; font-weight: 600">{{dbs.tabs[selected.value].status | uppercase}}</span>
+                                        </div>
+                                    </ng-container>
+                                </div>
+
+                                <div class="w3-margin-top">
+
+                                    <!-- <div *ngFor=></div> -->
+
+                                    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8"
+                                        style="width: 100%">
+
+                                        <ng-container matColumnDef="product">
+                                            <th mat-header-cell *matHeaderCellDef style="padding: 0em 1em;"> Producto
+                                            </th>
+                                            <td mat-cell *matCellDef="let element"
+                                                style="min-width: 100px; padding: 8px">
+                                                <span><strong>{{element.product.description}}</strong></span><br>
+                                                <span class="w3-small">{{element.product.sku}}</span>
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="price">
+                                            <th mat-header-cell *matHeaderCellDef style="padding: 0em 1em"> Precio
+                                            </th>
+                                            <td mat-cell *matCellDef="let element; let i = index"
+                                                style="padding: 0em 1em">
+                                                <span>{{element.product.price | currency: 'S/.'}}</span>
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="quantity">
+                                            <th mat-header-cell *matHeaderCellDef class="w3-center"
+                                                style="padding: 0em 0.7em"> Cant. </th>
+                                            <td mat-cell *matCellDef="let element" class="w3-center">
+                                                <span>{{element.quantity | number: '2.2'}}</span>
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="total">
+                                            <th mat-header-cell *matHeaderCellDef style="padding: 0em 0.7em"> Importe
+                                            </th>
+                                            <td mat-cell *matCellDef="let element; let i = index">
+                                                <span>{{element.quantity * element.product.price | currency: 'S/.'}}</span>
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="actions">
+                                            <th mat-header-cell *matHeaderCellDef class="w3-center"
+                                                style="padding: 0em 0.7em"></th>
+                                            <td mat-cell *matCellDef="let element; let i = index" style="width: 20px">
+                                                <div
+                                                    style="display: flex; justify-content: space-between" [ngStyle]="{'flex-direction': (platform.ANDROID || platform.IOS) ? 'column' : 'row'}">
+                                                    <button mat-icon-button (click)="addQuantity(i)"
+                                                        [disabled]="dbs.tabs[selected.value].status === 'Pagado' || (loading$ | async)">
+                                                        <mat-icon>add_circle</mat-icon>
+                                                    </button>
+                                                    <button mat-icon-button (click)="removeQuantity(i)"
+                                                        [disabled]="element.quantity === 1 || dbs.tabs[selected.value].status === 'Pagado' || (loading$ | async)">
+                                                        <mat-icon>remove_circle</mat-icon>
+                                                    </button>
+                                                    <button mat-icon-button color="warn" (click)="removeItem(i)"
+                                                        [disabled]="dbs.tabs[selected.value].status === 'Pagado' || (loading$ | async)">
+                                                        <mat-icon>delete</mat-icon>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </ng-container>
+
+                                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.out-of-stock]="(row.product.realStock < row.quantity) && (row.saleType === '1' || row.saleType === '2')"></tr>
+
+                                    </table>
+                                </div>
+                            </div>
+                        </ng-template>
+
+                    </mat-tab>
+                </mat-tab-group>
+            </ng-container>
+
+            <ng-template #loading>
+                <div style="display: flex; align-items: center; flex-direction: column">
+                    <mat-spinner></mat-spinner>
+                    <p>Cargando productos ...</p>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>

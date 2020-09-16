@@ -1,0 +1,77 @@
+<div mat-dialog-title>
+    <div class="header">
+        <span>
+            <mat-icon style="vertical-align: middle; transform: scale(1.2);">payment</mat-icon>
+            Cobrar
+        </span>
+        <span class="fill"></span>
+        <button type="button" mat-button (click)="close()" tabindex="-1">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+</div>
+<mat-divider class="w3-margin-top"></mat-divider>
+
+<div mat-dialog-content class="formFieldRounded w3-margin-top">
+
+    <div class="w3-row">
+        <div class="w3-half">
+            <div class="formFieldRounded w3-padding" style="display: flex; align-items: start; flex-direction: column">
+
+                <mat-form-field class="content search" appearance="outline">
+                    <mat-label>Opciones de pago</mat-label>
+                    <mat-icon matPrefix class="w3-margin-right">payment</mat-icon>
+                    <mat-select [formControl]="paymentMethod" placeholder='Seleccionar'>
+                        <mat-option *ngFor="let type of paymentTypes$ | async" [value]="type">
+                            <img class="example-option-img" aria-hidden [src]="type.photoURL" height="25">
+                            <span>{{type.name}}</span>
+                        </mat-option>
+                    </mat-select>
+                    <mat-error>Campo requerido</mat-error>
+                </mat-form-field>
+                <div class="w3-margin-bottom" *ngIf="paymentMethod.value as pay">
+                    <img class="example-option-img" height="30" aria-hidden [src]="pay['photoURL']" alt="image:account">
+                    <span>{{pay['account']}}</span>
+                </div>
+
+                <mat-form-field class="content search" appearance="outline">
+                    <mat-label>Paga con</mat-label>
+                    <mat-icon matPrefix class="w3-margin-right">attach_money</mat-icon>
+                    <input matInput type="tel" [formControl]="payment" placeholder="S/.0.00" autocomplete="off">
+                    <mat-error>Campo requerido</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="w3-half">
+            <div class="formFieldRounded w3-padding" style="display: flex; align-items: center; flex-direction: column">
+                <span style="font-size: 1.5em">Total a cobrar:</span><br>
+                <div color="primary" class="totalPrice">
+                    {{data.total | currency:"S/."}}
+                </div>
+
+                <span *ngIf="(payment.value - data.total) > 0"
+                    style="font-size: 1.5em; padding: 0.5em; border: 1px solid #2b2b2b; border-radius: 10px">Vuelto:
+                    <strong>{{payment.value - data.total | currency : 'S/.'}}</strong></span><br>
+
+                <span *ngIf="(payment.value - data.total) < 0 && payment.value > 0"
+                    style="font-size: 1.2em; padding: 0.5em; border: 1px solid #2b2b2b; border-radius: 10px; line-height: 24px; max-width: 200px">No puede
+                    ingresar montos menores al importe total</span><br>
+            </div>
+        </div>
+    </div>
+
+    <ng-container *ngIf="failedItems.length > 0">
+        <p>Los siguientes items fallaron en la transacción.</p>
+        <ul>
+            <li *ngFor="let item of failedItems">{{item.description}}</li>
+        </ul>
+        <p>El problema se debe a que estos productos no tienen el stock suficiente para generar la venta</p>
+        <p>Puede que algunos productos se hayan descontado del inventario, así que anule el ticket <strong>#{{failedCorrelative}}</strong></p>
+    </ng-container>
+</div>
+<mat-divider></mat-divider>
+<div mat-dialog-actions class="w3-margin-top" align="end">
+    <button mat-stroked-button class="w3-margin-right" color="warn" (click)="close()">Cancelar</button>
+    <button mat-raised-button color="accent" (click)="save()" type="button"
+        [disabled]="payment.value < data.total || !paymentMethod.value">Guardar</button>
+</div>

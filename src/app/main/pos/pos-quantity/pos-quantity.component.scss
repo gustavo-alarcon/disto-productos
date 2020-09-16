@@ -1,0 +1,24 @@
+.header {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 28px;
+  line-height: 37px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.warn {
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 28px;
+}
+
+.mat-dialog-content {
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+  color: #929292;
+}

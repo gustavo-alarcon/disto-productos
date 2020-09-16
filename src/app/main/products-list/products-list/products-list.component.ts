@@ -36,8 +36,8 @@ export class ProductsListComponent implements OnInit {
   productsTableDataSource = new MatTableDataSource<Product>();
   productsDisplayedColumns: string[] = [
     'index', 'photoURL', 'description', 'sku', 'category', 'price',
-    'unitDescription', 'unitAbbreviation', 'unitWeight', 'sellMinimum', 'alertMinimum',
-    'realStock', 'mermaStock', /*'virtualStock', */'published', 'actions'
+    'unitDescription', 'sellMinimum', 'alertMinimum',
+    'realStock', 'published', 'actions'
   ]
 
   productsObservable$: Observable<Product[]>
@@ -52,7 +52,7 @@ export class ProductsListComponent implements OnInit {
 
 
   //Variables
-  defaultImage = "../../../assets/images/Disto_Logo1.png";
+  defaultImage = "../../../assets/images/boom-logo-horizontal.jpg";
 
   //noResult
   noResult$: Observable<string>;
@@ -86,7 +86,8 @@ export class ProductsListComponent implements OnInit {
         let name = filter.trim().split('&+&')[1];       //product name
         let promo = filter.trim().split('&+&')[2];                    //promo
         return (data.category.match(new RegExp(category, 'ig'))
-          && data.description.match(new RegExp(name, 'ig'))
+          && (data.description.match(new RegExp(name, 'ig'))
+          || data.sku.match(new RegExp(name, 'ig')))
           && (String(data.promo) == promo || promo == "false"))
       }
 
@@ -117,7 +118,7 @@ export class ProductsListComponent implements OnInit {
       this.promoFilterForm.valueChanges.pipe(startWith(false)))
       .pipe(
         map(([categorySelected, itemsFormValue, promoFormValue]) => {
-          this.productsTableDataSource.filter = (categorySelected.length > 1 ? '' : categorySelected[0].name) + '&+&' + itemsFormValue + '&+&' + promoFormValue;
+          this.productsTableDataSource.filter = (categorySelected.length > 1 ? '' : categorySelected[0]?.name) + '&+&' + itemsFormValue + '&+&' + promoFormValue;
           return true
         })
       )
@@ -257,7 +258,6 @@ export class ProductsListComponent implements OnInit {
     let dialogRef: MatDialogRef<ProductCreateEditComponent>;
     if (edit == true) {
       dialogRef = this.dialog.open(ProductCreateEditComponent, {
-        width: '350px',
         data: {
           data: { ...product },
           edit: edit
@@ -278,7 +278,6 @@ export class ProductsListComponent implements OnInit {
     }
     else {
       dialogRef = this.dialog.open(ProductCreateEditComponent, {
-        width: '350px',
         data: {
           data: null,
           edit: edit

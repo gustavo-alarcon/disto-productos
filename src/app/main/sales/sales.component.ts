@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { Sale, SaleRequestedProducts } from 'src/app/core/models/sale.model';
 import { map } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { DatabaseService } from 'src/app/core/services/database.service';
 
 @Component({
   selector: 'app-sales',
@@ -16,12 +17,15 @@ export class SalesComponent implements OnInit {
 
   locationPadding$: Observable<string>;
 
-  totalPriceSubj: BehaviorSubject<number> = new BehaviorSubject(0)
+  totalPriceSubj: BehaviorSubject<number> = new BehaviorSubject(0);
   constructor(
-    public auth: AuthService
+    public auth: AuthService,
+    private dbs: DatabaseService 
   ) { }
 
   ngOnInit(): void {
+    this.dbs.changeTitle('Ventas online');
+    
     this.locationPadding$ = this.locationSubject.asObservable().pipe(
       map(location => {
         let aux = location+1 > 10 ? (location % 10) : location;

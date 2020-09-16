@@ -1,13 +1,13 @@
 <div>
   <!-- Actions -->
-  <div class="w3-margin actionsContainer formFieldRounded">
+  <div class="w3-margin toolbar formFieldRounded">
     <!-- Select item's type -->
-    <button mat-raised-button style="height: 45px;" (click)="onCreateEditItem(false)" color="accent">
+    <button class="toolbar_item" mat-raised-button style="height: 45px;" (click)="onCreateEditItem(false)" color="accent">
       <mat-icon>add</mat-icon>Crear
     </button>
 
-    <mat-form-field color="primary" *ngIf="categoryList$ | async as categories" class="content w3-small "
-      appearance="outline">
+    <mat-form-field color="primary" *ngIf="categoryList$ | async as categories" class="content w3-small toolbar_item"
+      appearance="outline" style="width: 150px;">
       <mat-label>Categoria</mat-label>
       <mat-icon matPrefix></mat-icon>
       <mat-icon matSuffix>arrow_drop_down</mat-icon>
@@ -27,14 +27,14 @@
     </mat-form-field>
 
     <ng-container *ngIf="filter$ | async as filter">
-      <mat-form-field color="primary" class="content w3-small" appearance="outline">
-        <mat-label>Buscar</mat-label>
+      <mat-form-field color="primary" class="content w3-small toolbar_item" appearance="outline" style="width: 150px;">
+        <mat-label>Buscar/Escanear</mat-label>
         <mat-icon matPrefix class="w3-margin-right">search</mat-icon>
         <input [formControl]="itemsFilterForm" matInput type="text" placeholder="Escriba..." autocomplete="off">
-        <mat-hint>Filtro de nombre</mat-hint>
+        <mat-hint>Filtro por nombre o código</mat-hint>
       </mat-form-field>
 
-      <mat-slide-toggle [formControl]="promoFilterForm" style="margin-bottom: 8px" color="accent">
+      <mat-slide-toggle class="toolbar_item" [formControl]="promoFilterForm" style="margin-bottom: 8px; margin-top: inherit;" color="accent">
         Mostrar solo ofertas
       </mat-slide-toggle>
     </ng-container>
@@ -46,7 +46,7 @@
   </div>
 
   <!-- Table -->
-  <div *ngIf="packagesObservable$ | async; else default">
+  <div *ngIf="packagesObservable$ | async; else loading">
     <!-- Desktop -->
     <div *ngIf="packagesTableDataSource.filteredData.length else default" class="w3-margin-top"
       style="border-radius: 10px 10px 10px 10px;">
@@ -244,5 +244,12 @@
   <div class="w3-container w3-center w3-margin-top w3-margin-bottom">
     <!-- <img [src]="noResultImage" alt="no data" style="width: 100%; max-width: 300px;"> -->
     <p>Sin Resultados</p>
+  </div>
+</ng-template>
+
+<ng-template #loading>
+  <div class="formFieldRounded" style="display: flex; align-items: center; flex-direction: column">
+    <mat-spinner></mat-spinner>
+    <p>Cargando paquetes</p>
   </div>
 </ng-template>

@@ -111,7 +111,7 @@ export class PackagesCreateEditComponent implements OnInit {
             disabled: this.data.data.dateLimit ? false : true,
           }, Validators.required],
         totalItems: [this.data.data.totalItems, [Validators.required, Validators.min(1)]],
-        additionalDescription:[this.data.data.additionalDescription, Validators.required],
+        additionalDescription:[this.data.data.additionalDescription],
         photoURL: [this.data.data.photoURL, Validators.required],
       })
     }
@@ -138,7 +138,7 @@ export class PackagesCreateEditComponent implements OnInit {
             disabled: true,
           }, Validators.required],
         totalItems: [0, [Validators.required, Validators.min(1)]],
-        additionalDescription:[null, Validators.required],
+        additionalDescription:[null],
         photoURL: [null, Validators.required],
       })
 

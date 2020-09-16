@@ -5,13 +5,14 @@
 export const environment = {
   production: false,
   firebaseConfig: {
-    apiKey: "AIzaSyCpBQUWevQMVibHA61JRviVwPsEG91OxeU",
-    authDomain: "disto-productos.firebaseapp.com",
-    databaseURL: "https://disto-productos.firebaseio.com",
-    projectId: "disto-productos",
-    storageBucket: "disto-productos.appspot.com",
-    messagingSenderId: "15927944313",
-    appId: "1:15927944313:web:a0dffcbc525585b62920a8"
+    apiKey: "AIzaSyAjnCaEjOVRn3VO2oHXbwki2z92Cm1itRo",
+    authDomain: "minimarket-boom.firebaseapp.com",
+    databaseURL: "https://minimarket-boom.firebaseio.com",
+    projectId: "minimarket-boom",
+    storageBucket: "minimarket-boom.appspot.com",
+    messagingSenderId: "432642033577",
+    appId: "1:432642033577:web:b7b334635ceafcb2afe6b8",
+    measurementId: "G-D3WM02R9P1"
   }
 };
 
@@ -22,4 +23,4 @@ export const environment = {
  * This import should be commented out in production mode because it will have a negative impact
  * on performance if an error is thrown.
  */
-// import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+import 'zone.js/dist/zone-error';  // Included with Angular CLI.

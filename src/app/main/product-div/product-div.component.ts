@@ -18,7 +18,7 @@ export class ProductDivComponent implements OnInit {
   @Input() product: Product
   @Input() maxWeight: number
   @Input() buttonAdd: boolean
-  defaultImage = "../../../assets/images/Disto_Logo1.png";
+  defaultImage = "../../../assets/images/boom-logo-horizontal.jpg";
 
   constructor(
     public dbs: DatabaseService,
@@ -107,7 +107,8 @@ export class ProductDivComponent implements OnInit {
 
     let quantity = realQuantity.reduce((a, b) => a + b, 0)
 
-    return stop - quantity >= prod
+    // return stop - quantity >= prod
+    return true
   }
 
   giveProductPrice(item) {

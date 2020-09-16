@@ -18,7 +18,7 @@ import { User } from 'src/app/core/models/user.model';
 export class SalesPhotoDialogComponent implements OnInit {
   saleStatusOptions = new saleStatusOptions()
 
-  defaultImage = "../../../../assets/images/Disto_Logo1.png";
+  defaultImage = "../../../../assets/images/boom-logo-horizontal.jpg";
 
   photoFormArray: FormArray = new FormArray([])
   loading$: BehaviorSubject<boolean> = new BehaviorSubject(false);

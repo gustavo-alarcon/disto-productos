@@ -28,9 +28,20 @@ const routes: Routes = [
         canActivate: [AuthGuard]
       },
       {
-        path: 'sales',
+        path: 'online-sales',
         loadChildren: () => import('./sales/sales.module').then(mod => mod.SalesModule),
         canActivate: [AuthGuard]
+      },
+      {
+        path: 'store-sales',
+        loadChildren: () => import('./store-sales/store-sales.module').then(mod => mod.StoreSalesModule),
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'pos',
+        loadChildren: () => import('./pos/pos.module').then(mod => mod.PosModule),
+        canActivate: [AuthGuard]
+        
       },
       {
         path: 'logistics',

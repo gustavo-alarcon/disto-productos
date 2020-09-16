@@ -1,97 +1,86 @@
 <div mat-dialog-title>
   <h2 class="ms-font-rubik ms-color-2b" style="font-size:1.2em">
-      <mat-icon style="vertical-align:middle" (click)="deb()">add_circle</mat-icon>
-      {{data.edit?'Editar Producto':'Crear Producto'}}
+    <mat-icon style="vertical-align:middle" (click)="deb()">add_circle</mat-icon>
+    {{data.edit?'Editar Producto':'Crear Producto'}}
   </h2>
   <mat-divider></mat-divider>
 </div>
 <mat-dialog-content>
-  <form [formGroup]="productForm"
-      style="display:flex; flex-direction: column;">
+  <form [formGroup]="productForm">
 
-      <!-- description  -->
-      <mat-form-field style="margin-bottom: 8px"
-        hintLabel="Máx. 40 carácteres" appearance="outline">
-          <mat-label>Descripción</mat-label>
-          <input #input autocomplete="off" maxlength="40"
-            formControlName="description" type="text"
-              matInput placeholder="Descripción del producto">
-          <ng-template *ngIf="descriptionFormatting$ | async"></ng-template>
-          <mat-error>
+    <div class="w3-row">
+      <div class="w3-half w3-padding">
+        <div style="display:flex; flex-direction: row; justify-content: space-between; width: 100%">
+          <!-- description  -->
+          <mat-form-field style="margin-bottom: 8px; width: 48%" hintLabel="Máx. 50 carácteres" appearance="outline">
+            <mat-label>Descripción</mat-label>
+            <input #input autocomplete="off" maxlength="50" formControlName="description" type="text" matInput
+              placeholder="Descripción del producto">
+            <ng-template *ngIf="descriptionFormatting$ | async"></ng-template>
+            <mat-error>
               <span *ngIf="productForm.get('description').errors?.required">Campo requerido</span>
-              <span *ngIf="productForm.get('description').errors?.descriptionRepeatedValidator">Este contenido ya se encuentra repetido.</span>
-          </mat-error>
-          <mat-hint align="end">{{input.value?.length || 0}}/40</mat-hint>
-      </mat-form-field>
+              <span *ngIf="productForm.get('description').errors?.descriptionRepeatedValidator">Este contenido ya se
+                encuentra repetido.</span>
+            </mat-error>
+            <mat-hint align="end">{{input.value?.length || 0}}/50</mat-hint>
+          </mat-form-field>
 
-      <!-- sku -->
-      <mat-form-field style="margin-bottom: 8px" appearance="outline">
-          <mat-label>SKU</mat-label>
-          <input #input autocomplete="off"
-            formControlName="sku" type="text"
-              matInput placeholder="SKU">
-          <ng-template *ngIf="skuFormatting$ | async"></ng-template>
-          <mat-error>
+          <!-- sku -->
+          <mat-form-field style="margin-bottom: 8px; width: 48%" appearance="outline">
+            <mat-label>SKU</mat-label>
+            <input #input autocomplete="off" formControlName="sku" type="text" matInput placeholder="SKU">
+            <ng-template *ngIf="skuFormatting$ | async"></ng-template>
+            <mat-error>
               <span *ngIf="productForm.get('sku').errors?.required">Campo requerido</span>
-              <span *ngIf="productForm.get('sku').errors?.skuRepeatedValidator">Este contenido ya se encuentra repetido.</span>
-          </mat-error>
-      </mat-form-field>
+              <span *ngIf="productForm.get('sku').errors?.skuRepeatedValidator">Este contenido ya se encuentra
+                repetido.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
 
-      <!-- additionalDescription -->
-      <mat-form-field appearance="outline" style="width: 100%">
-        <mat-label>Información</mat-label>
-        <textarea #addDesc 
-          style="min-height: 100px;"
-          formControlName="additionalDescription" 
-          matInput maxlength="150"></textarea>
-        <mat-hint align="end">{{addDesc.value?.length || 0}}/150</mat-hint>
-      </mat-form-field>
+        <!-- additionalDescription -->
+        <mat-form-field appearance="outline" style="width: 100%">
+          <mat-label>Información</mat-label>
+          <textarea #addDesc style="min-height: 100px;" formControlName="additionalDescription" matInput
+            maxlength="150"></textarea>
+          <mat-hint align="end">{{addDesc.value?.length || 0}}/150</mat-hint>
+        </mat-form-field>
 
-      <!-- Categories -->
-      <mat-form-field *ngIf="category$ | async as categories"
-        style="margin-bottom: 8px; display:block" appearance="outline">
+        <!-- Categories -->
+        <mat-form-field *ngIf="category$ | async as categories" style="margin-bottom: 8px; display:block"
+          appearance="outline">
           <mat-label>Categoria</mat-label>
-          <input autocomplete="off"
-            formControlName="category"
-            [matAutocomplete]="categoryAutocomplete"
-            type="text" matInput>
-          <mat-autocomplete 
-            autoActiveFirstOption   
-            #categoryAutocomplete="matAutocomplete">
-            <mat-option *ngFor="let category of categories"
-              [value]="category">
+          <input autocomplete="off" formControlName="category" [matAutocomplete]="categoryAutocomplete" type="text"
+            matInput>
+          <mat-autocomplete autoActiveFirstOption #categoryAutocomplete="matAutocomplete">
+            <mat-option *ngFor="let category of categories" [value]="category">
               {{category}}
             </mat-option>
           </mat-autocomplete>
           <mat-error>
             <span *ngIf="productForm.get('category').errors?.required">Por favor, complete el campo.</span>
-            <span *ngIf="productForm.get('category').errors?.invalid">Dato inválido. Complete con alguna opción válida.</span>
-          </mat-error>
-      </mat-form-field>
-
-      <!-- Price and unit -->
-      <div style="display:flex; flex-direction: row; justify-content: space-between; width: 100%"> 
-        <!-- price  -->
-        <mat-form-field style="margin-bottom: 8px; width: 48%"
-          appearance="outline">
-          <mat-label>Precio (S/.)</mat-label>
-          <input autocomplete="off"
-            formControlName="price" type="number"
-              matInput placeholder="Precio del producto">
-          <mat-error>
-              <span *ngIf="productForm.get('price').errors?.required">Campo requerido</span>
-              <span *ngIf="productForm.get('price').errors?.min">Solo positivos</span>
+            <span *ngIf="productForm.get('category').errors?.invalid">Dato inválido. Complete con alguna opción
+              válida.</span>
           </mat-error>
         </mat-form-field>
-        
-        <!-- unit  -->
-        <mat-form-field *ngIf="units$ | async as units"
-          style="margin-bottom: 8px; width: 48%"
-          appearance="outline">
+
+        <!-- Price and unit -->
+        <div style="display:flex; flex-direction: row; justify-content: space-between; width: 100%">
+          <!-- price  -->
+          <mat-form-field style="margin-bottom: 8px; width: 48%" appearance="outline">
+            <mat-label>Precio (S/.)</mat-label>
+            <input autocomplete="off" formControlName="price" type="number" matInput placeholder="Precio del producto">
+            <mat-error>
+              <span *ngIf="productForm.get('price').errors?.required">Campo requerido</span>
+              <span *ngIf="productForm.get('price').errors?.min">Solo positivos</span>
+            </mat-error>
+          </mat-form-field>
+
+          <!-- unit  -->
+          <mat-form-field *ngIf="units$ | async as units" style="margin-bottom: 8px; width: 48%" appearance="outline">
             <mat-label>Unidad</mat-label>
             <mat-select formControlName="unit">
-              <mat-option (click)="onAddUnit()"
-                [value]="">
+              <mat-option (click)="onAddUnit()" [value]="">
                 <mat-icon>add_circle_outline</mat-icon>Añadir
               </mat-option>
               <mat-option *ngFor="let unit of units" [value]="unit">
@@ -99,92 +88,103 @@
               </mat-option>
             </mat-select>
             <mat-error>
-                <span *ngIf="productForm.get('unit').errors?.required">Campo requerido</span>
+              <span *ngIf="productForm.get('unit').errors?.required">Campo requerido</span>
             </mat-error>
-        </mat-form-field>
+          </mat-form-field>
+        </div>
       </div>
 
-      <!-- realStock and mermaStock -->
-      <div style="display:flex; flex-direction: row; justify-content: space-between; width: 100%"> 
-        <!-- realStock  -->
-        <mat-form-field style="margin-bottom: 8px; width: 48%"
-          appearance="outline">
-          <mat-label>Stock</mat-label>
-          <input autocomplete="off"
-            formControlName="realStock" type="number"
-            matInput placeholder="Stock">
-          <mat-error>
+      <div class="w3-half w3-padding">
+
+        <!-- realStock and mermaStock -->
+        <div style="display:flex; flex-direction: row; justify-content: space-between; width: 100%">
+          <!-- realStock  -->
+          <mat-form-field style="margin-bottom: 8px; width: 48%" appearance="outline">
+            <mat-label>Stock</mat-label>
+            <input autocomplete="off" formControlName="realStock" type="number" matInput placeholder="Stock">
+            <mat-error>
               <span *ngIf="productForm.get('realStock').errors?.required">Campo requerido</span>
               <span *ngIf="productForm.get('realStock').errors?.min">Solo positivos</span>
-          </mat-error>
-        </mat-form-field>
-        
-        <!-- mermaStock  -->
-        <mat-form-field style="margin-bottom: 8px; width: 48%"
-          appearance="outline">
-          <mat-label>Merma</mat-label>
-          <input autocomplete="off"
-            formControlName="mermaStock" type="number"
-            matInput placeholder="Merma">
-          <mat-error>
+            </mat-error>
+          </mat-form-field>
+
+          <!-- mermaStock  -->
+          <!-- <mat-form-field style="margin-bottom: 8px; width: 48%" appearance="outline">
+            <mat-label>Merma</mat-label>
+            <input autocomplete="off" formControlName="mermaStock" type="number" matInput placeholder="Merma">
+            <mat-error>
               <span *ngIf="productForm.get('mermaStock').errors?.required">Campo requerido</span>
               <span *ngIf="productForm.get('mermaStock').errors?.min">Solo positivos</span>
-          </mat-error>
-        </mat-form-field>
-      </div>
+            </mat-error>
+          </mat-form-field> -->
 
-      <!-- sellMinimum and alertMinimum -->
-      <div style="display:flex; flex-direction: row; justify-content: space-between; width: 100%"> 
-        <!-- sellMinimum  -->
-        <mat-form-field style="margin-bottom: 20px; width: 48%"
-          appearance="outline">
-          <mat-label>Mín. bloqueo</mat-label>
-          <input autocomplete="off"
-            formControlName="sellMinimum" type="number"
-            matInput placeholder="Mínimo de bloqueo">
-          <mat-error>
-              <span *ngIf="productForm.get('sellMinimum').errors?.required">Campo requerido</span>
-              <span *ngIf="productForm.get('sellMinimum').errors?.min">Solo positivos</span>
-              <span *ngIf="productForm.get('sellMinimum').errors?.sellMinimumExceeded">
-                El mínimo de bloqueo debe ser menor al mínimo de alerta.</span>
-          </mat-error>
-        </mat-form-field>
-        
-        <!-- alertMinimum  -->
-        <mat-form-field style="margin-bottom: 20px; width: 48%"
-          appearance="outline">
-          <mat-label>Mín. alerta</mat-label>
-          <input autocomplete="off"
-            formControlName="alertMinimum" type="number"
-            matInput placeholder="Mínimo de alerta">
-          <mat-error>
+          <!-- alertMinimum  -->
+          <mat-form-field style="margin-bottom: 20px; width: 48%" appearance="outline">
+            <mat-label>Mín. alerta</mat-label>
+            <input autocomplete="off" formControlName="alertMinimum" type="number" matInput
+              placeholder="Mínimo de alerta">
+            <mat-error>
               <span *ngIf="productForm.get('alertMinimum').errors?.required">Campo requerido</span>
               <span *ngIf="productForm.get('alertMinimum').errors?.min">Solo positivos</span>
               <span *ngIf="productForm.get('alertMinimum').errors?.sellMinimumExceeded">
                 El mínimo de bloqueo debe ser menor al mínimo de alerta.</span>
-          </mat-error>
-        </mat-form-field>
-      </div>
-      
-      <!-- Photo  -->
-      <div style="display:flex; flex-direction: row; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
-          <img class="w3-card-4" (click)="photoURL.click()"
-              *ngIf="productForm.get('photoURL').value!=null" style="width: 100%;"
-              [src]="productForm.get('photoURL').value" alt="fotografía">
-          <img class="w3-card-4" (click)="photoURL.click()"
-              *ngIf="productForm.get('photoURL').value==null" style="width: 100%;"
-              [src]="noImage" alt="sin fotografía">
+            </mat-error>
+          </mat-form-field>
+        </div>
 
-          <mat-progress-bar *ngIf="photos?.resizing$.photoURL | async"
-          style="width:100%" mode="indeterminate">
+        <!-- sellMinimum and alertMinimum -->
+        <div style="display:flex; flex-direction: row; justify-content: space-between; width: 100%; padding: 0.5em; border: 1px solid lightgrey; border-radius: 10px">
+
+          <span>Tipo de venta</span>
+          <mat-radio-group aria-label="Seleccione una opción" formControlName="saleType">
+            <mat-radio-button class="w3-small w3-margin-right" value="1">Unidad</mat-radio-button>
+            <mat-radio-button class="w3-small w3-margin-right" value="2">Granel</mat-radio-button>
+            <mat-radio-button class="w3-small w3-margin-right" value="3">Sin stock</mat-radio-button>
+          </mat-radio-group>
+          <!-- sellMinimum  -->
+          <!-- <mat-form-field style="margin-bottom: 20px; width: 48%" appearance="outline">
+            <mat-label>Mín. bloqueo</mat-label>
+            <input autocomplete="off" formControlName="sellMinimum" type="number" matInput
+              placeholder="Mínimo de bloqueo">
+            <mat-error>
+              <span *ngIf="productForm.get('sellMinimum').errors?.required">Campo requerido</span>
+              <span *ngIf="productForm.get('sellMinimum').errors?.min">Solo positivos</span>
+              <span *ngIf="productForm.get('sellMinimum').errors?.sellMinimumExceeded">
+                El mínimo de bloqueo debe ser menor al mínimo de alerta.</span>
+            </mat-error>
+          </mat-form-field> -->
+
+          <!-- alertMinimum  -->
+          <!-- <mat-form-field style="margin-bottom: 20px; width: 48%" appearance="outline">
+            <mat-label>Mín. alerta</mat-label>
+            <input autocomplete="off" formControlName="alertMinimum" type="number" matInput
+              placeholder="Mínimo de alerta">
+            <mat-error>
+              <span *ngIf="productForm.get('alertMinimum').errors?.required">Campo requerido</span>
+              <span *ngIf="productForm.get('alertMinimum').errors?.min">Solo positivos</span>
+              <span *ngIf="productForm.get('alertMinimum').errors?.sellMinimumExceeded">
+                El mínimo de bloqueo debe ser menor al mínimo de alerta.</span>
+            </mat-error>
+          </mat-form-field> -->
+        </div>
+
+        <!-- Photo  -->
+        <div
+          style="display:flex; flex-direction: row; justify-content: space-between; align-items: flex-end; margin: 24px 0px 16px 0px;">
+          <img class="w3-card-4" (click)="photoURL.click()" *ngIf="productForm.get('photoURL').value!=null"
+            style="width: 70%;" [src]="productForm.get('photoURL').value" alt="fotografía">
+          <img class="w3-card-4" (click)="photoURL.click()" *ngIf="productForm.get('photoURL').value==null"
+            style="width: 70%;" [src]="noImage" alt="sin fotografía">
+
+          <mat-progress-bar *ngIf="photos?.resizing$.photoURL | async" style="width:70%" mode="indeterminate">
           </mat-progress-bar>
-          <span *ngIf="photos.resizing$.photoURL | async" 
-          class="w3-small ms-color-11 ms-font-montserrat" style="width:100%">*comprimiendo</span>
-          <input style="display: none" #photoURL type="file" accept='image/*' 
-            (change)="addNewPhoto('photoURL', photoURL.files)"/>
+          <span *ngIf="photos.resizing$.photoURL | async" class="w3-small ms-color-11 ms-font-montserrat"
+            style="width:70%">*comprimiendo</span>
+          <input style="display: none" #photoURL type="file" accept='image/*'
+            (change)="addNewPhoto('photoURL', photoURL.files)" />
+        </div>
       </div>
-
-
+    </div>
 
   </form>
   <mat-divider></mat-divider>
@@ -193,5 +193,5 @@
 <mat-dialog-actions align="end">
   <button mat-stroked-button class="w3-margin-right" mat-dialog-close>Cancelar</button>
   <button mat-raised-button color="accent" (click)="onSubmitForm(null)" type="button"
-      [disabled]="productForm.status != 'VALID'">Guardar</button>
+    [disabled]="productForm.status != 'VALID'">Guardar</button>
 </mat-dialog-actions>

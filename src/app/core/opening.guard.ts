@@ -52,11 +52,11 @@ export class OpeningGuard implements CanActivateChild {
             let isOpen = false;
 
             if (user?.admin || user?.seller || user?.accountant || user?.logistic) {
-              console.log('is admin');
+              // console.log('is admin');
               this.dbs.isAdmin = true;
               isOpen = true;
             } else {
-              console.log('is not admin')
+              // console.log('is not admin')
               this.dbs.isAdmin = false;
               
               // Calculating the actual decimal time based in hours

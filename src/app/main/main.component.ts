@@ -5,7 +5,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { LoginDialogComponent } from './login-dialog/login-dialog.component';
 import { Observable } from 'rxjs';
 import { DatabaseService } from '../core/services/database.service';
-import { mapTo } from 'rxjs/operators';
+import { mapTo, take, tap } from 'rxjs/operators';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-main',
@@ -17,15 +18,33 @@ export class MainComponent implements OnInit {
 
   openedMenu: boolean = false;
 
+  sub: any;
+  title$: Observable<string>;
+  title: string ;
+
   constructor(
     public auth: AuthService,
     public themeService: ThemeService,
     private dialog: MatDialog,
-    private dbs: DatabaseService
-  ) { }
+    private dbs: DatabaseService,
+    public route: Router
+  ) {
+
+  }
 
   ngOnInit(): void {
     this.version = this.dbs.version;
+
+    this.dbs.changeTitle('Categorias')
+
+    this.dbs.currentTitle$.subscribe(res => {
+      console.log(res);
+      this.title = res
+    });
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 
   toggleSideMenu(): void {

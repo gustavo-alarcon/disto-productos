@@ -4,7 +4,7 @@ import { AngularFirestore, AngularFirestoreCollection, DocumentReference, Angula
 import { Product } from '../models/product.model';
 import { shareReplay, map, takeLast, switchMap, take, mapTo, tap } from 'rxjs/operators';
 import { GeneralConfig } from '../models/generalConfig.model';
-import { Observable, concat, of, interval, BehaviorSubject } from 'rxjs';
+import { Observable, concat, of, interval, BehaviorSubject, Subject } from 'rxjs';
 import { User } from '../models/user.model';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { Recipe } from '../models/recipe.model';
@@ -12,12 +12,19 @@ import { Unit, PackageUnit } from '../models/unit.model';
 import { Buy, BuyRequestedProduct } from '../models/buy.model';
 import * as firebase from 'firebase'
 import { Package } from '../models/package.model';
+import { Ticket } from '../models/ticket.model';
+import { title } from 'process';
+import { StoreSale } from '../models/storeSale.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DatabaseService {
+<<<<<<< HEAD
   public version: string = 'V1.1.37r';
+=======
+  public version: string = 'V1.0.17r';
+>>>>>>> develop
   public isOpen: boolean = false;
   public isAdmin: boolean = false;
 
@@ -38,7 +45,15 @@ export class DatabaseService {
 
   // public opening = new BehaviorSubject<Array<{ opening: string, closing: string }>>([]);
   public opening$: Observable<Array<{ opening: string, closing: string }>>;
-  
+
+
+  // POS variables
+  public tabs: Array<Ticket> = [];
+  public tabCounter = 0;
+
+  public titleSource = new BehaviorSubject<string>('Cargando ...');
+  public currentTitle$ = this.titleSource.asObservable();
+
   constructor(
     private afs: AngularFirestore,
     private storage: AngularFireStorage,
@@ -46,13 +61,18 @@ export class DatabaseService {
     this.opening$ = this.getOpening();
   }
 
-  productsListRef = `db/distoProductos/productsList`;
-  packagesListRef = `db/distoProductos/packagesList`;
-  recipesRef = `db/distoProductos/recipes`;
-  buysRef = `db/distoProductos/buys`;
-  salesRef = `db/distoProductos/sales`;
-  configRef = `db/distoProductos/config`;
+  productsListRef = `db/minimarketBoom/productsList`;
+  packagesListRef = `db/minimarketBoom/packagesList`;
+  recipesRef = `db/minimarketBoom/recipes`;
+  buysRef = `db/minimarketBoom/buys`;
+  salesRef = `db/minimarketBoom/sales`;
+  storeSalesRef = `db/minimarketBoom/storeSales`;
+  configRef = `db/minimarketBoom/config`;
   generalConfigDoc = this.afs.collection(this.configRef).doc<GeneralConfig>('generalConfig');
+
+  changeTitle(newTitle: string): void {
+    this.titleSource.next(newTitle);
+  }
 
   getOpening(): Observable<Array<{ opening: string, closing: string }>> {
     return this.afs.collection(this.configRef).doc('generalConfig').valueChanges()
@@ -506,7 +526,7 @@ export class DatabaseService {
   }
 
   getSalesUser(user: string): Observable<Sale[]> {
-    return this.afs.collection<Sale>(`/db/distoProductos/sales`,
+    return this.afs.collection<Sale>(`/db/minimarketBoom/sales`,
       ref => ref.where("user.uid", "==", user)).valueChanges()
   }
 
@@ -675,7 +695,7 @@ export class DatabaseService {
 
   //configuracion
   getDistricts(): Observable<any> {
-    return this.afs.collection(`/db/distoProductos/config`).doc('generalConfig').valueChanges()
+    return this.afs.collection(`/db/minimarketBoom/config`).doc('generalConfig').valueChanges()
       .pipe(
         map(res => res['districts']),
         map(res => {
@@ -697,7 +717,7 @@ export class DatabaseService {
   }
 
   getPayments(): Observable<any> {
-    return this.afs.collection(`/db/distoProductos/config`).doc('generalConfig').valueChanges()
+    return this.afs.collection(`/db/minimarketBoom/config`).doc('generalConfig').valueChanges()
       .pipe(
         map(res => res['payments']),
         map(res => {
@@ -723,5 +743,23 @@ export class DatabaseService {
       .valueChanges().pipe(
         shareReplay(1)
       );
+  }
+
+  // STORE SALES
+  //Sales
+  getStoreSales(date: { begin: Date, end: Date }): Observable<StoreSale[]> {
+    return this.afs.collection<StoreSale>(this.storeSalesRef,
+      ref => ref.where("createdAt", "<=", date.end).where("createdAt", ">=", date.begin). orderBy("createdAt", 'desc'))
+      .valueChanges();
+  }
+
+  getUserTickets(uid: string): Observable<Array<Ticket>> {
+    return this.afs.collection<Ticket>(`/users/${uid}/tickets`, ref => ref.orderBy("index")).valueChanges()
+  }
+
+  // PRODUCT LIST ENTRIES
+  getProduct(id: string): Observable<Product> {
+    return this.afs.doc<Product>(`${this.productsListRef}/${id}`)
+      .valueChanges().pipe (shareReplay(1));
   }
 }

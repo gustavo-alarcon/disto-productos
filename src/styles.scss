@@ -13,20 +13,20 @@
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
 $mat-disto-productos-primary-palette: (
-  50: #ecf5e6,
-  100: #cee5c1,
-  200: #aed497,
-  300: #8ec36d,
-  400: #75b64e,
-  500: #5da92f,
-  600: #55a22a,
-  700: #4b9823,
-  800: #418f1d,
-  900: #307e12,
-  A100: #c5ffb3,
-  A200: #9eff80,
-  A400: #77ff4d,
-  A700: #64ff33,
+  50: #fbe9e7,
+  100: #ffccbc,
+  200: #ffab91,
+  300: #ff8a65,
+  400: #ff7043,
+  500: #ff5722,
+  600: #f4511e,
+  700: #e64a19,
+  800: #d84315,
+  900: #bf360c,
+  A100: #ff9e80,
+  A200: #ff6e40,
+  A400: #ff3d00,
+  A700: #dd2c00,
   contrast: (
     50: #000000,
     100: #000000,
@@ -46,20 +46,20 @@ $mat-disto-productos-primary-palette: (
 );
 
 $mat-disto-productos-accent-palette: (
-  50: #fffaea,
-  100: #fef3cb,
-  200: #feeba9,
-  300: #fde286,
-  400: #fcdc6c,
-  500: #fcd652,
-  600: #fcd14b,
-  700: #fbcc41,
-  800: #fbc638,
-  900: #fabc28,
-  A100: #ffffff,
-  A200: #ffffff,
-  A400: #fff0d0,
-  A700: #ffe8b7,
+  50: #fffde7,
+  100: #fff9c4,
+  200: #fff59d,
+  300: #fff176,
+  400: #ffee58,
+  500: #ffeb3b,
+  600: #fdd835,
+  700: #fbc02d,
+  800: #f9a825,
+  900: #f57f17,
+  A100: #ffff8d,
+  A200: #ffff00,
+  A400: #ffea00,
+  A700: #ffd600,
   contrast: (
     50: #000000,
     100: #000000,
@@ -138,10 +138,10 @@ a {
 }
 
 :root {
-  --primary-color: #5da92f;
-  --accent-color: #fcd652;
+  --primary-color: #FF5722;
+  --accent-color: #FFEB3B;
   --warn-color: #ef5350;
-  --forth-color: #267131;
+  --forth-color: #E64A19;
 }
 
 .ms-flex {
