@@ -65,12 +65,17 @@ export class ShoppingCartComponent implements OnInit {
   }
 
   delete(ind) {
+   
     this.order.splice(ind, 1)
     this.total = this.order.map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
     this.dbs.sum.next(this.total)
+    localStorage.removeItem('dbsorder')
+    localStorage.setItem('dbsorder', JSON.stringify(this.dbs.order));
     if (this.order.length == 0) {
       this.dbs.view.next(1)
       this.dbs.total = this.total
+      localStorage.removeItem('order')
+      localStorage.removeItem('length')
       localStorage.clear()
     }
 
