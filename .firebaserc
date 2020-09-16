@@ -1,14 +1,6 @@
 {
-  "targets": {
-    "disto-productos": {
-      "hosting": {
-        "disto-productos": [
-          "disto-productos"
-        ]
-      }
-    }
-  },
   "projects": {
-    "default": "disto-productos"
+    "boom": "minimarket-boom",
+    "default": "minimarket-boom"
   }
 }

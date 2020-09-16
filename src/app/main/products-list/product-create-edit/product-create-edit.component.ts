@@ -78,16 +78,17 @@ export class ProductCreateEditComponent implements OnInit {
           asyncValidators: this.skuRepeatedValidator(this.dbs, this.data),
           updateOn: 'blur'
         }),
-        additionalDescription: [this.data.data.additionalDescription, Validators.required],
+        additionalDescription: [this.data.data.additionalDescription],
         category: [this.data.data.category, Validators.required],
         price: [this.data.data.price, [Validators.required, Validators.min(0)]],
         unit: [this.data.data.unit, Validators.required],
         realStock: [this.data.data.realStock, [Validators.required, Validators.min(0)]],
         mermaStock: [this.data.data.mermaStock, [Validators.required, Validators.min(0)]],
         sellMinimum: [this.data.data.sellMinimum,
-        [Validators.required, Validators.min(1), , this.minimumSellValidator()]],
+        [Validators.required, Validators.min(0), , this.minimumSellValidator()]],
         alertMinimum: [this.data.data.alertMinimum,
-        [Validators.required, Validators.min(1), , this.minimumSellValidator()]],
+        [Validators.required, Validators.min(0), , this.minimumSellValidator()]],
+        saleType: [this.data.data.saleType ? this.data.data.saleType : 1, Validators.required],
         photoURL: [this.data.data.photoURL, Validators.required],
       })
     }
@@ -103,7 +104,7 @@ export class ProductCreateEditComponent implements OnInit {
           asyncValidators: this.skuRepeatedValidator(this.dbs, this.data),
           updateOn: 'blur'
         }),
-        additionalDescription: [null, Validators.required],
+        additionalDescription: [null],
         category: [null, Validators.required],
         price: [null, [Validators.required, Validators.min(0)]],
         unit: [null, Validators.required],
@@ -113,6 +114,7 @@ export class ProductCreateEditComponent implements OnInit {
           [Validators.required, Validators.min(0), , this.minimumSellValidator()]],
         alertMinimum: [0,
           [Validators.required, Validators.min(0), , this.minimumSellValidator()]],
+        saleType: [1, Validators.required],
         photoURL: [null, Validators.required],
       })
     }
@@ -212,7 +214,7 @@ export class ProductCreateEditComponent implements OnInit {
     let product: Product = {
       id: null,
       description: this.productForm.get('description').value.trim().toLowerCase(),
-      additionalDescription: this.productForm.get('additionalDescription').value.trim(),
+      additionalDescription: this.productForm.get('additionalDescription').value ? this.productForm.get('additionalDescription').value.trim() : '',
       sku: this.productForm.get('sku').value,
       category: this.productForm.get('category').value,
       price: this.productForm.get('price').value,
@@ -226,7 +228,8 @@ export class ProductCreateEditComponent implements OnInit {
       promo: this.data.edit ? this.data.data.promo : false,
       promoData: this.data.edit ? this.data.data.promoData : null,
       published: this.data.edit ? this.data.data.published : null,
-      priority: this.data.edit ? this.data.data.priority : 1,
+      priority: this.data.edit ? this.data.data.priority : 1, 
+      saleType: this.productForm.get('saleType').value,
       createdAt: this.data.edit ? this.data.data.createdAt : new Date(),
       createdBy: this.data.edit ? this.data.data.createdBy : user,
       editedAt: this.data.edit ? new Date() : null,
@@ -239,10 +242,12 @@ export class ProductCreateEditComponent implements OnInit {
           this.dialogRef.close(true);
         },
           err => {
+            // console.log(err)
             this.dialogRef.close(false);
           })
       },
         err => {
+          // console.log(err)
           this.dialogRef.close(false);
         });
   }

@@ -69,7 +69,7 @@ export class CreateCategoryComponent implements OnInit {
       const value = control.value.toLowerCase();
       return this.dbs.getCategoriesDoc().pipe(
         map(res => {
-          return res.findIndex(el => el['name'].toLowerCase() == value) >= 0 ? { repeatedValidator: true } : null
+          return res?.findIndex(el => el['name'].toLowerCase() == value) >= 0 ? { repeatedValidator: true } : null
         }))
     }
   }
@@ -128,7 +128,7 @@ export class CreateCategoryComponent implements OnInit {
   }
 
   createBanner(categorie, photo?: File) {
-    const payRef: DocumentReference = this.afs.firestore.collection(`/db/distoProductos/config/`).doc('generalConfig');
+    const payRef: DocumentReference = this.afs.firestore.collection(`/db/minimarketBoom/config/`).doc('generalConfig');
 
     categorie.photoURL = null;
 
@@ -164,42 +164,42 @@ export class CreateCategoryComponent implements OnInit {
   }
 
   editBanner(category, photo?: File) {
-    const payRef: DocumentReference = this.afs.firestore.collection(`/db/distoProductos/config/`).doc('generalConfig');
+    const payRef: DocumentReference = this.afs.firestore.collection(`/db/minimarketBoom/config/`).doc('generalConfig');
 
     if (photo) {
       concat(
         this.dbs.deletePhotoProduct(this.data.item.photoPath).pipe(takeLast(1)),
         this.uploadPhoto(category.name, photo).pipe(takeLast(1))
       ).pipe(
-        takeLast(1),
+        takeLast(1)
       ).subscribe((res: string) => {
         category.photoURL = res;
         category.photoPath = `/categories/pictures/${category.name}-${photo.name}`;
-        return this.afs.firestore.runTransaction((transaction) => {
+
+        this.afs.firestore.runTransaction((transaction) => {
           // This code may get re-run multiple times if there are conflicts.
           return transaction.get(payRef).then((doc) => {
             if (!doc.exists) {
               transaction.set(payRef, { categories: [] });
             }
+            else {
+              const list = doc.data().categories ? doc.data().categories : [];
 
-            const list = doc.data().categories ? doc.data().categories : [];
-
-            let ind = list.findIndex(el => el.name == this.data.item.name)
-            list[ind] = category
-            transaction.update(payRef, { categories: list });
-
+              let ind = list.findIndex(el => el.name == this.data.item.name);
+              list[ind] = category;
+              transaction.update(payRef, { categories: list });
+            }
           });
 
-        }).then(() => {
-          this.dialogRef.close(true)
-          this.loading.next(false)
-          this.snackBar.open("Elemento editado", "Cerrar", {
-            duration: 4000
-          })
-        }).catch(function (error) {
-          console.log("Transaction failed: ", error);
         });
-      })
+
+        this.dialogRef.close(true);
+        this.loading.next(false);
+        this.snackBar.open("Elemento editado", "Cerrar", {
+          duration: 4000
+        });
+
+      });
 
     } else {
       return this.afs.firestore.runTransaction((transaction) => {

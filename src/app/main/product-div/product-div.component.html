@@ -24,7 +24,7 @@
                 {{product.additionalDescription}}</p>
             <div *ngIf="package" class="product__choose ms-flex ms-flex--center">
                 <div style="width: 100%;">
-                    <div *ngFor="let item of product['items']" >
+                    <div *ngFor="let item of product['items']">
                         <div class="product__select" style="border-color: silver;"
                             *ngIf="item['productsOptions'].length == 1">
                             {{item['productsOptions'][0]['description'] | titlecase}} ({{item['productsOptions'][0].unit.abbreviation}})

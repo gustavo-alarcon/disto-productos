@@ -1,13 +1,14 @@
 <div>
   <!-- Actions -->
-  <div class="w3-margin actionsContainer formFieldRounded">
+  <div class="w3-margin toolbar formFieldRounded">
     <!-- Select item's type -->
-    <button mat-raised-button style="height: 45px;" (click)="onCreateEditItem(false)" color="accent">
+    <button class="toolbar_item" mat-raised-button style="height: 45px;" (click)="onCreateEditItem(false)"
+      color="accent">
       <mat-icon>add</mat-icon>Crear
     </button>
 
-    <mat-form-field color="primary" *ngIf="categoryList$ | async as categories" class="content w3-small "
-      appearance="outline">
+    <mat-form-field color="primary" *ngIf="categoryList$ | async as categories" class="content w3-small toolbar_item"
+      appearance="outline" style="width: 150px;">
       <mat-label>Categoria</mat-label>
       <mat-icon matPrefix></mat-icon>
       <mat-icon matSuffix>arrow_drop_down</mat-icon>
@@ -27,26 +28,27 @@
     </mat-form-field>
 
     <ng-container *ngIf="filter$ | async as filter">
-      <mat-form-field color="primary" class="content w3-small" appearance="outline">
-        <mat-label>Buscar</mat-label>
+      <mat-form-field color="primary" class="content w3-small toolbar_item" appearance="outline" style="width: 150px;">
+        <mat-label>Buscar/Escanear</mat-label>
         <mat-icon matPrefix class="w3-margin-right">search</mat-icon>
         <input [formControl]="itemsFilterForm" matInput type="text" placeholder="Escriba..." autocomplete="off">
-        <mat-hint>Filtro de nombre</mat-hint>
+        <mat-hint>Filtro por nombre o código</mat-hint>
       </mat-form-field>
 
-      <mat-slide-toggle [formControl]="promoFilterForm" style="margin-bottom: 8px" color="accent">
+      <mat-slide-toggle class="toolbar_item" [formControl]="promoFilterForm"
+        style="margin-bottom: 8px; margin-top: inherit;" color="accent">
         Mostrar solo ofertas
       </mat-slide-toggle>
     </ng-container>
 
-    <button mat-raised-button style="height: 45px;" (click)="downloadXls()" color="accent">
+    <button class="toolbar_item" mat-raised-button style="height: 45px;" (click)="downloadXls()" color="accent">
       Descargar Excel
     </button>
 
   </div>
 
   <!-- Table -->
-  <div *ngIf="productsObservable$ | async; else default">
+  <div *ngIf="productsObservable$ | async; else loading">
     <!-- Desktop -->
     <div *ngIf="productsTableDataSource.filteredData.length else default" class="w3-margin-top"
       style="border-radius: 10px 10px 10px 10px;">
@@ -63,7 +65,7 @@
 
           <ng-container matColumnDef="photoURL">
             <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282;  "
-              class="w3-center w3-padding  ">
+              class="w3-center w3-padding">
               Imagen referencial
             </th>
             <td *matCellDef="let raw" class="w3-center" style="padding: 10px">
@@ -74,12 +76,12 @@
                     <div class="slogan background--secondary" *ngIf="raw['promo']"></div>
                     <div class="promo" *ngIf="raw['promo']">OFERTA</div>
                     <img [defaultImage]="defaultImage" [lazyLoad]="raw.photoURL" [offset]="100"
-                      style="object-fit:cover; width: 115px; height: 115px;">
+                      style="object-fit:cover; width: 80px; height: 80px;">
                   </div>
                 </div>
               </a>
               <ng-template #defaultPicture>
-                <div style="height:120px;padding:6px 6px">
+                <div style="height:80px; padding:6px 6px">
                   <img src="../../../assets/images/no-image.png" style="max-width:100%; height:100%" class="w3-card-4">
                 </div>
               </ng-template>
@@ -91,7 +93,7 @@
               class="w3-center w3-padding  ">
               Descripción
             </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
               {{raw.description |titlecase}}
             </td>
           </ng-container>
@@ -101,7 +103,7 @@
               class="w3-center w3-padding  ">
               SKU
             </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
               {{raw.sku}}
             </td>
           </ng-container>
@@ -112,7 +114,7 @@
               mat-sort-header>
               Categoria
             </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
               {{raw.category}}
             </td>
           </ng-container>
@@ -122,7 +124,7 @@
               class="w3-center w3-padding  ">
               Precio
             </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
               {{raw.price | currency : 'S/.'}}
             </td>
           </ng-container>
@@ -130,69 +132,69 @@
           <ng-container matColumnDef="unitDescription">
             <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
               class="w3-center w3-padding  ">
-              Descripción de Unidad
+              Unidad
             </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
               {{raw.unit.description}}
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="unitAbbreviation">
+          <!-- <ng-container matColumnDef="unitAbbreviation">
             <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
               class="w3-center w3-padding  ">
               Abreviación
             </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
               {{raw.unit.abbreviation}}
             </td>
-          </ng-container>
+          </ng-container> -->
 
-          <ng-container matColumnDef="unitWeight">
+          <!-- <ng-container matColumnDef="unitWeight">
             <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
               class="w3-center w3-padding  ">
               Peso (KG)
             </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
               {{raw.unit.weight}}KG
             </td>
-          </ng-container>
+          </ng-container> -->
 
           <ng-container matColumnDef="realStock">
             <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
               class="w3-center w3-padding  ">
               Stock
             </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
               {{raw.realStock}}
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="mermaStock">
+          <!-- <ng-container matColumnDef="mermaStock">
             <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
               class="w3-center w3-padding  ">
               Merma
             </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
               {{raw.mermaStock}}
             </td>
-          </ng-container>
+          </ng-container> -->
 
-          <ng-container matColumnDef="virtualStock">
+          <!-- <ng-container matColumnDef="virtualStock">
             <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
               class="w3-center w3-padding  ">
               Stock Virtual
             </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
               {{raw.virtualStock$ | async}}
             </td>
-          </ng-container>
+          </ng-container> -->
 
           <ng-container matColumnDef="sellMinimum">
             <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
               class="w3-center w3-padding  ">
               Min. Venta
             </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
               {{raw.sellMinimum}}
             </td>
           </ng-container>
@@ -202,7 +204,7 @@
               class="w3-center w3-padding  ">
               Min. alerta
             </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
               {{raw.alertMinimum}}
             </td>
           </ng-container>
@@ -212,7 +214,7 @@
               class="w3-center w3-padding  ">
               Estado
             </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
               {{raw.published ? 'Publicado' : 'Oculto'}}
             </td>
           </ng-container>
@@ -278,5 +280,12 @@
   <div class="w3-container w3-center w3-margin-top w3-margin-bottom">
     <!-- <img [src]="noResultImage" alt="no data" style="width: 100%; max-width: 300px;"> -->
     <p>Sin Resultados</p>
+  </div>
+</ng-template>
+
+<ng-template #loading>
+  <div class="formFieldRounded" style="display: flex; align-items: center; flex-direction: column">
+    <mat-spinner></mat-spinner>
+    <p>Cargando productos</p>
   </div>
 </ng-template>

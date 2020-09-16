@@ -1,36 +1,45 @@
 <div style="max-width: 250px; position: relative;">
-  <div mat-dialog-title>
-      <div class="update-head">
-          <h2 class="title-login">
-              Hola, cheese lover!
-          </h2>
-          <button mat-icon-button mat-dialog-close>
-              <mat-icon>close</mat-icon>
-          </button>
-      </div>
-      <mat-divider></mat-divider>
+    <div mat-dialog-title>
+        <div class="update-head">
+            <h2 class="title-login">
+                Hola, Boom lover!
+            </h2>
+            <button mat-icon-button mat-dialog-close>
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <mat-divider></mat-divider>
 
-  </div>
-  <div mat-dialog-content class="w3-center" style="font-size: 1em;">
-      <p>Hay una nueva versión de nuestra plataforma y parece que te la estas perdiendo 😱</p>
+    </div>
+    <!-- <div style="display: flex; align-items: center;"> -->
+        <!-- <div style="padding: 0.5em;">
+            <img src="../../../../assets/svg/update.svg" width="170px" alt="">
+        </div> -->
+        <div mat-dialog-content class="w3-center" style="font-size: 1em;">
+            <p>Hay una nueva versión de nuestra plataforma y parece que te la estas perdiendo 😱</p>
 
-      <div class="update-button">
-        <ng-container *ngIf="platform.ANDROID || platform.IOS else desktop">
-            <span style="white-space: break-spaces;">Desliza hacia abajo tu pantalla</span>
-            <img src="../../../assets/images/update_mobile.png" width="58px" height="58px" alt="">    
-        </ng-container>
-        <ng-template #desktop>
-            <span>Presiona la tecla</span>
-            <img src="../../../assets/images/update_desktop.png" width="58px" height="58px" alt="">
-        </ng-template>
-      </div>
+            <div class="update-button">
+                <ng-container *ngIf="platform.ANDROID || platform.IOS else desktop">
+                    <span style="white-space: break-spaces;">Desliza hacia abajo tu pantalla</span>
+                    <img src="../../../assets/images/update_mobile.png" width="58px" height="58px" alt="">
+                </ng-container>
+                <ng-template #desktop>
+                    <span>Presiona la tecla</span>
+                    <img src="../../../assets/images/update_desktop.png" width="58px" height="58px" alt="">
+                </ng-template>
+            </div>
 
-      <p>Verifica en la parte inferior del menu que estes en la versión <b>{{data}}</b></p>
-      <div style="text-align: right;">
-          <img src="../../../../assets/images/Disto_firma.png" width="100px" alt="">
-      </div>
-  </div>
-  <div class="div-bottom">
-      <img class="bottom-img"  src="../../../assets/images/profile4.png" alt="">
-  </div>
+            <p>Verifica en la parte inferior del menu que estes en la versión <b>{{data}}</b></p>
+
+        </div>
+
+        <div class="div-bottom">
+            <p></p>
+        </div>
+
+    <!-- </div> -->
+
+    <!-- <div class="div-bottom">
+      <img class="bottom-img"  src="../../../assets/svg/update.svg" alt="">
+    </div> -->
 </div>

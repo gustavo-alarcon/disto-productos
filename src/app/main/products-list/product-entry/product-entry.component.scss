@@ -1,0 +1,29 @@
+.entry-container {
+    padding: 1em;
+    max-width: 350px;
+    margin-top: 1em;
+    border-radius: 10px;
+}
+
+.actions-container {
+    display: flex;
+    align-items: baseline;
+}
+
+.fill {
+    flex: auto 1 1;
+}
+
+.entry-title {
+    font-family: 'Raleway', sans-serif !important;
+    font-size: 1.2em !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5em !important;
+}
+
+.entry-stock {
+    font-family: 'Raleway', sans-serif !important;
+    font-size: 1em !important;
+    font-weight: 400 !important;
+    margin-bottom: 1em !important;
+}

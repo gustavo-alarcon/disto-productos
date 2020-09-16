@@ -1,0 +1,95 @@
+.totalPrice {
+    padding: 16px;
+    margin: 4px;
+    height: 56px;
+    margin-left: 8px;
+    background: var(--primary-color);
+    box-shadow: 0px 5.66077px 5.66077px rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+  
+    font-weight: 900;
+    font-size: 2em;
+    line-height: 41px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    letter-spacing: 0.05em;
+    font-feature-settings: 'pnum' on, 'lnum' on;
+  
+    color: #F2F2F2;
+  }
+
+.componente-container{
+    height: 100%; 
+    padding: 24px 0px
+}
+
+.search {
+    line-height: 17px;
+    width: 100%;
+    max-width: 320px;
+}
+
+.fill {
+    flex: auto 1 1;
+}
+
+.flex_container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.tickets_container {
+    padding: 0em 0.5em;
+}
+
+.details_container {
+    padding: 0em 0.5em;
+}
+
+.details {
+    margin: 1.5em 0em;
+    border-radius: 10px;
+    padding: 1em;
+}
+
+.ticket {
+    display: flex;
+    width: 100%;
+    border-radius: 10px;
+    margin: 1.5em 0em;
+}
+
+.column {
+    width: 25%;
+    padding: 1em;
+}
+
+.header {
+    font-size: 0.7em;
+    font-weight: 500;
+    color: #2b2b2b;
+}
+
+.body {
+    font-size: 1em;
+    color: #2b2b2b;
+}
+
+.price {
+    padding: 0.5em;
+    border-radius: 5px;
+    background: var(--primary-color);
+    color: white;
+    font-weight: 600;
+}
+
+.status {
+    padding: 0.5em;
+    border-radius: 5px;
+    background: var(--primary-color);
+    color: white;
+    font-weight: 600;
+}

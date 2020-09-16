@@ -1,0 +1,22 @@
+<div mat-dialog-title style="width: 300px">
+    <div class="header">
+        <span>
+            <mat-icon style="vertical-align: middle; transform: scale(1.2);">save</mat-icon>
+            Procesando
+        </span>
+        <button type="button" mat-button (click)="close()" tabindex="-1">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+</div>
+<mat-divider class="w3-margin-top"></mat-divider>
+
+<div mat-dialog-content class="formFieldRounded w3-margin-top">
+
+    <ng-container *ngIf="user$ | async">
+        <div class="formFieldRounded" style="display: flex; align-items: center; flex-direction: column">
+            <mat-spinner></mat-spinner>
+            <p>Guardando transacción</p>
+        </div>
+    </ng-container>
+</div>

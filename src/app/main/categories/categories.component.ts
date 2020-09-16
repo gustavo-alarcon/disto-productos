@@ -16,7 +16,7 @@ export class CategoriesComponent implements OnInit {
   loadingCategories = new BehaviorSubject<boolean>(true);
   loadingCategories$ = this.loadingCategories.asObservable();
 
-  defaultImage = "../../../assets/images/Disto_Logo1.png";
+  defaultImage = "../../../assets/images/boom-logo-horizontal.jpg";
 
   constructor(
     private router: Router,

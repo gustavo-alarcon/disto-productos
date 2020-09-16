@@ -47,6 +47,8 @@ export class CustomersComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.dbs.changeTitle('Lista de clientes');
+
     this.users$ = this.dbs.getUsers();
 
     this.searchFormControl = new FormControl('');

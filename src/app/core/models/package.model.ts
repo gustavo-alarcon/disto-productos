@@ -6,7 +6,7 @@ export interface Package {
   package: true;      //Variable that will always be true. Used to determine if it is a package
   id: string;
   description: string;
-  additionalDescription: string;
+  additionalDescription?: string;
   sku: string;
   price: number;      //Should this price be with IGV?
   unit: PackageUnit;  

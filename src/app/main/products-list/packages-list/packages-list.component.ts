@@ -53,7 +53,7 @@ export class PackagesListComponent implements OnInit {
 
 
   //Variables
-  defaultImage = "../../../assets/images/Disto_Logo1.png";
+  defaultImage = "../../../assets/images/boom-logo-horizontal.jpg";
 
   //noResult
   noResult$: Observable<string>;
@@ -119,7 +119,7 @@ export class PackagesListComponent implements OnInit {
       this.promoFilterForm.valueChanges.pipe(startWith(false)))
       .pipe(
         map(([categorySelected, itemsFormValue, promoFormValue]) => {
-          this.packagesTableDataSource.filter = (categorySelected.length > 1 ? '' : categorySelected[0].name) + '&+&' + itemsFormValue + '&+&' + promoFormValue;
+          this.packagesTableDataSource.filter = (categorySelected.length > 1 ? '' : categorySelected[0]?.name) + '&+&' + itemsFormValue + '&+&' + promoFormValue;
           return true
         })
       )

@@ -152,11 +152,13 @@
                                     <p class="opening__day">Martes:</p>
                                     <span class="opening__fill"></span>
                                     <mat-form-field class="opening__input" appearance="outline">
-                                        <input matInput type="time" formControlName="tuesday_opening" autocomplete="off">
+                                        <input matInput type="time" formControlName="tuesday_opening"
+                                            autocomplete="off">
                                     </mat-form-field>
                                     <span class="opening__dash"> - </span>
                                     <mat-form-field class="opening__input" appearance="outline">
-                                        <input matInput type="time" formControlName="tuesday_closing" autocomplete="off">
+                                        <input matInput type="time" formControlName="tuesday_closing"
+                                            autocomplete="off">
                                     </mat-form-field>
                                 </div>
 
@@ -164,11 +166,13 @@
                                     <p class="opening__day">Miércoles:</p>
                                     <span class="opening__fill"></span>
                                     <mat-form-field class="opening__input" appearance="outline">
-                                        <input matInput type="time" formControlName="wednesday_opening" autocomplete="off">
+                                        <input matInput type="time" formControlName="wednesday_opening"
+                                            autocomplete="off">
                                     </mat-form-field>
                                     <span class="opening__dash"> - </span>
                                     <mat-form-field class="opening__input" appearance="outline">
-                                        <input matInput type="time" formControlName="wednesday_closing" autocomplete="off">
+                                        <input matInput type="time" formControlName="wednesday_closing"
+                                            autocomplete="off">
                                     </mat-form-field>
                                 </div>
 
@@ -176,11 +180,13 @@
                                     <p class="opening__day">Jueves:</p>
                                     <span class="opening__fill"></span>
                                     <mat-form-field class="opening__input" appearance="outline">
-                                        <input matInput type="time" formControlName="thursday_opening" autocomplete="off">
+                                        <input matInput type="time" formControlName="thursday_opening"
+                                            autocomplete="off">
                                     </mat-form-field>
                                     <span class="opening__dash"> - </span>
                                     <mat-form-field class="opening__input" appearance="outline">
-                                        <input matInput type="time" formControlName="thursday_closing" autocomplete="off">
+                                        <input matInput type="time" formControlName="thursday_closing"
+                                            autocomplete="off">
                                     </mat-form-field>
                                 </div>
 
@@ -200,11 +206,13 @@
                                     <p class="opening__day">Sábado:</p>
                                     <span class="opening__fill"></span>
                                     <mat-form-field class="opening__input" appearance="outline">
-                                        <input matInput type="time" formControlName="saturday_opening" autocomplete="off">
+                                        <input matInput type="time" formControlName="saturday_opening"
+                                            autocomplete="off">
                                     </mat-form-field>
                                     <span class="opening__dash"> - </span>
                                     <mat-form-field class="opening__input" appearance="outline">
-                                        <input matInput type="time" formControlName="saturday_closing" autocomplete="off">
+                                        <input matInput type="time" formControlName="saturday_closing"
+                                            autocomplete="off">
                                     </mat-form-field>
                                 </div>
 
@@ -349,7 +357,7 @@
                     </div>
                 </mat-expansion-panel>
 
-                <mat-expansion-panel class="w3-margin-bottom">
+                <!-- <mat-expansion-panel class="w3-margin-bottom">
                     <mat-expansion-panel-header>
                         <mat-panel-title>
                             <h4 class="admin__title">Peso máximo por pedido</h4>
@@ -373,14 +381,13 @@
                     </div>
 
 
-                </mat-expansion-panel>
+                </mat-expansion-panel> -->
 
                 <mat-expansion-panel class="w3-margin-bottom">
                     <mat-expansion-panel-header>
                         <mat-panel-title>
                             <h4 class="admin__title">Tipo de Pagos</h4>
                         </mat-panel-title>
-
                     </mat-expansion-panel-header>
 
                     <div class="admin__container">
@@ -481,52 +488,51 @@
                         <mat-panel-title>
                             <h4 class="admin__title">Categorías</h4>
                         </mat-panel-title>
-
                     </mat-expansion-panel-header>
+
                     <mat-progress-bar *ngIf="loadingCategories$ | async" mode="indeterminate"></mat-progress-bar>
                     <div class="admin__container">
                         <button mat-raised-button color="accent" (click)="createCategory(null,false)">
                             Crear Categoría</button>
-                        <div *ngIf="categories$ |async as images">
+                        <div *ngIf="categories$ |async as categories">
                             <div class="w3-margin-top row-category">
-                                <div *ngFor="let image of categories" class="banner__category border--primary">
-                                    <img [defaultImage]="defaultImage" [lazyLoad]="image.photoURL" [offset]="100"
+                                <div *ngFor="let categorie of categories" class="banner__category border--primary">
+                                    <img [defaultImage]="defaultImage" [lazyLoad]="categorie.photoURL" [offset]="100"
                                         class="banner__image">
                                     <div class="row-category" style="align-items: center; padding-left: 10px;">
-                                        <span style="font-size: 0.8em;"><strong>{{image.name}}</strong></span>
+                                        <span style="font-size: 0.8em;"><strong>{{categorie.name}}</strong></span>
                                         <span class="ms-fill"></span>
-                                        <button mat-icon-button color="primary" (click)="createCategory(image, true)">
+                                        <button mat-icon-button color="primary"
+                                            (click)="createCategory(categorie, true)">
                                             <mat-icon>edit</mat-icon>
                                         </button>
                                         <button mat-icon-button color="primary" style="margin-left: 5px;"
-                                            (click)="deleteCategory(image)">
+                                            (click)="deleteCategory(categorie)">
                                             <mat-icon>delete</mat-icon>
                                         </button>
                                     </div>
-
-
                                 </div>
                             </div>
-                            <div *ngIf="images.length" class="w3-margin-top w3-margin-bottom">
+                            <div *ngIf="categories.length" class="w3-margin-top w3-margin-bottom">
                                 <mat-progress-bar mode='indeterminate' *ngIf="loadingCategories$ | async">
                                 </mat-progress-bar>
                                 <div style="width: 100%;max-width: 500px;">
                                     <div class="row-category" style="justify-content: space-between; padding: 10px 0;">
                                         <span style="font-weight: 700;">Ordenar posición</span>
                                         <button mat-raised-button color="primary"
-                                            [disabled]="loadingCategories$ | async" (click)="savePosition(images)">
+                                            [disabled]="loadingCategories$ | async" (click)="savePosition(categories)">
                                             <span>Guardar</span>
                                         </button>
                                     </div>
                                     <div cdkDropList class="banner__list border--primary"
-                                        (cdkDropListDropped)="drop(images,$event)">
-                                        <mat-card class="banner__box" *ngFor="let image of images" cdkDrag>
+                                        (cdkDropListDropped)="drop(categories,$event)">
+                                        <mat-card class="banner__box" *ngFor="let image of categories" cdkDrag>
                                             {{image['name']}}
                                         </mat-card>
                                     </div>
                                 </div>
                                 <div class="w3-margin-top ms-flex" style="justify-content: space-between;">
-                                    <div *ngFor="let image of images" class="banner__frame">
+                                    <div *ngFor="let image of categories" class="banner__frame">
                                         <img [defaultImage]="defaultImage" [lazyLoad]="image['photoURL']" [offset]="100"
                                             class="category-img">
                                     </div>
@@ -536,6 +542,7 @@
                         </div>
 
                     </div>
+
 
 
                 </mat-expansion-panel>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DatabaseService } from 'src/app/core/services/database.service';
 
 @Component({
   selector: 'app-parent-list',
@@ -8,10 +9,11 @@ import { Component, OnInit } from '@angular/core';
 export class ParentListComponent implements OnInit {
 
   constructor(
-
+    private dbs: DatabaseService
   ) { }
 
   ngOnInit(): void {
+    this.dbs.changeTitle('Lista de productos');
   }
 
 }

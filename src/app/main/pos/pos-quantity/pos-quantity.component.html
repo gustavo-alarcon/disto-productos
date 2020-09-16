@@ -1,0 +1,28 @@
+<div mat-dialog-title style="width: 300px">
+    <div class="header">
+        <span>
+            <!-- <mat-icon style="vertical-align: middle; transform: scale(1.2);">shopping_basket</mat-icon> -->
+            Cantidad
+        </span>
+        <button type="button" mat-button (click)="close()" tabindex="-1">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+</div>
+<mat-divider class="w3-margin-top"></mat-divider>
+
+<div mat-dialog-content class="formFieldRounded w3-margin-top">
+    <p>Asigne una cantidad de compra</p>
+    <mat-form-field appearance="outline" class="w3-block">
+        <mat-label>Cantidad</mat-label>
+        <mat-icon matPrefix>shopping_basket</mat-icon>
+        <input matInput type="tel" placeholder="Cantidad" [formControl]="quantityFormControl" min="0"
+            (keyup.enter)="save()" autocomplete="off">
+    </mat-form-field>
+</div>
+
+<div mat-dialog-actions align="end">
+    <button mat-raised-button class="w3-margin-right w3-text-white" color="warn" type="button"
+        (click)="close()">Cancelar</button>
+    <button mat-raised-button class="w3-margin-right" color="accent" type="button" (click)="save()">OK</button>
+</div>

@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "disto-productos": {
+    "minimarket-boom": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/disto-productos",
+            "outputPath": "dist/minimarket-boom",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -66,18 +66,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "disto-productos:build"
+            "browserTarget": "minimarket-boom:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "disto-productos:build:production"
+              "browserTarget": "minimarket-boom:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "disto-productos:build"
+            "browserTarget": "minimarket-boom:build"
           }
         },
         "test": {
@@ -114,11 +114,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "disto-productos:serve"
+            "devServerTarget": "minimarket-boom:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "disto-productos:serve:production"
+              "devServerTarget": "minimarket-boom:serve:production"
             }
           }
         },
@@ -129,5 +129,5 @@
       }
     }
   },
-  "defaultProject": "disto-productos"
+  "defaultProject": "minimarket-boom"
 }

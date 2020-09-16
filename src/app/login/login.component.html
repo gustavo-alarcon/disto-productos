@@ -1,18 +1,22 @@
 <div class="animated fadeIn delay-4 slower login-parent">
   <div class="login-container">
-    <img style="width:55%; max-width: 240px;" [src]="image">
-    <p class="title__login">
-      COMER QUESO NUNCA FUE TAN DELICIOSO
-    </p>
-    <button routerLink="/main" class="w3-large" style="height:42px;font-family: Karla;" mat-raised-button
-      color="accent">
-      <b>Estás a un click, Cheese Lover!</b>
-    </button>
-    <div style="position: absolute;
-                right: 8px;
-                bottom: 4px;
-                margin: 0">
-      <span style="color: grey;">{{version}}</span>
+    <div class="login-card mat-elevation-z8">
+      <div class="login-image">
+        <img style="width:55%; max-width: 240px; border-radius: 10px; margin: auto;" [src]="image">
+      </div>
+      <p class="title__login">
+        Todo lo que buscas en un solo lugar
+      </p>
+      <button routerLink="/main" class="w3-large" style="height:42px;font-family: Karla; margin-bottom: 2em;" mat-raised-button
+        color="accent">
+        <b>Estás a un click Boom lover!</b>
+      </button>
+      <div style="position: absolute;
+                  right: 8px;
+                  bottom: 4px;
+                  margin: 0">
+        <span style="color: grey;">{{version}}</span>
+      </div>
     </div>
   </div>
 </div>

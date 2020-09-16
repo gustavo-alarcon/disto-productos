@@ -1,0 +1,67 @@
+<div class="w3-container">
+    <!-- Actions -->
+    <div class="w3-margin toolbar formFieldRounded">
+        <!-- Select item's type -->
+
+
+        <mat-form-field color="primary" class="content w3-small toolbar_item w3-block" appearance="outline">
+            <mat-label>Buscar/Escanear</mat-label>
+            <mat-icon matPrefix class="w3-margin-right">search</mat-icon>
+            <input matInput type="text" [formControl]="itemsFilterForm" placeholder="Escanear código o escribir nombre"
+                autocomplete="off" [matAutocomplete]="matCode" autofocus>
+            <mat-autocomplete #matCode="matAutocomplete" autoActiveFirstOption [displayWith]="showOption">
+                <mat-option *ngFor="let option of filteredProduct$ | async" [value]="option">
+                    {{option.description}} | {{option.sku}}
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="productsObservable$ | async; else loading">
+
+        <ng-container *ngIf="filteredProduct$ | async as product">
+            <ng-container *ngIf="itemsFilterForm.value">
+                <div class="entry-container formFieldRounded mat-elevation-z2">
+                    <div class="actions-container">
+                        <span class="entry-title">{{itemsFilterForm.value.description }} <span style="color: #909090">|
+                                {{itemsFilterForm.value.sku}}</span></span>
+                        <span class="fill"></span>
+                        <span class="entry-stock">Stock: {{product[0]?.realStock | number : '2.'}} </span>
+                    </div>
+
+
+                    <mat-form-field color="primary" class="content w3-small toolbar_item w3-block" appearance="outline">
+                        <mat-label>Cantidad</mat-label>
+                        <mat-icon matPrefix class="w3-margin-right">widgets</mat-icon>
+                        <input matInput type="number" [formControl]="quantity" placeholder="Cantidad" autocomplete="off">
+                    </mat-form-field>
+
+                    <div class="actions-container">
+                        <span class="fill"></span>
+                        <button mat-raised-button color="accent" class="w3-right" (click)="save()"
+                            [disabled]="!quantity.value || quantity.value <= 0 || !itemsFilterForm.value"> Guardar</button>
+                    </div>
+                    <mat-progress-bar class="w3-margin-top" mode="indeterminate" *ngIf="loading$ | async"></mat-progress-bar>
+
+                </div>
+            </ng-container>
+        </ng-container>
+    </div>
+
+</div>
+
+<ng-template #default>
+    <div class="w3-container w3-center w3-margin-top w3-margin-bottom">
+        <!-- <img [src]="noResultImage" alt="no data" style="width: 100%; max-width: 300px;"> -->
+        <p>Sin Resultados</p>
+    </div>
+</ng-template>
+
+<ng-template #loading>
+    <div class="formFieldRounded" style="display: flex; align-items: center; flex-direction: column">
+        <mat-spinner></mat-spinner>
+        <p>Cargando productos</p>
+    </div>
+</ng-template>
