@@ -6,7 +6,7 @@ import { map, startWith, filter, tap } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { DatabaseService } from 'src/app/core/services/database.service';
 import { Observable, combineLatest } from 'rxjs';
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Product } from 'src/app/core/models/product.model';
 import { LoginDialogComponent } from '../login-dialog/login-dialog.component';
 @Component({
@@ -29,7 +29,7 @@ export class ProductsComponent implements OnInit {
 
   defaultImage = "../../../assets/images/default-image.jpg";
 
-  user:User = null
+  user: User = null
 
 
   p: number = 1;
@@ -89,30 +89,20 @@ export class ProductsComponent implements OnInit {
 
         let any = [].concat(packPublish, publish)
 
-        if (this.dbs.order.length == 0 && localStorage.getItem('order')) {
-
-          let number = Number(localStorage.getItem('length'))
-          for (let index = 0; index < number; index++) {
-            if (localStorage.getItem('order' + index + 'chosen')) {
-              let chosen = localStorage.getItem('order' + index + 'chosen').split(',')
-              this.dbs.order[index] = {
-                product: packPublish.filter(el => el.id == localStorage.getItem('order' + index))[0],
-                quantity: Number(localStorage.getItem('order' + index + 'q')),
-                chosenOptions: products.filter(el => chosen.includes(el.id))
-              }
-            } else {
-              this.dbs.order[index] = {
-                product: products.filter(el => el.id == localStorage.getItem('order' + index))[0],
-                quantity: Number(localStorage.getItem('order' + index + 'q'))
-              }
-            }
-          }
-          this.dbs.view.next(2)
-          this.dbs.total = this.dbs.order.map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
-          this.dbs.sum.next(this.dbs.total)
-        }
 
         return any.filter(el => search ? el.description.toLowerCase().includes(search) : true)
+      }),
+      tap(res => {
+        if (this.dbs.order.length == 0 && localStorage.getItem('order') && localStorage.getItem('dbsorder')) {
+          let guardado = localStorage.getItem('dbsorder')
+          this.dbs.order = JSON.parse(guardado)
+          if (this.dbs.order.length) {
+            this.dbs.view.next(2)
+            this.dbs.total = this.dbs.order.map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
+            this.dbs.sum.next(this.dbs.total)
+          }
+
+        }
       })
     )
 
@@ -164,23 +154,7 @@ export class ProductsComponent implements OnInit {
     this.dialog.open(LoginDialogComponent)
     localStorage.setItem('order', 'true')
     localStorage.setItem('length', this.dbs.order.length.toString())
-    this.dbs.order.forEach((el, i) => {
-      localStorage.setItem('order' + i, el.product.id)
-      localStorage.setItem('order' + i + 'q', el.quantity.toString())
-      if (el['chosenOptions']) {
-        let chosen = ''
-        let limit = el['chosenOptions'].length
-        el['chosenOptions'].forEach((ol, e) => {
-          if (e == limit - 1) {
-            chosen += ol.id
-          } else {
-            chosen += ol.id + ','
-          }
-        })
-        localStorage.setItem('order' + i + 'chosen', chosen)
-
-      }
-    })
+    localStorage.setItem('dbsorder', JSON.stringify(this.dbs.order));
   }
 
 
@@ -214,6 +188,9 @@ export class ProductsComponent implements OnInit {
   finish() {
     this.dbs.view.next(3)
     this.p = 1
+    localStorage.removeItem('dbsorder')
+    localStorage.removeItem('order')
+    localStorage.removeItem('length')
     localStorage.clear()
   }
 

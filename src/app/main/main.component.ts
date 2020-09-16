@@ -32,12 +32,13 @@ export class MainComponent implements OnInit {
     this.openedMenu = !this.openedMenu;
   }
 
-  login(){
+  login() {
     this.dialog.open(LoginDialogComponent)
   }
 
-  logout(){
+  logout() {
     this.auth.logout();
+    localStorage.clear()
   }
 
 }
