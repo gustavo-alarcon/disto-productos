@@ -18,6 +18,8 @@ import { ProductCreateEditComponent } from '../product-create-edit/product-creat
 import { ProductEditPromoComponent } from '../product-edit-promo/product-edit-promo.component';
 import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
 import { Category } from 'src/app/core/models/category.model';
+import { User } from 'src/app/core/models/user.model';
+import { ProductTransferMermaComponent } from '../product-transfer-merma/product-transfer-merma.component';
 
 
 @Component({
@@ -288,6 +290,54 @@ export class ProductsListComponent implements OnInit {
         switch (res) {
           case true:
             this.snackBar.open('El nuevo producto fue creado satisfactoriamente', 'Aceptar', { duration: 5000 });
+            break;
+          case false:
+            this.snackBar.open('Ocurrió un error. Por favor, vuelva a intentarlo', 'Aceptar', { duration: 5000 });
+            break;
+          default:
+            break;
+        }
+      })
+    }
+  }
+
+  onTransferMerma(toMerma: boolean, product: Product, user: User){
+    let dialogRef: MatDialogRef<ProductTransferMermaComponent>;
+
+    if(toMerma){
+      dialogRef = this.dialog.open(ProductTransferMermaComponent, {
+        width: '350px',
+        data: {
+          data: { ...product },
+          toMerma,
+          user
+        }
+      });
+      dialogRef.afterClosed().subscribe(res => {
+        switch (res) {
+          case true:
+            this.snackBar.open('El producto fue editado satisfactoriamente', 'Aceptar', { duration: 5000 });
+            break;
+          case false:
+            this.snackBar.open('Ocurrió un error. Por favor, vuelva a intentarlo', 'Aceptar', { duration: 5000 });
+            break;
+          default:
+            break;
+        }
+      })
+    } else {
+      dialogRef = this.dialog.open(ProductTransferMermaComponent, {
+        width: '350px',
+        data: {
+          data: { ...product },
+          toMerma,
+          user
+        }
+      });
+      dialogRef.afterClosed().subscribe(res => {
+        switch (res) {
+          case true:
+            this.snackBar.open('El producto fue editado satisfactoriamente', 'Aceptar', { duration: 5000 });
             break;
           case false:
             this.snackBar.open('Ocurrió un error. Por favor, vuelva a intentarlo', 'Aceptar', { duration: 5000 });

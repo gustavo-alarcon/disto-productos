@@ -37,6 +37,7 @@ import { PackagesListComponent } from './packages-list/packages-list.component';
 import { ProductsListComponent } from './products-list/products-list.component';
 import { ParentListComponent } from './parent-list.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ProductTransferMermaComponent } from './product-transfer-merma/product-transfer-merma.component';
 
 
 
@@ -51,7 +52,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     ProductConfigUnitsComponent,
     PackagesCreateEditComponent,
     PackagesConfigUnitsComponent,
-    PackagesListComponent
+    PackagesListComponent,
+    ProductTransferMermaComponent
   ],
   imports: [
     CommonModule,
@@ -84,6 +86,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     ProductEditPromoComponent,
     PackagesCreateEditComponent,
     PackagesConfigUnitsComponent,
+    ProductTransferMermaComponent,
     DatabaseService
   ]
 })

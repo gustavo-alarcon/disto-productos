@@ -614,11 +614,17 @@ export class SalesDetailComponent implements OnInit {
           if (newStatus == this.saleStatusOptions.confirmedRequest) {
             sale.confirmedRequestData = {
               assignedDate: this.confirmedRequestForm.get('assignedDate').value,
-              requestedProductsId: sale.requestedProducts.map(el => el.product.id),
+              requestedProductsId: [...sale.requestedProducts.map(el => el.product.id)], 
               observation: this.confirmedRequestForm.get('observation').value,
               confirmedBy: user,
               confirmedAt: date,
             }
+            //25/09/2020
+            sale.requestedProducts.filter(el => !!el.product.package).map(el2 => el2.chosenOptions
+              .map(el3 => el3.id))
+              .forEach(el4 => {
+                sale.confirmedRequestData.requestedProductsId.push(...el4)
+              })
           } else if (newStatus == this.saleStatusOptions.finished) {
             sale.finishedData = {
               finishedAt: date,

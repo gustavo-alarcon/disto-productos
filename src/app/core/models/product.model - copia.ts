@@ -31,12 +31,3 @@ interface PromoData {
   quantity: number;
   promoPrice: number;
 }
-
-export interface MermaTransfer {
-  id: string;
-  productId: string;
-  toMerma: boolean;         //From stock toMerma or from merma to stock
-  quantity: number;
-  date: Date;
-  user: User;
-}

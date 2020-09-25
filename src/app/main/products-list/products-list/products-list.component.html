@@ -221,42 +221,50 @@
             <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
               class="w3-center w3-padding w3-border-left w3-border-lightgrey">Acciones</th>
             <td style="padding:0px 24px" *matCellDef="let raw" class="w3-border-left w3-border-lightgrey">
-              <mat-menu #rawMenu="matMenu">
-                <button class="w3-small" mat-menu-item (click)="onPromo(raw)">
-                  <mat-icon>local_offer</mat-icon> Promoción
-                </button>
-                <button class="w3-small" *ngIf="raw?.published else publish" mat-menu-item
-                  (click)="onPublish(raw, false)">
-                  <mat-icon>visibility_off</mat-icon> Ocultar
-                </button>
-                <ng-template #publish>
-                  <button class="w3-small" mat-menu-item (click)="onPublish(raw, true)">
-                    <mat-icon>visibility</mat-icon> Publicar
-                  </button>
-                </ng-template>
-                <div [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
-                  <button class="w3-small" mat-menu-item (click)="increasePriority(raw)" [disabled]="!categorySelected">
-                    <mat-icon>add</mat-icon> Prioridad
-                  </button>
-                </div>
-                <div [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
-                  <button class="w3-small" mat-menu-item (click)="decreasePriority(raw)" [disabled]="!categorySelected"
-                    [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
-                    <mat-icon>remove</mat-icon> Prioridad
-                  </button>
-                </div>
-                <button class="w3-small" mat-menu-item (click)="onCreateEditItem(true, raw)">
-                  <mat-icon>edit</mat-icon> Editar
-                </button>
-                <button class="w3-small" mat-menu-item (click)="onDeleteItem(raw)">
-                  <mat-icon>delete</mat-icon> Borrar
-                </button>
-              </mat-menu>
               <ng-container *ngIf="(auth.user$ | async) as user">
+                <mat-menu #rawMenu="matMenu">
+                  <button class="w3-small" mat-menu-item (click)="onPromo(raw)">
+                    <mat-icon>local_offer</mat-icon> Promoción
+                  </button>
+                  <button class="w3-small" *ngIf="raw?.published else publish" mat-menu-item
+                    (click)="onPublish(raw, false)">
+                    <mat-icon>visibility_off</mat-icon> Ocultar
+                  </button>
+                  <ng-template #publish>
+                    <button class="w3-small" mat-menu-item (click)="onPublish(raw, true)">
+                      <mat-icon>visibility</mat-icon> Publicar
+                    </button>
+                  </ng-template>
+                  <div [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
+                    <button class="w3-small" mat-menu-item (click)="increasePriority(raw)" [disabled]="!categorySelected">
+                      <mat-icon>add</mat-icon> Prioridad
+                    </button>
+                  </div>
+                  <div [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
+                    <button class="w3-small" mat-menu-item (click)="decreasePriority(raw)" [disabled]="!categorySelected"
+                      [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
+                      <mat-icon>remove</mat-icon> Prioridad
+                    </button>
+                  </div>
+                  <button class="w3-small" mat-menu-item (click)="onTransferMerma(true, raw, user)">
+                    <mat-icon>redo</mat-icon> Transferir a merma
+                  </button>
+                  <button class="w3-small" mat-menu-item (click)="onTransferMerma(false, raw, user)">
+                    <mat-icon>undo</mat-icon> Transferir desde merma
+                  </button>
+                  <button class="w3-small" mat-menu-item (click)="onCreateEditItem(true, raw)">
+                    <mat-icon>edit</mat-icon> Editar
+                  </button>
+                  <button class="w3-small" mat-menu-item (click)="onDeleteItem(raw)">
+                    <mat-icon>delete</mat-icon> Borrar
+                  </button>
+                </mat-menu>
+
                 <button mat-icon-button [matMenuTriggerFor]="rawMenu" [disabled]="user.seller || user.accountant">
                   <mat-icon>more_vert</mat-icon>
                 </button>
               </ng-container>
+
             </td>
           </ng-container>
 
