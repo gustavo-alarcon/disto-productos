@@ -5,7 +5,7 @@ export interface Product {
   package?: false;
   id: string;
   description: string;
-  additionalDescription?: string;
+  additionalDescription: string;
   sku: string;
   category: string;   
   price: number;      //Should this price be with IGV?
@@ -21,7 +21,6 @@ export interface Product {
   promoData?: PromoData;
   published?: boolean;
   priority?: number;
-  saleType?: string;
   createdAt: Date;
   createdBy: User;
   editedAt: Date;
@@ -31,13 +30,4 @@ export interface Product {
 interface PromoData {
   quantity: number;
   promoPrice: number;
-}
-
-export interface MermaTransfer {
-  id: string;
-  productId: string;
-  toMerma: boolean;         //From stock toMerma or from merma to stock
-  quantity: number;
-  date: Date;
-  user: User;
 }

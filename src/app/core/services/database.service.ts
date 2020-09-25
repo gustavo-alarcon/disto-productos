@@ -1,7 +1,7 @@
 import { Sale, saleStatusOptions } from './../models/sale.model';
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, DocumentReference, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { Product } from '../models/product.model';
+import { MermaTransfer, Product } from '../models/product.model';
 import { shareReplay, map, takeLast, switchMap, take, mapTo, tap } from 'rxjs/operators';
 import { GeneralConfig } from '../models/generalConfig.model';
 import { Observable, concat, of, interval, BehaviorSubject, Subject } from 'rxjs';
@@ -265,6 +265,44 @@ export class DatabaseService {
       batch.set(productRef, productData, { merge: true });
       return of(batch);
     }
+  }
+
+  transferStock(toMerma: boolean, quantity: number, product: Product, user: User): firebase.firestore.WriteBatch {
+    let productRef: DocumentReference = this.afs.firestore.collection(this.productsListRef).doc(product.id);
+    let transferHistoryRef: DocumentReference = 
+      this.afs.firestore.collection(this.productsListRef+`/${product.id}/mermaTransfer`).doc();
+
+    let productData: {realStock: firebase.firestore.FieldValue, mermaStock: firebase.firestore.FieldValue};
+    let mermaTransferData: MermaTransfer  = {
+      date: new Date(),
+      id: transferHistoryRef.id,
+      productId: product.id,
+      quantity,
+      toMerma,
+      user: user
+    }
+    
+    let batch = this.afs.firestore.batch();
+
+    //To Merma
+    if (toMerma) {
+      productData = {
+        realStock: firebase.firestore.FieldValue.increment((-1)*(quantity)), 
+        mermaStock: firebase.firestore.FieldValue.increment(quantity)
+      }
+    }
+    //To Stock
+    else {
+      productData = {
+        realStock: firebase.firestore.FieldValue.increment(quantity), 
+        mermaStock: firebase.firestore.FieldValue.increment((-1)*(quantity))
+      }
+    }
+
+    batch.update(productRef, productData);
+    batch.set(transferHistoryRef, mermaTransferData);
+
+    return batch;
   }
 
   publishProduct(published: boolean, product: Product, user: User): firebase.firestore.WriteBatch {

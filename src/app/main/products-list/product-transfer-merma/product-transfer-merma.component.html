@@ -1,0 +1,44 @@
+<div mat-dialog-title>
+  <h2 class="ms-font-rubik ms-color-2b" style="font-size:1.2em">
+      <mat-icon style="vertical-align:middle" (click)="deb()">add_circle</mat-icon>
+      {{data.toMerma?'A merma':'Desde merma'}}
+  </h2>
+  <mat-divider></mat-divider>
+</div>
+<mat-dialog-content>
+  <form [formGroup]="mermaForm">
+
+    <!-- Transferir a merma -->
+    <mat-form-field *ngIf="mermaForm.get('toMerma').valid" style="margin-bottom: 8px" appearance="outline">
+        <mat-label>Transferir a merma (Stock: {{data.data.realStock}})</mat-label>
+        <input autocomplete="off"
+          [formControl]="toMerma" type="number" matInput>
+        <mat-error>
+            <span *ngIf="mermaForm.get('toMerma').errors?.required">Campo requerido</span>
+            <span *ngIf="mermaForm.get('toMerma').errors?.min">La cantidad no puede ser menor a 0.</span>
+            <span *ngIf="mermaForm.get('toMerma').errors?.min">La cantidad no puede ser mayor a {{data.data.realStock}}.</span>
+        </mat-error>
+    </mat-form-field>
+
+    <!-- Transferir desde merma -->
+    <mat-form-field *ngIf="mermaForm.get('fromMerma').valid" style="margin-bottom: 8px" appearance="outline">
+      <mat-label>Transferir desde merma</mat-label>
+      <input autocomplete="off"
+        [formControl]="fromMerma" type="number" matInput>
+      <mat-error>
+          <span *ngIf="mermaForm.get('fromMerma').errors?.required">Campo requerido</span>
+          <span *ngIf="mermaForm.get('fromMerma').errors?.min">La cantidad no puede ser menor a 0.</span>
+          <span *ngIf="mermaForm.get('fromMerma').errors?.min">La cantidad no puede ser mayor a {{data.data.mermaStock}}.</span>
+      </mat-error>
+    </mat-form-field>
+
+  </form>
+
+  <mat-divider></mat-divider>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button type="button" class="w3-margin-right" mat-dialog-close>Cancelar</button>
+  <button mat-raised-button color="accent" (click)="onSubmitForm()" type="button"
+      [disabled]="!mermaForm.valid">Transferir</button>
+</mat-dialog-actions>

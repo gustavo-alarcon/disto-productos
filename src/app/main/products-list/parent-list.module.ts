@@ -40,6 +40,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ProductEntryComponent } from './product-entry/product-entry.component';
 import { MatRadioModule } from '@angular/material/radio';
+import { ProductTransferMermaComponent } from './product-transfer-merma/product-transfer-merma.component';
 
 
 
@@ -56,6 +57,7 @@ import { MatRadioModule } from '@angular/material/radio';
     PackagesConfigUnitsComponent,
     PackagesListComponent,
     ProductEntryComponent
+    ProductTransferMermaComponent
   ],
   imports: [
     CommonModule,
@@ -90,6 +92,7 @@ import { MatRadioModule } from '@angular/material/radio';
     ProductEditPromoComponent,
     PackagesCreateEditComponent,
     PackagesConfigUnitsComponent,
+    ProductTransferMermaComponent,
     DatabaseService
   ]
 })
