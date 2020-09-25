@@ -56,7 +56,7 @@ import { ProductTransferMermaComponent } from './product-transfer-merma/product-
     PackagesCreateEditComponent,
     PackagesConfigUnitsComponent,
     PackagesListComponent,
-    ProductEntryComponent
+    ProductEntryComponent,
     ProductTransferMermaComponent
   ],
   imports: [
