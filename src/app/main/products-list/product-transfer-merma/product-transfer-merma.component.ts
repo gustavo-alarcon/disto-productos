@@ -39,9 +39,9 @@ export class ProductTransferMermaComponent implements OnInit {
   initForm() {
     this.mermaForm = this.fb.group({
       toMerma: [{disabled: !this.data.toMerma, value:0}, [
-        Validators.required, Validators.min(0), Validators.max(this.data.data.realStock)]],
+        Validators.required, Validators.min(1), Validators.max(this.data.data.realStock)]],
       fromMerma: [{disabled: this.data.toMerma, value:0}, [
-        Validators.required, Validators.min(0), Validators.max(this.data.data.mermaStock)]],
+        Validators.required, Validators.min(1), Validators.max(this.data.data.mermaStock)]],
     })
   }
 
