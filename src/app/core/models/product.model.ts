@@ -39,4 +39,5 @@ export interface MermaTransfer {
   quantity: number;
   date: Date;
   user: User;
+  observations: string;
 }

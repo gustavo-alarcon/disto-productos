@@ -20,14 +20,15 @@ import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmat
 import { Category } from 'src/app/core/models/category.model';
 import { User } from 'src/app/core/models/user.model';
 import { ProductTransferMermaComponent } from '../product-transfer-merma/product-transfer-merma.component';
+import { ProductMermaHistoryComponent } from '../product-merma-history/product-merma-history.component';
 
 
 @Component({
-  selector: 'app-products-list',
-  templateUrl: './products-list.component.html',
-  styleUrls: ['./products-list.component.scss']
+  selector: 'app-products-merma-list',
+  templateUrl: './products-merma-list.component.html',
+  styleUrls: ['./products-merma-list.component.scss']
 })
-export class ProductsListComponent implements OnInit {
+export class ProductsMermaListComponent implements OnInit {
 
   //Forms
   categoryForm: FormControl;
@@ -38,8 +39,8 @@ export class ProductsListComponent implements OnInit {
   productsTableDataSource = new MatTableDataSource<Product>();
   productsDisplayedColumns: string[] = [
     'index', 'photoURL', 'description', 'sku', 'category', 'price',
-    'unitDescription', 'unitAbbreviation', 'unitWeight', 'sellMinimum', 'alertMinimum',
-    'realStock', /*'mermaStock', 'virtualStock', */'published', 'actions'
+    'unitDescription', 'unitAbbreviation', 'unitWeight', /*'sellMinimum', 'alertMinimum',*/
+    /*'realStock',*/ 'mermaStock', /*'virtualStock', */'published', 'actions'
   ]
 
   productsObservable$: Observable<Product[]>
@@ -347,6 +348,15 @@ export class ProductsListComponent implements OnInit {
         }
       })
     }
+  }
+
+  onTransferHistoryMerma(product: Product){
+    let dialogRef: MatDialogRef<ProductMermaHistoryComponent>;
+    dialogRef = this.dialog.open(ProductMermaHistoryComponent, {
+      data: {
+        product: { ...product },
+      }
+    });
   }
 
   downloadXls(): void {
