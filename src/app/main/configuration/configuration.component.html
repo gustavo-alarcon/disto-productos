@@ -539,6 +539,55 @@
 
 
                 </mat-expansion-panel>
+
+                <mat-expansion-panel class="w3-margin-bottom">
+                  <mat-expansion-panel-header>
+                      <mat-panel-title>
+                          <h4 class="admin__title">Proveedores</h4>
+                      </mat-panel-title>
+
+                  </mat-expansion-panel-header>
+                  <mat-progress-bar *ngIf="loadingProvider$ | async" mode="indeterminate"></mat-progress-bar>
+                  <div class="admin__container">
+                    <mat-progress-bar *ngIf="loadingPayment$ | async" mode="indeterminate"></mat-progress-bar>
+                      <button mat-raised-button color="accent" (click)="createProvider(null,false)">
+                          Agregar Proveedor</button>
+                          <div *ngIf="providers$ | async as providers" class="w3-margin-top">
+                            <ul class="admin__list" style="padding-inline-start: 0px; max-width: 600px;">
+                              <li *ngFor="let element of providers| paginate: { itemsPerPage: 5, currentPage: p4 }"
+                                  class="admin__item">
+                                  <div style="width: 100%;" class="ms-flex ms-flex--center">
+                                      <div style="width: 60%;">
+                                        <div style="font-weight: 900;">{{element['name'] | titlecase}}</div>
+                                        <div style="font-size:0.9em;">{{element['ruc'] }}</div>
+                                      </div>
+                                      <span class="ms-fill"></span>
+                                      <div>
+                                        <button mat-icon-button (click)="createProvider(element, true)"
+                                            [disabled]="(loadingPayment$ | async)">
+                                            <mat-icon>edit</mat-icon>
+                                        </button>
+                                        <button mat-icon-button (click)="deleteProvider(element)"
+                                            [disabled]="(loadingPayment$ | async)">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
+                                    </div>
+                                  </div>
+
+
+                              </li>
+                          </ul>
+                          <div style="display: flex; width: 100%; justify-content: flex-end;"
+                              *ngIf="providers.length > 5">
+                              <pagination-controls (pageChange)="p4 = $event" previousLabel="" nextLabel=""
+                                  maxSize="6">
+                              </pagination-controls>
+                          </div>
+                        </div>
+                  </div>
+
+
+              </mat-expansion-panel>
             </div>
 
         </div>

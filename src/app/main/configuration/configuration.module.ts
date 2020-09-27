@@ -28,6 +28,7 @@ import { AddUserComponent } from './add-user/add-user.component';
 import { CreateCategoryComponent } from './create-category/create-category.component';
 import { LazyLoadImageModule } from 'ng-lazyload-image';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { ProviderDialogComponent } from './provider-dialog/provider-dialog.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     CreatePayComponent,
     CreateUserComponent,
     AddUserComponent,
-    CreateCategoryComponent
+    CreateCategoryComponent,
+    ProviderDialogComponent
   ],
   imports: [
     CommonModule,
@@ -66,7 +68,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
   ],
   entryComponents: [
     CreatePayComponent,
-    CreateUserComponent
+    CreateUserComponent,
+    ProviderDialogComponent
   ]
 })
 export class ConfigurationModule { }

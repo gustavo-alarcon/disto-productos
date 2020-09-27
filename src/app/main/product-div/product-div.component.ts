@@ -32,11 +32,11 @@ export class ProductDivComponent implements OnInit {
   }
 
   add(item) {
-    
+    /*
     if (!this.dbs.isOpen && !this.dbs.isAdmin) {
       this.dialog.open(StoreClosedDialogComponent);
       return;
-    }
+    }*/
 
     if (this.package) {
       let newpackage = {

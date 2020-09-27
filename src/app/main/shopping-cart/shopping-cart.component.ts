@@ -11,13 +11,13 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class ShoppingCartComponent implements OnInit {
 
-  @Input() delivery: number = 6
+  @Input() delivery: number = 0
   @Input() order: {
     product: Product,
     quantity: number
   }[] = []
   @Input() modified: boolean
-
+  @Input() view: boolean
 
   delivery$: Observable<number>
   total: number = 0
@@ -28,7 +28,7 @@ export class ShoppingCartComponent implements OnInit {
 
   ngOnInit(): void {
     this.total = this.order.map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
-    
+
   }
 
   getUnit(quantity: number, unit: Unit) {
@@ -65,7 +65,7 @@ export class ShoppingCartComponent implements OnInit {
   }
 
   delete(ind) {
-   
+
     this.order.splice(ind, 1)
     this.total = this.order.map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
     this.dbs.sum.next(this.total)

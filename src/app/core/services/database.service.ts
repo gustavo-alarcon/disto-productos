@@ -38,7 +38,7 @@ export class DatabaseService {
 
   // public opening = new BehaviorSubject<Array<{ opening: string, closing: string }>>([]);
   public opening$: Observable<Array<{ opening: string, closing: string }>>;
-  
+
   constructor(
     private afs: AngularFirestore,
     private storage: AngularFireStorage,
@@ -127,6 +127,12 @@ export class DatabaseService {
   getCategoriesDoc(): Observable<any> {
     return this.generalConfigDoc.get().pipe(map((snap) => {
       return snap.data()['categories']
+    }));
+  }
+
+  getProvidersDoc(): Observable<any> {
+    return this.generalConfigDoc.get().pipe(map((snap) => {
+      return snap.data()['providers']
     }));
   }
 
@@ -249,7 +255,7 @@ export class DatabaseService {
 
   transferStock(toMerma: boolean, quantity: number, product: Product, user: User): firebase.firestore.WriteBatch {
     let productRef: DocumentReference = this.afs.firestore.collection(this.productsListRef).doc(product.id);
-    let transferHistoryRef: DocumentReference = 
+    let transferHistoryRef: DocumentReference =
       this.afs.firestore.collection(this.productsListRef+`/${product.id}/mermaTransfer`).doc();
 
     let productData: {realStock: firebase.firestore.FieldValue, mermaStock: firebase.firestore.FieldValue};
@@ -261,20 +267,20 @@ export class DatabaseService {
       toMerma,
       user: user
     }
-    
+
     let batch = this.afs.firestore.batch();
 
     //To Merma
     if (toMerma) {
       productData = {
-        realStock: firebase.firestore.FieldValue.increment((-1)*(quantity)), 
+        realStock: firebase.firestore.FieldValue.increment((-1)*(quantity)),
         mermaStock: firebase.firestore.FieldValue.increment(quantity)
       }
     }
     //To Stock
     else {
       productData = {
-        realStock: firebase.firestore.FieldValue.increment(quantity), 
+        realStock: firebase.firestore.FieldValue.increment(quantity),
         mermaStock: firebase.firestore.FieldValue.increment((-1)*(quantity))
       }
     }
@@ -293,7 +299,7 @@ export class DatabaseService {
   }
 
   increasePriority(product: Product | Package): firebase.firestore.WriteBatch {
-    // works with both products and packages 
+    // works with both products and packages
     let productRef: DocumentReference = product.package ? this.afs.firestore.collection(this.packagesListRef).doc(product.id) : this.afs.firestore.collection(this.productsListRef).doc(product.id);
     let batch = this.afs.firestore.batch();
     batch.update(productRef, { priority: product.priority })

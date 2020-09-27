@@ -14,6 +14,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { AddUserComponent } from './add-user/add-user.component';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ProviderDialogComponent } from './provider-dialog/provider-dialog.component';
 
 @Component({
   selector: 'app-configuration',
@@ -86,10 +87,16 @@ export class ConfigurationComponent implements OnInit {
   indCategory: number = 1
   defaultImage = "../../../assets/images/Disto_Logo1.png";
 
+  /*Payments*/
+  providers$: Observable<object[]>
+
+  loadingProvider = new BehaviorSubject<boolean>(true);
+  loadingProvider$ = this.loadingProvider.asObservable();
 
   p1: number = 1;
   p2: number = 1;
   p3: number = 1;
+  p4: number = 1;
 
   openingFormGroup: FormGroup;
   opening$: Observable<{ opening: string, closing: string }[]>
@@ -192,7 +199,6 @@ export class ConfigurationComponent implements OnInit {
           this.dataSourcePay.data = res
           this.loadingPayment.next(false)
         }
-
       })
     )
 
@@ -215,6 +221,14 @@ export class ConfigurationComponent implements OnInit {
           this.indCategory = res.length + 1
         }
         this.loadingCategories.next(false)
+      })
+    )
+
+    //Providers
+    this.providers$ = this.dbs.getGeneralConfigDoc().pipe(
+      map(el => el['providers']),
+      tap(res => {
+        this.loadingProvider.next(false)
       })
     )
 
@@ -441,6 +455,43 @@ export class ConfigurationComponent implements OnInit {
     })
   }
 
+  //Providers
+  createProvider(data, isedit) {
+    this.dialog.open(ProviderDialogComponent, {
+      data: {
+        item: data,
+        edit: isedit
+      }
+    })
+  }
+
+  deleteProvider(data) {
+    this.loadingProvider.next(true)
+    const payRef = this.af.firestore.collection(`/db/distoProductos/config/`).doc('generalConfig');
+    return this.af.firestore.runTransaction((transaction) => {
+      return transaction.get(payRef).then((doc) => {
+        if (!doc.exists) {
+          transaction.set(payRef, { providers: [] });
+        }
+
+        const providers = doc.data().providers ? doc.data().providers : [];
+
+        let ind = providers.findIndex(el => el.name == data.name)
+        providers.splice(ind, 1)
+        transaction.update(payRef, { providers: providers });
+
+      });
+
+    }).then(() => {
+      this.loadingPayment.next(false)
+      this.snackBar.open("Elemento eliminado", "Cerrar", {
+        duration: 4000
+      })
+    }).catch(function (error) {
+      console.log("Transaction failed: ", error);
+    });
+
+  }
   saveOpening(): void {
 
     let openingArray =

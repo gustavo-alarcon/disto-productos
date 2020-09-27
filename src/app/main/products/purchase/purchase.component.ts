@@ -37,7 +37,7 @@ export class PurchaseComponent implements OnInit {
 
   name: boolean = false
   total: number = 0
-  delivery: number = 6
+  delivery: number = 0
 
   firstFormGroup: FormGroup;
   secondFormGroup: FormGroup;
@@ -132,7 +132,7 @@ export class PurchaseComponent implements OnInit {
       photoURL: [null]
     });
 
-    
+
 
     this.delivery = this.dbs.delivery
     this.total = [...this.dbs.order].map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
@@ -141,7 +141,7 @@ export class PurchaseComponent implements OnInit {
       tap(res=>{
        this.user = res
         this.getData()
-        
+
       })
     )
 

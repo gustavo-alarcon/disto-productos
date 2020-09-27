@@ -6,9 +6,10 @@ import { map, startWith, filter, tap } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { DatabaseService } from 'src/app/core/services/database.service';
 import { Observable, combineLatest } from 'rxjs';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { Product } from 'src/app/core/models/product.model';
 import { LoginDialogComponent } from '../login-dialog/login-dialog.component';
+import { ScrollDispatcher } from '@angular/cdk/overlay';
 @Component({
   selector: 'app-products',
   templateUrl: './products.component.html',
@@ -23,6 +24,7 @@ export class ProductsComponent implements OnInit {
 
   name: string = ''
   maxWeight: number = 3
+  districts: Array<any>
   total$: Observable<number>
 
   searchForm: FormControl = new FormControl('')
@@ -30,20 +32,34 @@ export class ProductsComponent implements OnInit {
   defaultImage = "../../../assets/images/default-image.jpg";
 
   user: User = null
-
+  scroll$: Observable<any>
 
   p: number = 1;
+
+  @ViewChild("scroll", { static: false }) scrollbar: ElementRef;
+
   constructor(
     public dbs: DatabaseService,
     private dialog: MatDialog,
     public auth: AuthService,
     private router: Router,
+    public scroll: ScrollDispatcher,
+    private renderer: Renderer2,
     private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
-    this.dbs.delivery = 6
-
+    this.dbs.delivery = 0
+    this.scroll$ = this.scroll.scrolled().pipe(
+      tap(data => {
+        const scrollTop = data.getElementRef().nativeElement.scrollTop || 0;
+        if (scrollTop >= 120) {
+          this.renderer.addClass(this.scrollbar.nativeElement, 'shadow')
+        } else {
+          this.renderer.removeClass(this.scrollbar.nativeElement, 'shadow')
+        }
+      })
+    )
     this.categoryList$ = combineLatest(
       this.route.fragment, this.dbs.getProductsListCategoriesValueChanges()).pipe(
         map(([route, categories]) => {
@@ -112,6 +128,7 @@ export class ProductsComponent implements OnInit {
     ).pipe(
       map(([user, confi]) => {
         this.maxWeight = confi['maxWeight']
+        this.districts = confi['districts']
         if (user) {
           return user
         } else {
@@ -129,9 +146,10 @@ export class ProductsComponent implements OnInit {
 
           if (res['contact']) {
             this.name = res.name.split(' ')[0]
-            this.dbs.delivery = res.contact.district.delivery
-          } else {
-            this.dbs.delivery = 6
+            if (this.compareDistricts(res.contact.district)) {
+              this.dbs.delivery = res.contact.district.delivery
+            }
+
           }
         }
       })
@@ -142,7 +160,9 @@ export class ProductsComponent implements OnInit {
 
   }
 
-
+  compareDistricts(district) {
+    return this.districts.find(el => el['name'] == district['name'])
+  }
 
   getdiscount(item: Product) {
     let promo = item.price - item.promoData.promoPrice
