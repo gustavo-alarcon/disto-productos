@@ -38,6 +38,8 @@ import { ProductsListComponent } from './products-list/products-list.component';
 import { ParentListComponent } from './parent-list.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProductTransferMermaComponent } from './product-transfer-merma/product-transfer-merma.component';
+import { ProductMermaHistoryComponent } from './product-merma-history/product-merma-history.component';
+import { ProductsMermaListComponent } from './products-merma-list/products-merma-list.component';
 
 
 
@@ -53,7 +55,10 @@ import { ProductTransferMermaComponent } from './product-transfer-merma/product-
     PackagesCreateEditComponent,
     PackagesConfigUnitsComponent,
     PackagesListComponent,
-    ProductTransferMermaComponent
+    ProductTransferMermaComponent,
+    ProductsListComponent,
+    ProductMermaHistoryComponent,
+    ProductsMermaListComponent
   ],
   imports: [
     CommonModule,
@@ -86,8 +91,13 @@ import { ProductTransferMermaComponent } from './product-transfer-merma/product-
     ProductEditPromoComponent,
     PackagesCreateEditComponent,
     PackagesConfigUnitsComponent,
-    ProductTransferMermaComponent,
-    DatabaseService
+    ProductsListComponent,
+    DatabaseService,
+  ],
+  entryComponents: [
+    ProductMermaHistoryComponent,
+    ProductTransferMermaComponent
+
   ]
 })
 export class ParentListModule { }

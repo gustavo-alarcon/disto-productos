@@ -253,7 +253,7 @@ export class DatabaseService {
     }
   }
 
-  transferStock(toMerma: boolean, quantity: number, product: Product, user: User): firebase.firestore.WriteBatch {
+  transferStock(toMerma: boolean, quantity: number, observations: string, product: Product, user: User): firebase.firestore.WriteBatch {
     let productRef: DocumentReference = this.afs.firestore.collection(this.productsListRef).doc(product.id);
     let transferHistoryRef: DocumentReference =
       this.afs.firestore.collection(this.productsListRef+`/${product.id}/mermaTransfer`).doc();
@@ -265,7 +265,8 @@ export class DatabaseService {
       productId: product.id,
       quantity,
       toMerma,
-      user: user
+      user,
+      observations
     }
 
     let batch = this.afs.firestore.batch();
@@ -289,6 +290,11 @@ export class DatabaseService {
     batch.set(transferHistoryRef, mermaTransferData);
 
     return batch;
+  }
+
+  getMermaTransferHistory(id: string): Observable<MermaTransfer[]>{
+    return this.afs.collection<MermaTransfer>(this.productsListRef+`/${id}/mermaTransfer`, 
+      ref => ref.orderBy("date", "desc")).valueChanges()
   }
 
   publishProduct(published: boolean, product: Product, user: User): firebase.firestore.WriteBatch {

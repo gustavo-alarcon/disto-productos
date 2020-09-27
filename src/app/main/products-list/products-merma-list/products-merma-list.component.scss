@@ -1,0 +1,31 @@
+.reveal {
+  display: inline-block;
+}
+
+.triangleTopLeft {
+  width: auto;
+  height: 120px;
+  position: relative;
+  border: 1px solid var(--accent-color);
+}
+
+.slogan {
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 80px;
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  clip-path: polygon(0 0, 0% 100%, 100% 0);
+  background-color: var(--accent-color);
+}
+
+.promo {
+  position: absolute;
+  top: 20px;
+  left: 0px;
+  z-index: 3;
+  transform: rotate(-45deg);
+  font-size: 0.9em;
+}

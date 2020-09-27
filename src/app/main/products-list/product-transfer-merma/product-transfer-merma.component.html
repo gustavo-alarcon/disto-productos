@@ -36,6 +36,16 @@
       </mat-error>
     </mat-form-field>
 
+    <!-- observations -->
+    <mat-form-field appearance="outline" style="margin-bottom: 8px; width: 100%">
+      <mat-label>Observaciones</mat-label>
+      <textarea #addDesc 
+        style="min-height: 100px;"
+        formControlName="observations" 
+        matInput maxlength="150"></textarea>
+      <mat-hint align="end">{{addDesc.value?.length || 0}}/150</mat-hint>
+    </mat-form-field>
+
   </form>
 
   <mat-divider></mat-divider>

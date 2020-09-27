@@ -2,9 +2,9 @@
   <!-- Actions -->
   <div class="w3-margin actionsContainer formFieldRounded">
     <!-- Select item's type -->
-    <button mat-raised-button style="height: 45px;" (click)="onCreateEditItem(false)" color="accent">
+    <!-- <button mat-raised-button style="height: 45px;" (click)="onCreateEditItem(false)" color="accent">
       <mat-icon>add</mat-icon>Crear
-    </button>
+    </button> -->
 
     <mat-form-field color="primary" *ngIf="categoryList$ | async as categories" class="content w3-small "
       appearance="outline">
@@ -223,7 +223,7 @@
             <td style="padding:0px 24px" *matCellDef="let raw" class="w3-border-left w3-border-lightgrey">
               <ng-container *ngIf="(auth.user$ | async) as user">
                 <mat-menu #rawMenu="matMenu">
-                  <button class="w3-small" mat-menu-item (click)="onPromo(raw)">
+                  <!-- <button class="w3-small" mat-menu-item (click)="onPromo(raw)">
                     <mat-icon>local_offer</mat-icon> Promoción
                   </button>
                   <button class="w3-small" *ngIf="raw?.published else publish" mat-menu-item
@@ -245,19 +245,22 @@
                       [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
                       <mat-icon>remove</mat-icon> Prioridad
                     </button>
-                  </div>
-                  <!-- <button class="w3-small" mat-menu-item (click)="onTransferMerma(true, raw, user)">
-                    <mat-icon>redo</mat-icon> Transferir a merma
+                  </div> -->
+                  <button class="w3-small" mat-menu-item (click)="onTransferHistoryMerma(raw)">
+                    <mat-icon>history</mat-icon> Historial
+                  </button>
+                  <button class="w3-small" mat-menu-item (click)="onTransferMerma(true, raw, user)">
+                    <mat-icon>redo</mat-icon> Transferir de stock a merma
                   </button>
                   <button class="w3-small" mat-menu-item (click)="onTransferMerma(false, raw, user)">
-                    <mat-icon>undo</mat-icon> Transferir desde merma
-                  </button> -->
-                  <button class="w3-small" mat-menu-item (click)="onCreateEditItem(true, raw)">
+                    <mat-icon>undo</mat-icon> Transferir desde merma a stock
+                  </button>
+                  <!-- <button class="w3-small" mat-menu-item (click)="onCreateEditItem(true, raw)">
                     <mat-icon>edit</mat-icon> Editar
                   </button>
                   <button class="w3-small" mat-menu-item (click)="onDeleteItem(raw)">
                     <mat-icon>delete</mat-icon> Borrar
-                  </button>
+                  </button> -->
                 </mat-menu>
 
                 <button mat-icon-button [matMenuTriggerFor]="rawMenu" [disabled]="user.seller || user.accountant">
