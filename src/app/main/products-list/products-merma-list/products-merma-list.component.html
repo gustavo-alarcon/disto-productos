@@ -47,7 +47,7 @@
 
   <!-- Table -->
   <div *ngIf="productsObservable$ | async; else default">
-    <!-- Desktop -->
+    
     <div *ngIf="productsTableDataSource.filteredData.length else default" class="w3-margin-top"
       style="border-radius: 10px 10px 10px 10px;">
       <div style="overflow:auto; border-radius: 10px 10px 0px 0px">
@@ -249,9 +249,9 @@
                   <button class="w3-small" mat-menu-item (click)="onTransferHistoryMerma(raw)">
                     <mat-icon>history</mat-icon> Historial
                   </button>
-                  <button class="w3-small" mat-menu-item (click)="onTransferMerma(true, raw, user)">
+                  <!-- <button class="w3-small" mat-menu-item (click)="onTransferMerma(true, raw, user)">
                     <mat-icon>redo</mat-icon> Transferir de stock a merma
-                  </button>
+                  </button> -->
                   <button class="w3-small" mat-menu-item (click)="onTransferMerma(false, raw, user)">
                     <mat-icon>undo</mat-icon> Transferir desde merma a stock
                   </button>

@@ -38,9 +38,9 @@ export class ProductsMermaListComponent implements OnInit {
   //Table
   productsTableDataSource = new MatTableDataSource<Product>();
   productsDisplayedColumns: string[] = [
-    'index', 'photoURL', 'description', 'sku', 'category', 'price',
-    'unitDescription', 'unitAbbreviation', 'unitWeight', /*'sellMinimum', 'alertMinimum',*/
-    /*'realStock',*/ 'mermaStock', /*'virtualStock', */'published', 'actions'
+    'index', 'photoURL', 'description', 'sku', 'category', /*'price',*/
+    'unitDescription', /*'unitAbbreviation', */'unitWeight', /*'sellMinimum', 'alertMinimum',*/
+    /*'realStock',*/ 'mermaStock', /*'virtualStock', 'published', */'actions'
   ]
 
   productsObservable$: Observable<Product[]>
@@ -87,10 +87,8 @@ export class ProductsMermaListComponent implements OnInit {
       (data: Product, filter: string) => {
         let category = filter.trim().split('&+&')[0];   //category
         let name = filter.trim().split('&+&')[1];       //product name
-        let promo = filter.trim().split('&+&')[2];                    //promo
-        return (data.category.match(new RegExp(category, 'ig'))
-          && data.description.match(new RegExp(name, 'ig'))
-          && (String(data.promo) == promo || promo == "false"))
+        return (!!data.category.match(new RegExp(category, 'ig'))
+          && !!data.description.match(new RegExp(name, 'ig')))
       }
 
     this.categoryObservable$ = combineLatest(
@@ -114,18 +112,18 @@ export class ProductsMermaListComponent implements OnInit {
       return filter;
     }));
 
-    this.filter$ = combineLatest(
+    this.filter$ = combineLatest([
       this.categoryList$,
-      this.itemsFilterForm.valueChanges.pipe(startWith('')),
-      this.promoFilterForm.valueChanges.pipe(startWith(false)))
+      this.itemsFilterForm.valueChanges.pipe(startWith(''))])
       .pipe(
-        map(([categorySelected, itemsFormValue, promoFormValue]) => {
-          this.productsTableDataSource.filter = (categorySelected.length > 1 ? '' : categorySelected[0].name) + '&+&' + itemsFormValue + '&+&' + promoFormValue;
+        map(([categorySelected, itemsFormValue]) => {
+          this.productsTableDataSource.filter = (categorySelected.length > 1 ? '' : categorySelected[0].name) + '&+&' + itemsFormValue;
           return true
         })
       )
 
     this.productsObservable$ = this.dbs.getProductsListValueChanges().pipe(
+      map(res => res.filter(el => !!el.mermaStock)),
       tap(res => {
         this.productsTableDataSource.data = res.map(el => {
           el['virtualStock$'] = this.dbs.getVirtualStock(el).pipe(
@@ -141,165 +139,6 @@ export class ProductsMermaListComponent implements OnInit {
 
   showCategory(category: any): string | null {
     return category ? category.name : null
-  }
-
-  onPublish(product: Product, publish: boolean) {
-    let prod = { ...product };
-    prod.published = publish;
-    this.dbs.publishProduct(publish, prod, null).commit().then(
-      res => {
-        this.snackBar.open('Producto editado satisfactoriamente.', 'Aceptar');
-      },
-      err => {
-        this.snackBar.open('Ocurrió un error. Vuelva a intentarlo.', 'Aceptar');
-      }
-    )
-
-  }
-
-  increasePriority(product: Product) {
-    let prod = { ...product };
-    prod.priority++;
-    console.log(prod.priority);
-    this.dbs.increasePriority(prod).commit().then(
-      res => {
-        this.snackBar.open('Prioridad incrementada', 'Aceptar');
-      },
-      err => {
-        this.snackBar.open('Ocurrió un error. Vuelva a intentarlo.', 'Aceptar');
-      }
-    )
-
-  }
-
-  decreasePriority(product: Product) {
-    let prod = { ...product };
-    prod.priority--;
-    console.log(prod.priority);
-    this.dbs.decreasePriority(prod).commit().then(
-      res => {
-        this.snackBar.open('Prioridad reducida', 'Aceptar');
-      },
-      err => {
-        this.snackBar.open('Ocurrió un error. Vuelva a intentarlo.', 'Aceptar');
-      }
-    )
-
-  }
-
-  onDeleteItem(product: Product) {
-    let dialogRef: MatDialogRef<ConfirmationDialogComponent>;
-    dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      closeOnNavigation: true,
-      disableClose: true,
-      width: '360px',
-      maxWidth: '360px',
-      data: {
-        warning: `El producto será borrado.`,
-        content: `¿Está seguro de borrar el producto ${product.description}?`,
-        noObservation: true,
-        observation: null,
-        title: 'Borrar',
-        titleIcon: 'done_all'
-      }
-    })
-
-    dialogRef.afterClosed().pipe(
-      take(1),
-      switchMap((answer: { action: string, lastObservation: string }) =>
-        iif(
-          () => { return answer.action == "confirm" },
-          this.dbs.deleteProduct(product),
-          of(answer)
-        )
-      ))
-      .subscribe((answer: { action: string, lastObservation: string } | firebase.firestore.WriteBatch) => {
-        if ((<Object>answer).hasOwnProperty("action")) {
-          //We don't do anything, as the action was cancelled,
-        }
-        else {
-          (<firebase.firestore.WriteBatch>answer).commit().then(
-            res => {
-              this.snackBar.open('Producto eliminado satisfactoriamente.', 'Aceptar');
-            },
-            err => {
-              this.snackBar.open('Ocurrió un error. Vuelva a intentarlo.', 'Aceptar');
-            }
-          )
-        }
-      },
-        err => {
-          this.snackBar.open('Ocurrió un error. Vuelva a intentarlo.', 'Aceptar');
-        })
-
-  }
-
-  onPromo(product: Product) {
-    let dialogRef: MatDialogRef<ProductEditPromoComponent>;
-    dialogRef = this.dialog.open(ProductEditPromoComponent, {
-      width: '350px',
-      data: {
-        data: { ...product },
-      }
-    });
-    dialogRef.afterClosed().subscribe(res => {
-      switch (res) {
-        case true:
-          this.snackBar.open('El producto fue editado satisfactoriamente', 'Aceptar', { duration: 5000 });
-          break;
-        case false:
-          this.snackBar.open('Ocurrió un error. Por favor, vuelva a intentarlo', 'Aceptar', { duration: 5000 });
-          break;
-        default:
-          break;
-      }
-    })
-  }
-
-  onCreateEditItem(edit: boolean, product?: Product) {
-    let dialogRef: MatDialogRef<ProductCreateEditComponent>;
-    if (edit == true) {
-      dialogRef = this.dialog.open(ProductCreateEditComponent, {
-        width: '350px',
-        data: {
-          data: { ...product },
-          edit: edit
-        }
-      });
-      dialogRef.afterClosed().subscribe(res => {
-        switch (res) {
-          case true:
-            this.snackBar.open('El producto fue editado satisfactoriamente', 'Aceptar', { duration: 5000 });
-            break;
-          case false:
-            this.snackBar.open('Ocurrió un error. Por favor, vuelva a intentarlo', 'Aceptar', { duration: 5000 });
-            break;
-          default:
-            break;
-        }
-      })
-    }
-    else {
-      dialogRef = this.dialog.open(ProductCreateEditComponent, {
-        width: '350px',
-        data: {
-          data: null,
-          edit: edit
-        }
-      });
-      dialogRef.afterClosed().subscribe(res => {
-        switch (res) {
-          case true:
-            this.snackBar.open('El nuevo producto fue creado satisfactoriamente', 'Aceptar', { duration: 5000 });
-            break;
-          case false:
-            this.snackBar.open('Ocurrió un error. Por favor, vuelva a intentarlo', 'Aceptar', { duration: 5000 });
-            break;
-          default:
-            break;
-        }
-      })
-    }
   }
 
   onTransferMerma(toMerma: boolean, product: Product, user: User){
