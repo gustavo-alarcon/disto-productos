@@ -137,9 +137,11 @@ export class PurchaseComponent implements OnInit {
     this.delivery = this.dbs.delivery
     this.total = [...this.dbs.order].map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
 
+    this.order = [...this.dbs.order]
+
     this.userData$ = this.auth.user$.pipe(
-      tap(res=>{
-       this.user = res
+      tap(res => {
+        this.user = res
         this.getData()
 
       })
@@ -148,7 +150,7 @@ export class PurchaseComponent implements OnInit {
 
   }
 
-  getData(){
+  getData() {
     if (this.user) {
       if (this.user['contact']) {
         this.firstFormGroup = this.fb.group({
@@ -343,6 +345,49 @@ export class PurchaseComponent implements OnInit {
 
   }
 
+  getneworder() {
+
+    let copy = [...this.order]
+    let newOrder: any = [...copy].map(order => {
+      if (order['chosenOptions']) {
+        return order['chosenOptions'].map(el => {
+          return {
+            product: el,
+            quantity: 1 * order.quantity
+          }
+        })
+      } else {
+        return [order]
+      }
+    })
+
+    let otherorder = [...newOrder].reduce((a, b) => a.concat(b), []).map((el, index, array) => {
+      let counter = 0
+      let others = []
+      let reduce = 0
+      array.forEach(al => {
+        if (al.product['id'] == el.product['id']) {
+          counter++
+          others.push(al.quantity)
+        }
+      })
+      if (counter > 1) {
+        reduce = others.reduce((d, e) => d + e, 0)
+      }else{
+        reduce = el.quantity
+      }
+
+      return {
+        product:el.product,
+        reduce: reduce
+      }
+    }).filter((dish, index, array) => array.findIndex(el => el.product['id'] === dish.product['id']) === index)
+
+    return otherorder
+
+
+  }
+
   save() {
     this.loading.next(true)
 
@@ -429,37 +474,13 @@ export class PurchaseComponent implements OnInit {
         });
 
       }).then(() => {
-        let copy = [...this.dbs.order]
-        let newOrder: any = [...copy].map(order => {
-          if (order['chosenOptions']) {
-            return order['chosenOptions'].map(el => {
-              return {
-                product: el,
-                quantity: 1 * order.quantity
-              }
-            })
-          } else {
-            return [order]
-          }
-        })
+        let reduceOrder = this.getneworder()
 
-        this.order = newOrder.reduce((a, b) => a.concat(b), []).map((el, index, array) => {
-          let counter = 0
-          array.forEach(al => {
-            if (al.product['id'] == el.product['id']) {
-              counter++
-            }
-          })
-
-          el['quantity'] = counter
-          return el
-        }).filter((dish, index, array) => array.findIndex(el => el.product['id'] === dish.product['id']) === index)
-
-        this.order.forEach((order, ind) => {
+        reduceOrder.forEach((order, ind) => {
           const ref = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(order.product.id);
           this.af.firestore.runTransaction((transaction) => {
             return transaction.get(ref).then((prodDoc) => {
-              let newStock = prodDoc.data().realStock - order.quantity;
+              let newStock = prodDoc.data().realStock - order.reduce;
               transaction.update(ref, { realStock: newStock });
             });
           }).then(() => {

@@ -1,42 +1,53 @@
 <div class="w3-section w3-margin-left w3-margin-right">
-    <div class="w3-row">
-        <div class="w3-col s0 m1 l1">
-            <p class="w3-hide-small"></p>
+  <div class="w3-row">
+    <div class="w3-col s0 m1 l1">
+      <p class="w3-hide-small"></p>
+    </div>
+    <div class="w3-col s12 m10 l10">
+      <div
+        *ngIf="categories$ | async as categories; else load"
+        class="ms-flex w3-margin-top"
+        style="justify-content: space-between"
+      >
+        <div
+          *ngFor="let category of categories"
+          class="category-div"
+          (click)="navigate(category['name'])"
+        >
+          <img
+            [defaultImage]="defaultImage"
+            [lazyLoad]="category['photoURL']"
+            [offset]="100"
+            class="category-img"
+          />
         </div>
-        <div class="w3-col s12 m10 l10">
-            <div *ngIf="categories$ | async as categories; else load" class="ms-flex w3-margin-top"
-                style="justify-content: space-between;">
-                <div *ngFor="let category of categories" class="category-div" (click)="navigate(category['name'])">
-                    <img [defaultImage]="defaultImage" [lazyLoad]="category['photoURL']" [offset]="100"
-                        class="category-img">
-                </div>
+      </div>
+      <ng-template #load>
+        <div style="height: 70vh" class="w3-display-container">
+          <div class="w3-display-middle">
+            <div class="lds-ring">
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
             </div>
-            <ng-template #load>
-                <div style="height: 70vh;" class="w3-display-container">
-                    <div class="w3-display-middle">
-                        <div class="lds-ring">
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                    </div>
-                </div>
-            </ng-template>
+          </div>
         </div>
-        <div class="w3-col s0 m1 l1">
-            <p></p>
-        </div>
+      </ng-template>
     </div>
-
+    <div class="w3-col s0 m1 l1">
+      <p></p>
+    </div>
+  </div>
 </div>
-<div class="w3-hide-large  w3-hide-medium">
-    <div class="fly-button" *ngIf="dbs.total>0">
-        <div class="shopping-button" (click)="shoppingCart()">
-            <span class="shopping-button__icon">🛒</span>
-            <div class="shopping-button__total">
-                <span style="font-size: 0.7em">S/. </span>
-                {{dbs.total | number: '.2'}}</div>
-        </div>
+<div class="w3-hide-large w3-hide-medium">
+  <div class="fly-button" *ngIf="dbs.total > 0">
+    <div class="shopping-button" (click)="shoppingCart()">
+      <span class="shopping-button__icon">🛒</span>
+      <div class="shopping-button__total">
+        <span style="font-size: 0.7em">S/. </span>
+        {{ dbs.total | number: ".2" }}
+      </div>
     </div>
+  </div>
 </div>

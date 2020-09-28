@@ -79,11 +79,14 @@
         <div style="width: 70%; text-align: right; padding: 0 20px">Total</div>
         <div style="width: 30%">S/. {{ total | number: ".2" }}</div>
       </div>
-      <div class="ms-flex" *ngIf="delivery > 0">
-        <div style="width: 70%; text-align: right; padding: 0 20px">
-          Delivery
+      <div *ngIf="delivery > 0">
+        <div class="ticket__separate"></div>
+        <div class="ms-flex font--primary" style="font-weight: 900;">
+          <div style="width: 70%; text-align: right; padding: 0 20px">
+            Delivery
+          </div>
+          <div style="width: 30%">S/. {{ delivery | number: ".2" }}</div>
         </div>
-        <div style="width: 30%">S/. {{ delivery | number: ".2" }}</div>
       </div>
     </div>
   </div>

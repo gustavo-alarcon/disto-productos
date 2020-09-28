@@ -293,7 +293,7 @@ export class DatabaseService {
   }
 
   getMermaTransferHistory(id: string): Observable<MermaTransfer[]>{
-    return this.afs.collection<MermaTransfer>(this.productsListRef+`/${id}/mermaTransfer`, 
+    return this.afs.collection<MermaTransfer>(this.productsListRef+`/${id}/mermaTransfer`,
       ref => ref.orderBy("date", "desc")).valueChanges()
   }
 

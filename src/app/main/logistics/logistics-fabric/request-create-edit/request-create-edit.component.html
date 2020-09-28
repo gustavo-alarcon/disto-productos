@@ -1,44 +1,75 @@
 <div mat-dialog-title>
-  <h2 class="ms-font-rubik ms-color-2b" style="font-size:1.2em">
-      <mat-icon style="vertical-align:middle">add_circle</mat-icon>
-      Solicitud #F{{correlative$ | async}}
+  <h2 class="ms-font-rubik ms-color-2b" style="font-size: 1.2em">
+    <mat-icon style="vertical-align: middle">add_circle</mat-icon>
+    Solicitud #F{{ correlative$ | async }}
   </h2>
   <mat-divider></mat-divider>
 </div>
 <mat-dialog-content>
-  <form *ngIf="products$ | async as products else cargando"
-    [formGroup]="requestFormGroup"  style="width: 100%">
-
-    <mat-form-field style="margin-bottom: 8px; display:block"
-      appearance="outline">
-        <mat-label>Producto</mat-label>
-        <input formControlName="product" #product
-          type="text" autocomplete="off"
-          matInput placeholder="Seleccione el producto"
-          [matAutocomplete]="auto">
-        <mat-autocomplete
-          #auto="matAutocomplete" autoActiveFirstOption 
-          [displayWith]="displayFn.bind(this)">
-          <mat-option *ngFor="let product of products" [value]="product">
-            {{product.description}}
-          </mat-option>
-        </mat-autocomplete>
-        <mat-error>
-            <span *ngIf="requestFormGroup.get('product').errors?.required">Campo requerido</span>
-            <span *ngIf="requestFormGroup.get('product').errors?.noProduct">Seleccione un producto de la lista.</span>
-        </mat-error>
+  <form
+    *ngIf="products$ | async as products; else cargando"
+    [formGroup]="requestFormGroup"
+    style="width: 100%"
+  >
+    <mat-form-field
+      style="margin-bottom: 8px; display: block"
+      appearance="outline"
+    >
+      <mat-label>Producto</mat-label>
+      <input
+        formControlName="product"
+        #product
+        type="text"
+        autocomplete="off"
+        matInput
+        placeholder="Seleccione el producto"
+        [matAutocomplete]="auto"
+      />
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        autoActiveFirstOption
+        [displayWith]="displayFn.bind(this)"
+      >
+        <mat-option *ngFor="let product of products" [value]="product">
+          {{ product.description }}
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error>
+        <span *ngIf="requestFormGroup.get('product').errors?.required"
+          >Campo requerido</span
+        >
+        <span *ngIf="requestFormGroup.get('product').errors?.noProduct"
+          >Seleccione un producto de la lista.</span
+        >
+      </mat-error>
     </mat-form-field>
 
-    <mat-form-field style="margin-bottom: 8px; display:block"
-      appearance="outline">
-        <mat-label>Cantidad {{requestFormGroup.get('product').value?.unit?.abbreviation}}</mat-label>
-        <input formControlName="quantity" #quantity
-            type="number" autocomplete="off"
-            matInput placeholder="Cantidad">
-        <mat-error>
-            <span *ngIf="requestFormGroup.get('quantity').errors?.required">Campo requerido</span>
-            <span *ngIf="requestFormGroup.get('quantity').errors?.min">El peso debe ser mayor a 0.</span>
-        </mat-error>
+    <mat-form-field
+      style="margin-bottom: 8px; display: block"
+      appearance="outline"
+    >
+      <mat-label
+        >Cantidad
+        {{
+          requestFormGroup.get("product").value?.unit?.abbreviation
+        }}</mat-label
+      >
+      <input
+        formControlName="quantity"
+        #quantity
+        type="number"
+        autocomplete="off"
+        matInput
+        placeholder="Cantidad"
+      />
+      <mat-error>
+        <span *ngIf="requestFormGroup.get('quantity').errors?.required"
+          >Campo requerido</span
+        >
+        <span *ngIf="requestFormGroup.get('quantity').errors?.min"
+          >El peso debe ser mayor a 0.</span
+        >
+      </mat-error>
     </mat-form-field>
 
     <!-- <mat-form-field style="margin-bottom: 8px; display:block"
@@ -53,50 +84,102 @@
         </mat-error>
     </mat-form-field> -->
 
-    <mat-form-field style="margin-bottom: 8px; display:block"
-      appearance="outline">
+    <mat-form-field
+      style="margin-bottom: 8px; display: block"
+      appearance="outline"
+    >
       <mat-label>Fecha deseada</mat-label>
-      <input readonly matInput placeholder="Fecha deseada" [min]="dateLimit"
-        [formControl]="requestFormGroup.get('desiredDate')" [satDatepicker]="picker">
+      <input
+        readonly
+        matInput
+        placeholder="Fecha deseada"
+        [min]="dateLimit"
+        [formControl]="requestFormGroup.get('desiredDate')"
+        [satDatepicker]="picker"
+      />
       <sat-datepicker #picker [rangeMode]="false"></sat-datepicker>
       <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
     </mat-form-field>
 
-    <button *ngIf="selectedProducts$ | async as selProds"
-      mat-raised-button color="accent"
-      style="display:block; width: 100%; margin-bottom: 16px"
+    <button
+      *ngIf="selectedProducts$ | async as selProds"
+      mat-raised-button
+      color="accent"
+      style="display: block; width: 100%; margin-bottom: 16px"
       [disabled]="requestFormGroup.status != 'VALID'"
-      (click)="onAddProduct()">
-        Agregar
+      (click)="onAddProduct()"
+    >
+      Agregar
     </button>
     <mat-divider></mat-divider>
 
-    <table *ngIf="selectedProducts$ | async as selProds else cargando">
+    <table *ngIf="selectedProducts$ | async as selProds; else cargando">
       <tr *ngFor="let product of selProds">
-        <td>{{product.productDescription}}</td>
+        <td>{{ product.productDescription }}</td>
         <!-- <td>{{product.unitPrice | currency:'S/.'}}</td> -->
-        <td>{{product.quantity}}({{product.unit.abbreviation}})</td>
-        <td>{{product.desiredDate | date:'d/MM/yy'}}</td>
+        <td>{{ product.quantity }}({{ product.unit.abbreviation }})</td>
+        <td>{{ product.desiredDate | date: "d/MM/yy" }}</td>
         <td>
-          <mat-icon class="removeIcon"
-            (click)="onDeleteProduct(product.id)">
+          <mat-icon class="removeIcon" (click)="onDeleteProduct(product.id)">
             remove_circle
           </mat-icon>
         </td>
       </tr>
     </table>
-
   </form>
-
-  <ng-template #cargando>
-    Cargando contenido...
-  </ng-template>
+  <ng-template #cargando> Cargando contenido... </ng-template>
   <mat-divider></mat-divider>
+  <mat-form-field
+  class="w3-margin-top w3-block"
+  appearance="outline"
+  *ngIf="products$ | async"
+>
+  <mat-label>Proveedor</mat-label>
+  <input
+    [formControl]="providerForm"
+    type="text"
+    autocomplete="off"
+    matInput
+    placeholder="Seleccione"
+    [matAutocomplete]="autoProvider"
+  />
+  <mat-autocomplete
+    #autoProvider="matAutocomplete"
+    [displayWith]="displayPr.bind(this)"
+  >
+    <mat-option
+      *ngFor="let option of filteredProvider$ | async"
+      [value]="option"
+    >
+      <span>{{ option["name"] }}</span>
+    </mat-option>
+    <mat-option>
+      <button mat-button class="w3-block" (click)="createProvider()">
+        Agregar Proveedor
+      </button>
+    </mat-option>
+  </mat-autocomplete>
+  <mat-error>
+    <span *ngIf="providerForm.errors?.required"
+      >Campo requerido</span
+    >
+    <span *ngIf="providerForm.errors?.noProduct"
+      >Proveedor no encontrado.</span
+    >
+  </mat-error>
+</mat-form-field>
+
 </mat-dialog-content>
 
 <mat-dialog-actions>
-  <button mat-raised-button color="accent" 
-      style="display: block; width: 100%;"
-      (click)="onSubmitForm(null)" type="button"
-      [disabled]="!selectedProducts.value.length || requestFormGroup.pending">Guardar</button>
+  <button
+    mat-raised-button
+    color="accent"
+    style="display: block; width: 100%"
+    (click)="onSubmitForm(null)"
+    type="button"
+    [disabled]="!selectedProducts.value.length || requestFormGroup.pending || !providerForm.valid"
+  >
+    Guardar
+  </button>
 </mat-dialog-actions>

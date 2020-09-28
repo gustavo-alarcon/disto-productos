@@ -20,13 +20,15 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { LoginDialogComponent } from './login-dialog/login-dialog.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatInputModule } from '@angular/material/input';
+import { ProviderDialogComponent } from './provider-dialog/provider-dialog.component';
 
 
 @NgModule({
   declarations: [
     MainComponent,
     ConfirmationDialogComponent,
-    LoginDialogComponent
+    LoginDialogComponent,
+    ProviderDialogComponent
   ],
   imports: [
     CommonModule,
@@ -48,7 +50,8 @@ import { MatInputModule } from '@angular/material/input';
   ],
   entryComponents: [
     ConfirmationDialogComponent,
-    LoginDialogComponent
+    LoginDialogComponent,
+    ProviderDialogComponent
   ]
 })
 export class MainModule { }

@@ -48,11 +48,7 @@ export class ProviderDialogComponent implements OnInit {
       const value = control.value.toLowerCase();
       return this.dbs.getProvidersDoc().pipe(
         map(res => {
-          if (res) {
-            return res.findIndex(el => el['name'].toLowerCase() == value) >= 0 ? { repeatedValidator: true } : null
-          } else {
-            return null
-          }
+          return res.findIndex(el => el['name'].toLowerCase() == value) >= 0 ? { repeatedValidator: true } : null
 
         }))
     }

@@ -14,7 +14,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { AddUserComponent } from './add-user/add-user.component';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ProviderDialogComponent } from './provider-dialog/provider-dialog.component';
+import { ProviderDialogComponent } from '../provider-dialog/provider-dialog.component';
 
 @Component({
   selector: 'app-configuration',

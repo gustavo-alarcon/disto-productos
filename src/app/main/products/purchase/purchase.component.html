@@ -62,6 +62,12 @@
                     <mat-error>Campo requerido</mat-error>
                 </mat-form-field>
 
+                <mat-form-field class="w3-block" appearance="outline">
+                  <mat-label>Referencia</mat-label>
+                  <input autocomplete="off" formControlName="ref" type="text" matInput placeholder="Referencia">
+                  <mat-error>Campo requerido</mat-error>
+              </mat-form-field>
+
                 <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
                     <mat-select [compareWith]="compareObjects" formControlName="district" placeholder="Distrito">
                         <mat-option *ngFor="let district of districts" [value]="district"
@@ -73,25 +79,25 @@
                     <mat-error>Campo requerido</mat-error>
                 </mat-form-field>
 
-                <mat-form-field class="w3-block" appearance="outline">
-                    <mat-label>Referencia</mat-label>
-                    <input autocomplete="off" formControlName="ref" type="text" matInput placeholder="Referencia">
-                    <mat-error>Campo requerido</mat-error>
-                </mat-form-field>
-                <!-- <div class="w3-margin-bottom">
-                    <div style="display: flex; flex-wrap: wrap;justify-content: space-between;">
-                        <div style="width: 80%;">Especifica tu dirección en el mapa (Opcional)</div>
-                        <button mat-icon-button color="primary" (click)="findMe()">
-                            <mat-icon>gps_fixed</mat-icon>
-                        </button>
+                <div *ngIf="delivery > 0" class="w3-margin-bottom">
+                  <div class="ticket__separate"></div>
+                  <div class="ms-flex">
+                    <div style="width: 70%; text-align: right; padding: 0 20px">Total</div>
+                    <div style="width: 30%">S/. {{ total | number: ".2" }}</div>
+                  </div>
+                  <div class="ms-flex font--primary" style="font-weight: 900;">
+                    <div style="width: 70%; text-align: right; padding: 0 20px">
+                      Delivery
                     </div>
-                    <br>
-                    <agm-map style="height: 280px;" [latitude]="latitud" [longitude]="longitud" [zoom]="15"
-                        (mapClick)="mapClicked($event)">
-                        <agm-marker [latitude]="latitud" [longitude]="longitud"></agm-marker>
-                    </agm-map>
+                    <div style="width: 30%">S/. {{ delivery | number: ".2" }}</div>
+                  </div>
+                  <div class="ticket__separate"></div>
+                  <div class="ms-flex font--primary" style="font-weight: 900;">
+                    <div style="width: 70%;"></div>
+                    <div style="width: 30%">S/. {{total + delivery | number: '.2'}}</div>
+                  </div>
+                </div>
 
-                </div> -->
                 <div class="ms-flex">
                     <button mat-button matStepperPrevious class="font--primary">
                         <mat-icon color="primary">keyboard_backspace</mat-icon> Anterior

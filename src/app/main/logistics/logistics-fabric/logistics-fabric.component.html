@@ -38,6 +38,7 @@
     <mat-expansion-panel-header>
       <div class="ms-flex w3-block" style="justify-content: space-between; align-items: center;">
         <div>#F{{("000"+buy.correlative).slice(-4)}}</div>
+        <div *ngIf="buy.provider">{{buy.provider.name}}</div>
         <div class="thin w3-hide-small">{{buy.totalAmount}} KG</div>
         <div class="thin w3-hide-small">S/. {{buy.totalPrice | number: '.2'}}</div>
         <div class="thin w3-hide-small">
