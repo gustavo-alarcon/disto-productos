@@ -166,7 +166,7 @@ export class RequestCreateEditComponent implements OnInit {
         validated: false,       //already validated docs should not be editted again
         validatedDate: null,
         status: 'por validar',
-        provider: this.providerForm.value,
+        //provider: this.providerForm.value,
         requestedDate: this.data.data.requestedDate,
         requestedBy: this.data.data.requestedBy,
         editedBy: user,
@@ -184,7 +184,7 @@ export class RequestCreateEditComponent implements OnInit {
         validated: false,
         validatedDate: null,
         status: 'por validar',
-        provider: this.providerForm.value,
+        //provider: this.providerForm.value,
         requestedDate: date,
         requestedBy: user,
         editedBy: null,
