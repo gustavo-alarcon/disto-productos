@@ -4,7 +4,7 @@ import { AngularFirestore, AngularFirestoreCollection, DocumentReference, Angula
 import { MermaTransfer, Product } from '../models/product.model';
 import { shareReplay, map, takeLast, switchMap, take, mapTo, tap } from 'rxjs/operators';
 import { GeneralConfig } from '../models/generalConfig.model';
-import { Observable, concat, of, interval, BehaviorSubject } from 'rxjs';
+import { Observable, concat, of, interval, BehaviorSubject, from } from 'rxjs';
 import { User } from '../models/user.model';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { Recipe } from '../models/recipe.model';
@@ -12,6 +12,7 @@ import { Unit, PackageUnit } from '../models/unit.model';
 import { Buy, BuyRequestedProduct } from '../models/buy.model';
 import * as firebase from 'firebase'
 import { Package } from '../models/package.model';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -42,6 +43,8 @@ export class DatabaseService {
   constructor(
     private afs: AngularFirestore,
     private storage: AngularFireStorage,
+    private afAuth: AngularFireAuth,
+
   ) {
     this.opening$ = this.getOpening();
   }
@@ -295,6 +298,18 @@ export class DatabaseService {
   getMermaTransferHistory(id: string): Observable<MermaTransfer[]>{
     return this.afs.collection<MermaTransfer>(this.productsListRef+`/${id}/mermaTransfer`,
       ref => ref.orderBy("date", "desc")).valueChanges()
+  }
+
+  getMermaTransferHistoryDate(date: {begin: Date, end: Date}): Observable<MermaTransfer[]>{
+
+    let end = date.end;
+    end.setHours(23);
+    end.setMinutes(59);
+    end.setSeconds(59);
+
+    return this.afs.collectionGroup<MermaTransfer>('mermaTransfer',
+      ref => ref.where("date", "<=", date.end).where("date", ">=", date.begin).orderBy("date", "desc"))
+      .valueChanges();
   }
 
   publishProduct(published: boolean, product: Product, user: User): firebase.firestore.WriteBatch {
@@ -773,5 +788,9 @@ export class DatabaseService {
       .valueChanges().pipe(
         shareReplay(1)
       );
+  }
+
+  emailMethod(email: string): Observable<string[]> {
+    return from(this.afAuth.fetchSignInMethodsForEmail(email))
   }
 }
