@@ -6,6 +6,12 @@
       <mat-icon>add</mat-icon>Crear
     </button> -->
 
+    <mat-form-field class="content" appearance="outline">
+      <input readonly matInput placeholder="FECHA / PERIODO" [formControl]="date" [satDatepicker]="picker">
+      <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
+      <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
+    </mat-form-field>
+
     <mat-form-field color="primary" *ngIf="categoryList$ | async as categories" class="content w3-small "
       appearance="outline">
       <mat-label>Categoria</mat-label>
@@ -34,252 +40,522 @@
         <mat-hint>Filtro de nombre</mat-hint>
       </mat-form-field>
 
-      <mat-slide-toggle [formControl]="promoFilterForm" style="margin-bottom: 8px" color="accent">
-        Mostrar solo ofertas
+      <mat-slide-toggle [formControl]="historyForm" style="margin-bottom: 8px" color="accent">
+        Historial
       </mat-slide-toggle>
     </ng-container>
 
     <button mat-raised-button style="height: 45px;" (click)="downloadXls()" color="accent">
-      Descargar Excel
+      Descargar
     </button>
 
   </div>
 
   <!-- Table -->
-  <div *ngIf="productsObservable$ | async; else default">
-    
-    <div *ngIf="productsTableDataSource.filteredData.length else default" class="w3-margin-top"
-      style="border-radius: 10px 10px 10px 10px;">
-      <div style="overflow:auto; border-radius: 10px 10px 0px 0px">
-        <table mat-table [dataSource]="productsTableDataSource" matSort style="text-align: center !important; ">
+  <div *ngIf="mermaObservable$ | async; else default">
 
-          <ng-container matColumnDef="index">
-            <th *matHeaderCellDef style="font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282;"
-              class="w3-center w3-padding  ">N°</th>
-            <td style="padding:0px 25px;" *matCellDef="let raw; let i = index">
-              {{1 + i + (productsPaginator.pageIndex * productsPaginator.pageSize)}}
-            </td>
-          </ng-container>
+    <ng-container *ngIf="!historyForm.value else history">
+      <div *ngIf="productsTableDataSource.filteredData.length else default" class="w3-margin-top"
+        style="border-radius: 10px 10px 10px 10px;">
+        <div style="overflow:auto; border-radius: 10px 10px 0px 0px">
+          <table mat-table [dataSource]="productsTableDataSource" matSort style="text-align: center !important; width:100% ">
 
-          <ng-container matColumnDef="photoURL">
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282;  "
-              class="w3-center w3-padding  ">
-              Imagen referencial
-            </th>
-            <td *matCellDef="let raw" class="w3-center" style="padding: 10px">
-              <a href="{{raw.photoURL}}" target="_blank" *ngIf="raw.photoURL; else defaultPicture">
-                <div class="reveal">
-                  <div
-                    [className]="raw.promo?'border--secondary triangleTopLeft w3-card-4':'border--primary triangleTopLeft w3-card-4'">
-                    <div class="slogan background--secondary" *ngIf="raw['promo']"></div>
-                    <div class="promo" *ngIf="raw['promo']">OFERTA</div>
-                    <img [defaultImage]="defaultImage" [lazyLoad]="raw.photoURL" [offset]="100"
-                      style="object-fit:cover; width: 115px; height: 115px;">
+            <ng-container matColumnDef="index">
+              <th *matHeaderCellDef style="font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282;"
+                class="w3-center w3-padding  ">N°</th>
+              <td style="padding:0px 25px;" *matCellDef="let raw; let i = index">
+                {{1 + i + (productsPaginator.pageIndex * productsPaginator.pageSize)}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="photoURL">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282;  "
+                class="w3-center w3-padding  ">
+                Imagen referencial
+              </th>
+              <td *matCellDef="let raw" class="w3-center" style="padding: 10px">
+                <a href="{{raw.photoURL}}" target="_blank" *ngIf="raw.photoURL; else defaultPicture">
+                  <div class="reveal">
+                    <div
+                      [className]="raw.promo?'border--secondary triangleTopLeft w3-card-4':'border--primary triangleTopLeft w3-card-4'">
+                      <div class="slogan background--secondary" *ngIf="raw['promo']"></div>
+                      <div class="promo" *ngIf="raw['promo']">OFERTA</div>
+                      <img [defaultImage]="defaultImage" [lazyLoad]="raw.photoURL" [offset]="100"
+                        style="object-fit:cover; width: 115px; height: 115px;">
+                    </div>
                   </div>
-                </div>
-              </a>
-              <ng-template #defaultPicture>
-                <div style="height:120px;padding:6px 6px">
-                  <img src="../../../assets/images/no-image.png" style="max-width:100%; height:100%" class="w3-card-4">
-                </div>
-              </ng-template>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="description" sticky>
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding  ">
-              Descripción
-            </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.description |titlecase}}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="sku">
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding  ">
-              SKU
-            </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.sku}}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="category">
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding  " matTooltip="Ordenar tabla por tipo de documento" matTooltipPosition="above"
-              mat-sort-header>
-              Categoria
-            </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.category}}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="price">
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding  ">
-              Precio
-            </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.price | currency : 'S/.'}}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="unitDescription">
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding  ">
-              Descripción de Unidad
-            </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.unit.description}}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="unitAbbreviation">
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding  ">
-              Abreviación
-            </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.unit.abbreviation}}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="unitWeight">
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding  ">
-              Peso (KG)
-            </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.unit.weight}}KG
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="realStock">
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding  ">
-              Stock
-            </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.realStock}}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="mermaStock">
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding  ">
-              Merma
-            </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.mermaStock}}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="virtualStock">
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding  ">
-              Stock Virtual
-            </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.virtualStock$ | async}}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="sellMinimum">
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding  ">
-              Min. Venta
-            </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.sellMinimum}}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="alertMinimum">
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding  ">
-              Min. alerta
-            </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.alertMinimum}}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="published">
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding  ">
-              Estado
-            </th>
-            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.published ? 'Publicado' : 'Oculto'}}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="actions" stickyEnd>
-            <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
-              class="w3-center w3-padding w3-border-left w3-border-lightgrey">Acciones</th>
-            <td style="padding:0px 24px" *matCellDef="let raw" class="w3-border-left w3-border-lightgrey">
-              <ng-container *ngIf="(auth.user$ | async) as user">
-                <mat-menu #rawMenu="matMenu">
-                  <!-- <button class="w3-small" mat-menu-item (click)="onPromo(raw)">
-                    <mat-icon>local_offer</mat-icon> Promoción
-                  </button>
-                  <button class="w3-small" *ngIf="raw?.published else publish" mat-menu-item
-                    (click)="onPublish(raw, false)">
-                    <mat-icon>visibility_off</mat-icon> Ocultar
-                  </button>
-                  <ng-template #publish>
-                    <button class="w3-small" mat-menu-item (click)="onPublish(raw, true)">
-                      <mat-icon>visibility</mat-icon> Publicar
-                    </button>
-                  </ng-template>
-                  <div [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
-                    <button class="w3-small" mat-menu-item (click)="increasePriority(raw)" [disabled]="!categorySelected">
-                      <mat-icon>add</mat-icon> Prioridad
-                    </button>
+                </a>
+                <ng-template #defaultPicture>
+                  <div style="height:120px;padding:6px 6px">
+                    <img src="../../../assets/images/no-image.png" style="max-width:100%; height:100%" class="w3-card-4">
                   </div>
-                  <div [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
-                    <button class="w3-small" mat-menu-item (click)="decreasePriority(raw)" [disabled]="!categorySelected"
-                      [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
-                      <mat-icon>remove</mat-icon> Prioridad
-                    </button>
-                  </div> -->
-                  <button class="w3-small" mat-menu-item (click)="onTransferHistoryMerma(raw)">
-                    <mat-icon>history</mat-icon> Historial
-                  </button>
-                  <!-- <button class="w3-small" mat-menu-item (click)="onTransferMerma(true, raw, user)">
-                    <mat-icon>redo</mat-icon> Transferir de stock a merma
-                  </button> -->
-                  <button class="w3-small" mat-menu-item (click)="onTransferMerma(false, raw, user)">
-                    <mat-icon>undo</mat-icon> Transferir desde merma a stock
-                  </button>
-                  <!-- <button class="w3-small" mat-menu-item (click)="onCreateEditItem(true, raw)">
-                    <mat-icon>edit</mat-icon> Editar
-                  </button>
-                  <button class="w3-small" mat-menu-item (click)="onDeleteItem(raw)">
-                    <mat-icon>delete</mat-icon> Borrar
-                  </button> -->
-                </mat-menu>
+                </ng-template>
+              </td>
+            </ng-container>
 
-                <button mat-icon-button [matMenuTriggerFor]="rawMenu" [disabled]="user.seller || user.accountant">
-                  <mat-icon>more_vert</mat-icon>
-                </button>
+            <ng-container matColumnDef="description" sticky>
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Descripción
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.description |titlecase}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="sku">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                SKU
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.sku}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="category">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding"
+                mat-sort-header>
+                Categoria
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.category}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="price">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Precio
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.price | currency : 'S/.'}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="unitDescription">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Descripción de Unidad
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.unit.description}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="unitAbbreviation">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Abreviación
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.unit.abbreviation}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="unitWeight">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; white-space: nowrap; "
+                class="w3-center w3-padding  ">
+                Peso (KG)
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.unit.weight}}KG
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="realStock">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Stock
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.realStock}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="mermaStock">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Merma
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.mermaStock}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="virtualStock">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Stock Virtual
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.virtualStock$ | async}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="sellMinimum">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Min. Venta
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.sellMinimum}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="alertMinimum">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Min. alerta
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.alertMinimum}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="published">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Estado
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.published ? 'Publicado' : 'Oculto'}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions" stickyEnd>
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding w3-border-left w3-border-lightgrey">Acciones</th>
+              <td style="padding:0px 24px" *matCellDef="let raw" class="w3-border-left w3-border-lightgrey">
+                <ng-container *ngIf="(auth.user$ | async) as user">
+                  <mat-menu #rawMenu="matMenu">
+                    <!-- <button class="w3-small" mat-menu-item (click)="onPromo(raw)">
+                      <mat-icon>local_offer</mat-icon> Promoción
+                    </button>
+                    <button class="w3-small" *ngIf="raw?.published else publish" mat-menu-item
+                      (click)="onPublish(raw, false)">
+                      <mat-icon>visibility_off</mat-icon> Ocultar
+                    </button>
+                    <ng-template #publish>
+                      <button class="w3-small" mat-menu-item (click)="onPublish(raw, true)">
+                        <mat-icon>visibility</mat-icon> Publicar
+                      </button>
+                    </ng-template>
+                    <div [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
+                      <button class="w3-small" mat-menu-item (click)="increasePriority(raw)" [disabled]="!categorySelected">
+                        <mat-icon>add</mat-icon> Prioridad
+                      </button>
+                    </div>
+                    <div [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
+                      <button class="w3-small" mat-menu-item (click)="decreasePriority(raw)" [disabled]="!categorySelected"
+                        [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
+                        <mat-icon>remove</mat-icon> Prioridad
+                      </button>
+                    </div> -->
+                    <button class="w3-small" mat-menu-item (click)="onTransferHistoryMerma(raw)">
+                      <mat-icon>history</mat-icon> Historial
+                    </button>
+                    <!-- <button class="w3-small" mat-menu-item (click)="onTransferMerma(true, raw, user)">
+                      <mat-icon>redo</mat-icon> Transferir de stock a merma
+                    </button> -->
+                    <button class="w3-small" mat-menu-item (click)="onTransferMerma(false, raw, user)">
+                      <mat-icon>undo</mat-icon> Transferir desde merma a stock
+                    </button>
+                    <!-- <button class="w3-small" mat-menu-item (click)="onCreateEditItem(true, raw)">
+                      <mat-icon>edit</mat-icon> Editar
+                    </button>
+                    <button class="w3-small" mat-menu-item (click)="onDeleteItem(raw)">
+                      <mat-icon>delete</mat-icon> Borrar
+                    </button> -->
+                  </mat-menu>
+
+                  <button mat-icon-button [matMenuTriggerFor]="rawMenu" [disabled]="user.seller || user.accountant">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                </ng-container>
+
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="productsDisplayedColumns; sticky: true" style="text-align-last: center;">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: productsDisplayedColumns;"></tr>
+
+            
+          </table>
+          <mat-paginator #productsPaginator style="border-radius: 0px 0px 10px 10px" [pageSizeOptions]="[5, 10, 20]"
+              showFirstLastButtons></mat-paginator>  
+          
+        </div>
+        
+      </div>
+    </ng-container>
+
+    <ng-template #history>
+      <!-- Merma table -->
+      <div *ngIf="mermaTableDataSource.data.length else default" class="w3-margin-top"
+        style="border-radius: 10px 10px 10px 10px;">
+        <div style="overflow:auto; border-radius: 10px 10px 0px 0px">
+          <table mat-table [dataSource]="mermaTableDataSource" matSort style="text-align: center !important; ">
+
+            <ng-container matColumnDef="index">
+              <th *matHeaderCellDef style="font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282;"
+                class="w3-center w3-padding  ">N°</th>
+              <td style="padding:0px 25px;" *matCellDef="let raw; let i = index">
+                {{1 + i + (mermaPaginator.pageIndex * mermaPaginator.pageSize)}}
+              </td>
+            </ng-container>
+
+            <!-- <ng-container matColumnDef="photoURL">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282;  "
+                class="w3-center w3-padding  ">
+                Imagen referencial
+              </th>
+              <td *matCellDef="let raw" class="w3-center" style="padding: 10px">
+                <a href="{{raw.photoURL}}" target="_blank" *ngIf="raw.photoURL; else defaultPicture">
+                  <div class="reveal">
+                    <div
+                      [className]="raw.promo?'border--secondary triangleTopLeft w3-card-4':'border--primary triangleTopLeft w3-card-4'">
+                      <div class="slogan background--secondary" *ngIf="raw['promo']"></div>
+                      <div class="promo" *ngIf="raw['promo']">OFERTA</div>
+                      <img [defaultImage]="defaultImage" [lazyLoad]="raw.photoURL" [offset]="100"
+                        style="object-fit:cover; width: 115px; height: 115px;">
+                    </div>
+                  </div>
+                </a>
+                <ng-template #defaultPicture>
+                  <div style="height:120px;padding:6px 6px">
+                    <img src="../../../assets/images/no-image.png" style="max-width:100%; height:100%" class="w3-card-4">
+                  </div>
+                </ng-template>
+              </td>
+            </ng-container> -->
+
+            <ng-container matColumnDef="description" sticky>
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; min-width:200px "
+                class="w3-center w3-padding  ">
+                Descripción
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.description |titlecase}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="sku">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                SKU
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.sku}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="category">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  "
+                mat-sort-header>
+                Categoria
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.category}}
+              </td>
+            </ng-container>
+
+            <!-- <ng-container matColumnDef="price">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Precio
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.price | currency : 'S/.'}}
+              </td>
+            </ng-container> -->
+
+            <ng-container matColumnDef="unitDescription">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Descripción de Unidad
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.unit.description}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="unitAbbreviation">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Abreviación
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.unit.abbreviation}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="unitWeight">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Peso (KG)
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.unit.weight}}KG
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="date">
+                <th  *matHeaderCellDef mat-sort-header
+                  style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                  class="w3-center w3-padding">
+                Fecha/hora de movimiento
+                </th>
+                <td  *matCellDef="let request" class="w3-center"
+                  style="padding:0px 8px; font-weight: bold;">
+                  <span class="w3-small"
+                    style="font-weight:500">{{request.date['seconds'] * 1000 | date : 'dd/MM/yyyy'}}</span><br>
+                  <span class="w3-small">({{request.date['seconds'] * 1000 | date : 'hh:mm:ss'}})</span>
+                </td>
               </ng-container>
 
-            </td>
-          </ng-container>
+              <ng-container matColumnDef="toMerma">
+                <th  *matHeaderCellDef mat-sort-header
+                  style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                  class="w3-center w3-padding">
+                  Estado</th>
+                <td  *matCellDef="let request"
+                  style="padding:0px 8px; font-weight: bold; white-space: nowrap;">
+                  {{request.toMerma ? "De stock a merma" : "De merma a stock"}}
+                </td>
+              </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="productsDisplayedColumns; sticky: true" style="text-align-last: center;">
-          </tr>
-          <tr mat-row *matRowDef="let row; columns: productsDisplayedColumns;"></tr>
+              <ng-container matColumnDef="quantity">
+                <th  *matHeaderCellDef mat-sort-header
+                  style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282;"
+                  class="w3-center w3-padding">
+                  Cant
+                </th>
+                <td  *matCellDef="let request;"
+                  style="padding:0px 8px; font-weight: bold;">
+                  {{request.quantity}}
+                </td>
+              </ng-container>
 
-        </table>
+              <ng-container matColumnDef="user">
+                <th  *matHeaderCellDef mat-sort-header
+                  style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282;"
+                  class="w3-center w3-padding">
+                  Usuario</th>
+                <td  *matCellDef="let request"
+                  style="padding:0px 8px; font-weight: bold;">
+                  <span>{{request.user.displayName}}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="observations">
+                <th  *matHeaderCellDef mat-sort-header
+                  style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282;"
+                  class="w3-center w3-padding">
+                  Observaciones</th>
+                <td  *matCellDef="let request"
+                  style="padding:0px 8px; font-weight: bold; min-width:200px">
+                  <span>{{request.observations}}</span>
+                </td>
+              </ng-container>
+
+            <!-- <ng-container matColumnDef="realStock">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Stock
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.realStock}}
+              </td>
+            </ng-container> 
+
+            <ng-container matColumnDef="mermaStock">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Merma
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.mermaStock}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="virtualStock">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Stock Virtual
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.virtualStock$ | async}}
+              </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="sellMinimum">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Min. Venta
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.sellMinimum}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="alertMinimum">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Min. alerta
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.alertMinimum}}
+              </td>
+            </ng-container>
+            
+
+            <ng-container matColumnDef="published">
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding  ">
+                Estado
+              </th>
+              <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+                {{raw.published ? 'Publicado' : 'Oculto'}}
+              </td>
+            </ng-container>
+            -->
+
+            <ng-container matColumnDef="actions" stickyEnd>
+              <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
+                class="w3-center w3-padding w3-border-left w3-border-lightgrey">Acciones</th>
+              <td style="padding:0px 24px" *matCellDef="let raw" class="w3-border-left w3-border-lightgrey">
+                <ng-container *ngIf="(auth.user$ | async) as user">
+                  <mat-menu #rawMenu="matMenu">
+                    <button class="w3-small" mat-menu-item (click)="onTransferHistoryMerma(raw)">
+                      <mat-icon>history</mat-icon> Historial
+                    </button>
+                    <!-- <button class="w3-small" mat-menu-item (click)="onTransferMerma(false, raw, user)">
+                      <mat-icon>undo</mat-icon> Transferir desde merma a stock
+                    </button> -->
+                  </mat-menu>
+
+                  <button mat-icon-button [matMenuTriggerFor]="rawMenu" [disabled]="user.seller || user.accountant">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                </ng-container>
+
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="mermaDisplayedColumns; sticky: true" style="text-align-last: center;">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: mermaDisplayedColumns;"></tr>
+
+          </table>
+        </div>
+        <mat-paginator #mermaPaginator style="border-radius: 0px 0px 10px 10px" [pageSizeOptions]="[5, 10, 20]"
+          showFirstLastButtons></mat-paginator>
       </div>
-      <mat-paginator #productsPaginator style="border-radius: 0px 0px 10px 10px" [pageSizeOptions]="[5, 10, 20]"
-        showFirstLastButtons></mat-paginator>
-    </div>
+    </ng-template>
 
   </div>
 
