@@ -41,3 +41,5 @@ export interface MermaTransfer {
   user: User;
   observations: string;
 }
+
+export interface MermaTransferWithProduct extends MermaTransfer, Product {} 

@@ -1,10 +1,10 @@
 import { DatabaseService } from 'src/app/core/services/database.service';
-import { FormBuilder, FormGroup, Validators, AbstractControl, FormControl } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, FormControl, ValidationErrors } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { map, startWith, tap, debounceTime, take, switchMap, mapTo } from 'rxjs/operators';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { Observable, of, combineLatest } from 'rxjs';
+import { Observable, of, combineLatest, BehaviorSubject } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -16,6 +16,8 @@ export class LoginDialogComponent implements OnInit {
   version: string
   auth$: Observable<any>
   dataFormGroup: FormGroup;
+
+  registerLogin$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false) //true when email already exist, so you need to login
 
   hidePass: boolean = true;
 
@@ -51,17 +53,10 @@ export class LoginDialogComponent implements OnInit {
       })
     )
 
-    this.register$ = this.registerForm.valueChanges.pipe(
-      startWith(false),
-      tap(res => {
-        this.register = res
-      })
-    )
-
   }
 
   login(): void {
-    this.auth.signInEmail(this.dataFormGroup.value['email'], this.dataFormGroup.value['pass'])
+    this.auth.signInEmail(this.dataFormGroup.get('email').value, this.dataFormGroup.get('pass').value)
       .then(res => {
         this.snackbar.open('Hola!', 'Cerrar', {
           duration: 6000
@@ -92,55 +87,57 @@ export class LoginDialogComponent implements OnInit {
       });
   }
 
-  emailRepeatedValidator() {
-    return (control: AbstractControl) => {
-      const value = control.value;
-      return this.dbs.getUsersStatic().pipe(
-        map(res => {
-          if (this.register) {
-            return res.find(el => el.email == value) ? null : { emailRepeatedValidator: true }
-          } else {
-            return res.find(el => el.email == value) ? { emailRepeatedValidator: true } : null
-          }
-        }))
-    }
-  }
-
-  reset() {
-    let data = this.dataFormGroup.value
-    this.dataFormGroup = this.fb.group({
-      email: [data.email, [Validators.required, Validators.email], [this.emailRepeatedValidator()]],
-      pass: [data.pass, [Validators.required, Validators.minLength(6)]]
-    });
+  signInProvider(type: 'facebook'|'google') {
+    this.auth.signIn(type).then(res => {
+      if(res){
+        this.snackbar.open('¡Bienvenido!', 'Cerrar');
+      } else {
+        this.snackbar.open('Parece que hubo un error ...', 'Cerrar');
+        console.log('res from signingoogle not found');
+      }
+    })
+    .catch(error => {
+      this.snackbar.open('Parece que hubo un error ...', 'Cerrar');
+      console.log(error);
+    });;
   }
 
   passwordReset() {
-    if (this.dataFormGroup.get('email').value) {
-      if (this.dataFormGroup.get('email').valid) {
-        //console.log('email');
-        this.auth.resetPassword(this.dataFormGroup.get('email').value).then(() => {
-          // Email sent.
+    this.auth.resetPassword(this.dataFormGroup.get('email').value).then(() => {
+      // Email sent.
+      this.snackbar.open(
+        'Se envió un correo para restaurar su contraseña. Revise correo no deseado.',
+        'Cerrar');
+    }).catch((error) => {
+      this.snackbar.open(
+        'Ocurrió un error. Por favor, vuelva a intentarlo.',
+        'Cerrar');
+    });
+  }
 
-          this.snackbar.open(
-            'Se envió un correo para restaurar su contraseña, sino aparece revise correo no deseado',
-            'Cerrar',
-            { duration: 6000, }
-          );
-        }).catch((error) => {
-          this.snackbar.open(
-            'Ocurrió un error. Por favor, vuelva a intentarlo.',
-            'Cerrar',
-            { duration: 6000, }
-          );
-        });
-
-      } else {
-        this.snackbar.open('Escribe un correo válido', 'Cerrar', {
-          duration: 6000
-        });
-      }
-    } else {
-      //this.dataFormGroup.get('email').setErrors()
+  emailRepeatedValidator() {
+    return (control: AbstractControl): Observable<ValidationErrors|null> => {
+      const email = control.value;
+      return this.dbs.emailMethod(email).pipe(
+        debounceTime(500),
+        map(res => {
+          control.parent.get('pass').enable()
+          this.registerLogin$.next(false)
+          switch(res[0]) {
+            case 'google.com':
+              control.parent.get('pass').disable()
+              return {googleLogin: true}
+            case 'facebook.com':
+              control.parent.get('pass').disable()
+              return {facebookLogin: true}
+            case 'password':
+              this.registerLogin$.next(true)
+              return null
+            default: 
+              return null
+          }
+        }
+      ))
     }
   }
 }
