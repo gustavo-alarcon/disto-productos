@@ -11,7 +11,7 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class ShoppingCartComponent implements OnInit {
 
-  @Input() delivery: number = 0
+  @Input() delivery: number = 6
   @Input() order: {
     product: Product,
     quantity: number

@@ -37,7 +37,6 @@ export class PurchaseComponent implements OnInit {
 
   name: boolean = false
   total: number = 0
-  delivery: number = 0
 
   firstFormGroup: FormGroup;
   secondFormGroup: FormGroup;
@@ -73,7 +72,7 @@ export class PurchaseComponent implements OnInit {
     private fb: FormBuilder,
     private ng2ImgMax: Ng2ImgMaxService,
     private dialog: MatDialog,
-    private dbs: DatabaseService,
+    public dbs: DatabaseService,
     private af: AngularFirestore
   ) { }
 
@@ -132,9 +131,6 @@ export class PurchaseComponent implements OnInit {
       photoURL: [null]
     });
 
-
-
-    this.delivery = this.dbs.delivery
     this.total = [...this.dbs.order].map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
 
     this.order = [...this.dbs.order]
@@ -216,7 +212,6 @@ export class PurchaseComponent implements OnInit {
 
   changeDelivery(district) {
     this.dbs.delivery = district['delivery']
-    this.delivery = district['delivery']
   }
 
   roundNumber(number) {
@@ -417,7 +412,7 @@ export class PurchaseComponent implements OnInit {
       requestedProducts: this.dbs.order,
       status: 'Solicitado',
       total: this.total,
-      deliveryPrice: this.delivery,
+      deliveryPrice: this.dbs.delivery,
       voucher: [],
       voucherChecked: false
     }

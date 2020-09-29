@@ -79,7 +79,7 @@
                     <mat-error>Campo requerido</mat-error>
                 </mat-form-field>
 
-                <div *ngIf="delivery > 0" class="w3-margin-bottom">
+                <div *ngIf="dbs.delivery > 0" class="w3-margin-bottom">
                   <div class="ticket__separate"></div>
                   <div class="ms-flex">
                     <div style="width: 70%; text-align: right; padding: 0 20px">Total</div>
@@ -89,12 +89,12 @@
                     <div style="width: 70%; text-align: right; padding: 0 20px">
                       Delivery
                     </div>
-                    <div style="width: 30%">S/. {{ delivery | number: ".2" }}</div>
+                    <div style="width: 30%">S/. {{ dbs.delivery | number: ".2" }}</div>
                   </div>
                   <div class="ticket__separate"></div>
                   <div class="ms-flex font--primary" style="font-weight: 900;">
                     <div style="width: 70%;"></div>
-                    <div style="width: 30%">S/. {{total + delivery | number: '.2'}}</div>
+                    <div style="width: 30%">S/. {{total + dbs.delivery | number: '.2'}}</div>
                   </div>
                 </div>
 
@@ -137,7 +137,7 @@
                             Total a pagar
                         </div>
                         <div class="ticket__total">
-                            S/. {{total + delivery | number: '.2'}}
+                            S/. {{total + dbs.delivery | number: '.2'}}
                         </div>
                     </div>
 
