@@ -17,7 +17,8 @@
         <form [formGroup]="dataFormGroup">
             <mat-form-field class="w3-block w3-small" appearance="outline">
                 <mat-label>Usuario</mat-label>
-                <input matInput type="text" formControlName="email" placeholder="Correo electrónico" autocomplete="off">
+                <input matInput type="email" autocapitalize="none"
+                    formControlName="email" placeholder="Correo electrónico" autocomplete="off">
                 <mat-error>
                     <span *ngIf="dataFormGroup.get('email').errors?.required">Usuario requerido</span>
                     <span *ngIf="dataFormGroup.get('email').errors?.email">Email no válido</span>
@@ -30,7 +31,8 @@
 
             <mat-form-field class="w3-block w3-small" appearance="outline">
                 <mat-label>Contraseña</mat-label>
-                <input matInput [type]="hidePass ? 'password' : 'text'" formControlName="pass" placeholder="***"
+                <input matInput [type]="hidePass ? 'password' : 'text'" 
+                    formControlName="pass" placeholder="***" autocapitalize="none"
                     autocomplete="off">
                 <button mat-icon-button matSuffix (click)="hidePass = !hidePass"
                     [attr.aria-label]="'Ocultar contraseña'" [attr.aria-pressed]="hidePass">
