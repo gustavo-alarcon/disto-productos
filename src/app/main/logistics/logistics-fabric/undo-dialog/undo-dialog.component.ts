@@ -6,6 +6,7 @@ import { DatabaseService } from './../../../../core/services/database.service';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { MermaTransfer } from 'src/app/core/models/product.model';
 
 @Component({
   selector: 'app-undo-dialog',
@@ -61,6 +62,8 @@ export class UndoDialogComponent implements OnInit {
     const requestProductRef = this.af.firestore.collection(`/db/distoProductos/buys/${this.data.item.buyId}/buyRequestedProducts`).doc(this.data.item.id);
 
     const ref = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(this.data.item.id);
+    const transferHistoryRef = this.af.firestore.collection(this.dbs.productsListRef + `/${this.data.item.id}/mermaTransfer`).doc();
+
     this.af.firestore.runTransaction((transaction) => {
       return transaction.get(ref).then((prodDoc) => {
         let newStock = prodDoc.data().realStock - item.quantity
@@ -70,6 +73,20 @@ export class UndoDialogComponent implements OnInit {
           mermaStock: newMerma,
           realStock: newStock
         })
+
+        if (item.merma != 0) {
+          let mermaTransferData: MermaTransfer = {
+            date: new Date(),
+            id: transferHistoryRef.id,
+            productId: this.data.item.id,
+            quantity: item.merma,
+            toMerma: false,
+            user: null,
+            observations: 'anulado en logistica'
+          }
+          transaction.set(transferHistoryRef, mermaTransferData)
+        }
+
 
         transaction.update(requestProductRef, {
           validated: false,
@@ -118,13 +135,14 @@ export class UndoDialogComponent implements OnInit {
     const requestProductRef = this.af.firestore.collection(`/db/distoProductos/buys/${product.buyId}/buyRequestedProducts`).doc(product.id);
     const productRef = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(product.id);
     let quantity = product.quantity - (product.validationData.mermaStock + product.validationData.returned)
+    const transferHistoryRef = this.af.firestore.collection(this.dbs.productsListRef + `/${this.data.item.id}/mermaTransfer`).doc();
 
     let returnAll$ = this.dbs.getBuyRequestedProducts(product.buyId).pipe(
       map(products => {
         let prodFilter = products.map(el => {
           let count = 0
           let retValid = true
-          
+
           if (el.validationData && el.id != product.id) {
             count = el.validationData.returned
             retValid = el.returnedValidated
@@ -158,6 +176,19 @@ export class UndoDialogComponent implements OnInit {
         return transaction.get(productRef).then((prodDoc) => {
           let newStock = prodDoc.data().realStock - quantity;
           let newMerma = prodDoc.data().mermaStock - product.validationData.mermaStock;
+
+          if (product.validationData.mermaStock != 0) {
+            let mermaTransferData: MermaTransfer = {
+              date: new Date(),
+              id: transferHistoryRef.id,
+              productId: this.data.item.id,
+              quantity: product.validationData.mermaStock,
+              toMerma: false,
+              user: null,
+              observations: 'anulado en logistica'
+            }
+            transaction.set(transferHistoryRef, mermaTransferData)
+          }
 
           transaction.update(productRef, {
             realStock: newStock,
