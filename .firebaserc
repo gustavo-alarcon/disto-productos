@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "disto-productos": {
+      "hosting": {
+        "disto-productos": [
+          "disto-productos"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "disto-productos"
+  }
+}
