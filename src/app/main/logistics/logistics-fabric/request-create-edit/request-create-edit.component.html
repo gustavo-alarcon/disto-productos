@@ -178,7 +178,7 @@
     style="display: block; width: 100%"
     (click)="onSubmitForm(null)"
     type="button"
-    [disabled]="!selectedProducts.value.length || requestFormGroup.pending || !providerForm.valid"
+    [disabled]="!selectedProducts.value.length || requestFormGroup.pending"
   >
     Guardar
   </button>
