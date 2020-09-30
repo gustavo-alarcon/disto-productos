@@ -368,12 +368,12 @@ export class PurchaseComponent implements OnInit {
       })
       if (counter > 1) {
         reduce = others.reduce((d, e) => d + e, 0)
-      }else{
+      } else {
         reduce = el.quantity
       }
 
       return {
-        product:el.product,
+        product: el.product,
         reduce: reduce
       }
     }).filter((dish, index, array) => array.findIndex(el => el.product['id'] === dish.product['id']) === index)
@@ -417,6 +417,13 @@ export class PurchaseComponent implements OnInit {
       voucherChecked: false
     }
 
+    const email = {
+      to: this.user.email,
+      template: {
+        name: 'saleEmail'
+      }
+    }
+    const emailRef = this.af.firestore.collection(`/mail`).doc();
 
     let userCorrelative = 1
     const ref = this.af.firestore.collection(`/users`).doc(this.user.uid);
@@ -456,6 +463,8 @@ export class PurchaseComponent implements OnInit {
           newSale.correlative = newCorr
 
           transaction.set(saleRef, newSale);
+          //email
+          transaction.set(emailRef,email)
           //user
           transaction.update(ref, {
             contact: newSale.location,
