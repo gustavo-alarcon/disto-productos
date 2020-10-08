@@ -384,8 +384,36 @@ export class PurchaseComponent implements OnInit {
   }
 
   save() {
-    this.loading.next(true)
+    //this.loading.next(true)
+    let safe=[]
 
+    let reduceOrder = this.getneworder()
+    reduceOrder.forEach((order, ind) => {
+      const ref = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(order.product.id);
+      this.af.firestore.runTransaction((transaction) => {
+        return transaction.get(ref).then((prodDoc) => {
+          let newStock = prodDoc.data().realStock - order.reduce;
+
+          transaction.update(ref, { realStock: newStock});
+        });
+      }).then(() => {
+        safe.push(true)
+        if (reduceOrder.length-1 == ind) {
+          this.savePurchase()
+        }
+
+      }).catch(()=>{
+        safe.push(false)
+
+      })
+
+
+    })
+
+
+
+  }
+  savePurchase() {
     const saleCount = this.af.firestore.collection(`/db/distoProductos/config/`).doc('generalConfig');
     const saleRef = this.af.firestore.collection(`/db/distoProductos/sales`).doc();
 
@@ -464,7 +492,7 @@ export class PurchaseComponent implements OnInit {
 
           transaction.set(saleRef, newSale);
           //email
-          transaction.set(emailRef,email)
+          transaction.set(emailRef, email)
           //user
           transaction.update(ref, {
             contact: newSale.location,
@@ -478,39 +506,21 @@ export class PurchaseComponent implements OnInit {
         });
 
       }).then(() => {
-        let reduceOrder = this.getneworder()
-
-        reduceOrder.forEach((order, ind) => {
-          const ref = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(order.product.id);
-          this.af.firestore.runTransaction((transaction) => {
-            return transaction.get(ref).then((prodDoc) => {
-              let newStock = prodDoc.data().realStock - order.reduce;
-              transaction.update(ref, { realStock: newStock });
-            });
-          }).then(() => {
-            if (ind == this.order.length - 1) {
-              this.dialog.open(SaleDialogComponent, {
-                data: {
-                  name: this.firstFormGroup.value['name'],
-                  number: newSale.correlative,
-                  email: this.user.email
-                }
-              })
-
-              this.dbs.order = []
-              this.dbs.total = 0
-              this.dbs.view.next(1)
-              this.loading.next(false)
-            }
-
-          })
+        this.dialog.open(SaleDialogComponent, {
+          data: {
+            name: this.firstFormGroup.value['name'],
+            number: newSale.correlative,
+            email: this.user.email
+          }
         })
+
+        this.dbs.order = []
+        this.dbs.total = 0
+        this.dbs.view.next(1)
+        this.loading.next(false)
       }).catch(function (error) {
         console.log("Transaction failed: ", error);
       });
     })
-
-
   }
-
 }

@@ -793,4 +793,20 @@ export class DatabaseService {
   emailMethod(email: string): Observable<string[]> {
     return from(this.afAuth.fetchSignInMethodsForEmail(email))
   }
+
+  //NUEVO
+
+  getProduct(id) {
+    return this.afs.collection<Product>(this.productsListRef).doc(id)
+      .valueChanges().pipe(
+        shareReplay(1)
+      );
+  }
+
+  getPackage(id) {
+    return this.afs.collection<Package>(this.packagesListRef).doc(id)
+      .valueChanges().pipe(
+        shareReplay(1)
+      );
+  }
 }

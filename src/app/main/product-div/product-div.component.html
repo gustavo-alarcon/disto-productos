@@ -1,4 +1,4 @@
-<mat-card [ngClass]="package?'product product--package w3-margin-bottom':'product product--product w3-margin-bottom'">
+<mat-card *ngIf="product$ | async" [ngClass]="package?'product product--package w3-margin-bottom':'product product--product w3-margin-bottom'">
     <div class="ms-flex product__container">
         <div class="product__image-div">
             <img [defaultImage]="defaultImage" [lazyLoad]="product.photoURL" [offset]="100" class="product__image">
@@ -35,7 +35,7 @@
                                 {{status['description'] | titlecase}} ({{status.unit.abbreviation}})
                             </mat-option>
                         </mat-select>
-    
+
                     </div>
                 </div>
             </div>

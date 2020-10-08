@@ -6,6 +6,8 @@ import { Product } from 'src/app/core/models/product.model';
 import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { StoreClosedDialogComponent } from 'src/app/shared-dialogs/store-closed-dialog/store-closed-dialog.component';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-product-div',
@@ -15,10 +17,13 @@ import { StoreClosedDialogComponent } from 'src/app/shared-dialogs/store-closed-
 export class ProductDivComponent implements OnInit {
 
   @Input() package: boolean
-  @Input() product: Product
+  @Input() id: string
   @Input() maxWeight: number
   @Input() buttonAdd: boolean
   defaultImage = "../../../assets/images/Disto_Logo1.png";
+
+  product$:Observable<any>
+  product: Product
 
   constructor(
     public dbs: DatabaseService,
@@ -28,7 +33,19 @@ export class ProductDivComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // console.log(this.product);
+    if(this.package){
+      this.product$ = this.dbs.getPackage(this.id).pipe(
+        tap(res=>{
+          this.product = res
+        })
+      )
+    }else{
+      this.product$ = this.dbs.getProduct(this.id).pipe(
+        tap(res=>{
+          this.product = res
+        })
+      )
+    }
   }
 
   add(item) {
