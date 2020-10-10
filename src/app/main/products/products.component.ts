@@ -84,7 +84,7 @@ export class ProductsComponent implements OnInit {
       )
     ).pipe(
       map(([route, products, packages, search]) => {
-        let publish = products.filter(el => route ? el.category == route : true)
+        let publish = products.filter(el => route ? el.category == route : true).filter(el => el.published)
         let packPublish = [...packages].filter(el => el.published).map(el => {
           el['items'] = el.items.map(el => {
             let options = [...el.productsOptions].map(ul => {
