@@ -148,7 +148,7 @@ export class DatabaseService {
       }));
   }
 
-  getProductsListValueChanges() {
+  getProductsListValueChanges(): Observable<Product[]> {
     return this.afs.collection<Product>(this.productsListRef, ref => ref.orderBy("priority", "desc"))
       .valueChanges().pipe(
         shareReplay(1)

@@ -384,31 +384,36 @@ export class PurchaseComponent implements OnInit {
   }
 
   save() {
-    //this.loading.next(true)
-    let safe=[]
-
+    this.loading.next(true)
     let reduceOrder = this.getneworder()
-    reduceOrder.forEach((order, ind) => {
-      const ref = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(order.product.id);
-      this.af.firestore.runTransaction((transaction) => {
-        return transaction.get(ref).then((prodDoc) => {
+    this.af.firestore.runTransaction((transaction) => {
+      let promises = []
+      reduceOrder.forEach((order, ind) => {
+        const sfDocRef = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(order.product.id);
+
+        promises.push(transaction.get(sfDocRef).then((prodDoc) => {
+
           let newStock = prodDoc.data().realStock - order.reduce;
+          transaction.update(sfDocRef, { realStock: newStock });
 
-          transaction.update(ref, { realStock: newStock});
-        });
-      }).then(() => {
-        safe.push(true)
-        if (reduceOrder.length-1 == ind) {
-          this.savePurchase()
-        }
+        }).catch(function (error) {
+          console.log("Transaction failed: ", error);
+        }));
 
-      }).catch(()=>{
-        safe.push(false)
 
       })
+      return Promise.all(promises);
+    }).then(() => {
+        this.savePurchase()
+
+
+    }).catch(() => {
+      this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
 
 
     })
+
+
 
 
 
@@ -519,7 +524,7 @@ export class PurchaseComponent implements OnInit {
         this.dbs.view.next(1)
         this.loading.next(false)
       }).catch(function (error) {
-        console.log("Transaction failed: ", error);
+        this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
       });
     })
   }

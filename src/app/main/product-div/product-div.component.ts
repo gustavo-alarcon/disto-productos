@@ -6,8 +6,8 @@ import { Product } from 'src/app/core/models/product.model';
 import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { StoreClosedDialogComponent } from 'src/app/shared-dialogs/store-closed-dialog/store-closed-dialog.component';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, combineLatest } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-product-div',
@@ -34,7 +34,26 @@ export class ProductDivComponent implements OnInit {
 
   ngOnInit(): void {
     if(this.package){
-      this.product$ = this.dbs.getPackage(this.id).pipe(
+      this.product$ = combineLatest(
+        this.dbs.getProductsListValueChanges(),
+        this.dbs.getPackage(this.id)
+      ).pipe(
+        map(([productsList,pack])=>{
+          pack['items'] = pack['items'].map(el => {
+            let options = [...el.productsOptions].map(ul => {
+              let productOp = productsList.filter(lo => lo.id == ul.id)[0]
+              return productOp
+            })
+
+            // let select = options.filter(lu => (lu.realStock >= lu.sellMinimum) && lu.published)[0]
+            let select = options.filter(lu => (lu?.realStock >= lu?.sellMinimum))[0]
+            return {
+              productsOptions: options,
+              choose: select
+            }
+          })
+          return pack;
+        }),
         tap(res=>{
           this.product = res
         })

@@ -85,33 +85,13 @@ export class ProductsComponent implements OnInit {
     ).pipe(
       map(([route, products, packages, search]) => {
         let publish = products.filter(el => route ? el.category == route : true).filter(el => el.published)
-        let packPublish = [...packages].filter(el => el.published).map(el => {
-          el['items'] = el.items.map(el => {
-            let options = [...el.productsOptions].map(ul => {
-              let productOp = products.filter(lo => lo.id == ul.id)[0]
-              return productOp
-            })
-
-            // let select = options.filter(lu => (lu.realStock >= lu.sellMinimum) && lu.published)[0]
-            let select = options.filter(lu => (lu?.realStock >= lu?.sellMinimum))[0]
-            return {
-              productsOptions: options,
-              choose: select
-            }
-          })
-
-          return el
-        }).filter(el => route ? el.category == route : true)
+        let packPublish = [...packages].filter(el => el.published).filter(el => route ? el.category == route : true)
 
         let any = [].concat(packPublish, publish)
-
-
-        return any.filter(el => search ? el.description.toLowerCase().includes(search) : true)
-      }),
-      tap(res => {
         if (this.dbs.order.length == 0 && localStorage.getItem('order') && localStorage.getItem('dbsorder')) {
           let guardado = localStorage.getItem('dbsorder')
-          this.dbs.order = JSON.parse(guardado)
+          let neworder = JSON.parse(guardado)
+          this.dbs.order = neworder
           if (this.dbs.order.length) {
             this.dbs.view.next(2)
             this.dbs.total = this.dbs.order.map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
@@ -119,6 +99,9 @@ export class ProductsComponent implements OnInit {
           }
 
         }
+
+        return any.filter(el => search ? el.description.toLowerCase().includes(search) : true)
+
       })
     )
 
