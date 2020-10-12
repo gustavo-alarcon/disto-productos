@@ -25,6 +25,7 @@ export class ProductDivComponent implements OnInit {
   product$:Observable<any>
   product: Product
 
+  productsList:Array<Product>
   constructor(
     public dbs: DatabaseService,
     private router: Router,
@@ -39,6 +40,7 @@ export class ProductDivComponent implements OnInit {
         this.dbs.getPackage(this.id)
       ).pipe(
         map(([productsList,pack])=>{
+          this.productsList = productsList
           pack['items'] = pack['items'].map(el => {
             let options = [...el.productsOptions].map(ul => {
               let productOp = productsList.filter(lo => lo.id == ul.id)[0]
@@ -61,6 +63,11 @@ export class ProductDivComponent implements OnInit {
     }else{
       this.product$ = this.dbs.getProduct(this.id).pipe(
         tap(res=>{
+          let index = this.dbs.order.findIndex(el => el['product']['id'] == res['id'])
+          if (index != -1){
+            res['realStock']-=this.dbs.order[index]['quantity']
+          }
+         
           this.product = res
         })
       )
@@ -82,6 +89,9 @@ export class ProductDivComponent implements OnInit {
       }
       this.dbs.order.push(newpackage)
     } else {
+      this.product.realStock--
+      console.log(this.product);
+      
       let index = this.dbs.order.findIndex(el => el['product']['id'] == item['id'])
 
       if (index == -1) {
