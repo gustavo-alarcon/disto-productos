@@ -18,7 +18,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
   providedIn: 'root'
 })
 export class DatabaseService {
-  public version: string = 'V1.1.46r';
+  public version: string = 'V1.1.47r';
   public isOpen: boolean = false;
   public isAdmin: boolean = false;
 

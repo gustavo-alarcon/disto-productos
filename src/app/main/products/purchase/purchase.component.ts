@@ -394,17 +394,36 @@ export class PurchaseComponent implements OnInit {
         promises.push(transaction.get(sfDocRef).then((prodDoc) => {
 
           let newStock = prodDoc.data().realStock - order.reduce;
-          transaction.update(sfDocRef, { realStock: newStock });
+          if(newStock>=prodDoc.data().sellMinimum){
+            transaction.update(sfDocRef, { realStock: newStock });
+            return true
+          }else{
+            return false
+          }
+          
 
-        }).catch(function (error) {
+        }).catch((error)=> {
           console.log("Transaction failed: ", error);
+          return false
+          
         }));
 
 
       })
       return Promise.all(promises);
-    }).then(() => {
-        this.savePurchase()
+    }).then(res => {
+      
+      let failedItems = [];
+      let rightItems = [];
+      res.forEach((el, index) => {
+        if (!el) {
+          failedItems.push(index);
+        } else {
+          rightItems.push(index);
+        }
+      });
+      
+      this.savePurchase()
 
 
     }).catch(() => {

@@ -43,7 +43,10 @@ export class ProductDivComponent implements OnInit {
           this.productsList = productsList
           pack['items'] = pack['items'].map(el => {
             let options = [...el.productsOptions].map(ul => {
-              let productOp = productsList.filter(lo => lo.id == ul.id)[0]
+              let productOp = productsList.filter(lo => lo.id == ul.id).map(lu=>{
+                
+                return this.inOrder(lu)
+              })[0]
               return productOp
             })
 
@@ -63,19 +66,32 @@ export class ProductDivComponent implements OnInit {
     }else{
       this.product$ = this.dbs.getProduct(this.id).pipe(
         tap(res=>{
-          let index = this.dbs.order.findIndex(el => el['product']['id'] == res['id'])
-          if (index != -1){
-            res['realStock']-=this.dbs.order[index]['quantity']
-          }
-         
-          this.product = res
+          this.product = this.inOrder(res)
         })
       )
     }
   }
 
-  add(item) {
+  inOrder(res){
+    let index = this.dbs.order.findIndex(el => el['product']['id'] == res['id'])
+    if (index != -1){
+      res['realStock']-=this.dbs.order[index]['quantity']
+    }
+    let inPackage = this.dbs.order.filter(li=>{
+      if(li.product.package){
+        return li.chosenOptions.filter(lo=>lo['id']==res['id'])
+      }else{
+        return false
+      }
+    })
+    if(inPackage.length){
+      res['realStock']-=inPackage.length
+    }
+    return res
+  }
 
+  add(item) {
+    
     if (!this.dbs.isOpen && !this.dbs.isAdmin) {
       this.dialog.open(StoreClosedDialogComponent);
       return;
@@ -87,10 +103,25 @@ export class ProductDivComponent implements OnInit {
         quantity: 1,
         chosenOptions: item['items'].map(el => el['choose'])
       }
+      let change = false
+      this.product['items']=this.product['items'].map(el=>{
+        el['productsOptions']= el['productsOptions'].map(lo=>{
+          if(lo['id']==el['choose']['id']){
+            lo['realStock']--
+            change = change || lo['realStock']<=el['choose']['sellMinimum']
+          }
+          return lo
+        })
+        
+        if(change){
+          el['choose'] = el['productsOptions'].filter(lu => (lu?.realStock >= lu?.sellMinimum))[0]
+        }
+        
+        return el
+      })
       this.dbs.order.push(newpackage)
     } else {
       this.product.realStock--
-      console.log(this.product);
       
       let index = this.dbs.order.findIndex(el => el['product']['id'] == item['id'])
 
@@ -181,7 +212,7 @@ export class ProductDivComponent implements OnInit {
 
   optionDisabled(product: Product): boolean {
     let stock = product.realStock <= product.sellMinimum
-    return !product.published || stock
+    return stock
   }
 
   packageDisabled(pack): boolean {
