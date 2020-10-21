@@ -58,7 +58,7 @@
                                     <mat-icon>close</mat-icon>
                                 </button>
                             </div>
-                            <app-shopping-cart [delivery]="chooseSale.deliveryPrice"
+                            <app-shopping-cart [delivery]="chooseSale.deliveryPrice" [change]="false"
                                 [order]="chooseSale.requestedProducts" [modified]="false">
                             </app-shopping-cart>
 
@@ -111,7 +111,7 @@
                     <h2 class="title2 w3-margin-left">Lista de compras
                         #{{chooseSale.correlativeType}}{{("000"+chooseSale.correlative).slice(-4)}} 🛒</h2>
                 </div>
-                <app-shopping-cart [delivery]="chooseSale.deliveryPrice" [order]="chooseSale.requestedProducts"
+                <app-shopping-cart [delivery]="chooseSale.deliveryPrice" [change]="false" [order]="chooseSale.requestedProducts"
                     [modified]="false"></app-shopping-cart>
 
             </div>

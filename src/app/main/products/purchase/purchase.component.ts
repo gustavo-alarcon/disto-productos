@@ -323,7 +323,8 @@ export class PurchaseComponent implements OnInit {
   }
 
   prueba() {
-    this.updateUser()
+    this.save()
+    /*this.updateUser()
     if (this.firstFormGroup.valid && this.secondFormGroup.valid) {
       if (this.payFormGroup.valid) {
         if (!this.payFormGroup.value['photoURL']) {
@@ -336,7 +337,7 @@ export class PurchaseComponent implements OnInit {
       }
     } else {
       this.snackbar.open('Parece que hubo un problema, complete todos los campos anteriores', 'cerrar')
-    }
+    }*/
 
   }
 
@@ -384,7 +385,7 @@ export class PurchaseComponent implements OnInit {
   }
 
   save() {
-    this.loading.next(true)
+    //this.loading.next(true)
     let reduceOrder = this.getneworder()
     this.af.firestore.runTransaction((transaction) => {
       let promises = []
@@ -395,16 +396,27 @@ export class PurchaseComponent implements OnInit {
 
           let newStock = prodDoc.data().realStock - order.reduce;
           if(newStock>=prodDoc.data().sellMinimum){
-            transaction.update(sfDocRef, { realStock: newStock });
-            return true
+            return {
+              isSave:true,
+              index:ind
+            }
           }else{
-            return false
+            return {
+              isSave:false,
+              id:prodDoc.data().id,
+              stock:prodDoc.data().realStock-prodDoc.data().sellMinimum,
+              index:ind
+            }
           }
           
 
         }).catch((error)=> {
           console.log("Transaction failed: ", error);
-          return false
+          return {
+            isSave:false,
+            stock:-1,
+            index:ind
+          }
           
         }));
 
@@ -415,15 +427,45 @@ export class PurchaseComponent implements OnInit {
       
       let failedItems = [];
       let rightItems = [];
-      res.forEach((el, index) => {
-        if (!el) {
-          failedItems.push(index);
+      res.forEach(el => {
+        if (!el.isSave) {
+          failedItems.push(el);
         } else {
-          rightItems.push(index);
+          rightItems.push(el);
         }
       });
-      
-      this.savePurchase()
+      if(failedItems.length){
+        console.log('Hubo problemas de stock');
+        let mess=[]
+        failedItems.forEach(el=>{
+          console.log(el);
+          
+          if(el.stock >= 0){
+            mess.push({
+              product:reduceOrder[el.index]["product"],
+              stock:el['stock']
+            })
+            
+            let index = this.dbs.order.findIndex(
+              (lu) => lu["product"]["id"] == el.id
+            );
+            
+            if (index != -1) {
+              this.dbs.order[index]["quantity"] = el['stock'];
+            }
+          }
+          
+        })
+        console.log(this.dbs.order);
+        
+        this.save()
+        
+      }else{
+        console.log('todo bien');
+        
+      }
+      console.log(failedItems);
+      //this.savePurchase()
 
 
     }).catch(() => {
@@ -433,10 +475,8 @@ export class PurchaseComponent implements OnInit {
     })
 
 
-
-
-
   }
+  
   savePurchase() {
     const saleCount = this.af.firestore.collection(`/db/distoProductos/config/`).doc('generalConfig');
     const saleRef = this.af.firestore.collection(`/db/distoProductos/sales`).doc();

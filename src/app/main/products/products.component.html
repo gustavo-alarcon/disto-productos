@@ -92,18 +92,6 @@
             </div>
           </ng-template>
         </div>
-        <ng-template #load>
-          <div style="height: 70vh" class="w3-display-container">
-            <div class="w3-display-middle">
-              <div class="lds-ring">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-              </div>
-            </div>
-          </div>
-        </ng-template>
       </div>
       <div *ngIf="(dbs.view$ | async) == 2" style="max-width: 400px">
         <div class="ms-flex ms-flex--center">
@@ -125,11 +113,14 @@
           </button>
           <h2 class="title2 w3-margin-left">Lista de compras 🛒</h2>
         </div>
-        <app-shopping-cart
-          [delivery]="dbs.delivery"
-          [order]="dbs.order"
-          [modified]="true"
-        ></app-shopping-cart>
+        <div *ngIf="loadCart$ | async; else load">
+          <app-shopping-cart
+            [delivery]="dbs.delivery"
+            [order]="dbs.order"
+            [modified]="true"
+            [change]="true"
+          ></app-shopping-cart>
+        </div>
 
         <button
           *ngIf="auth.user$ | async; else register"
@@ -180,21 +171,34 @@
             <app-purchase></app-purchase>
           </div>
           <span class="ms-fill"></span>
-          <div #scroll >
-            <mat-card style="min-width: 400px;padding: 10px 16px;"
+          <div #scroll>
+            <mat-card
+              style="min-width: 400px; padding: 10px 16px"
               class="w3-hide-small w3-hide-medium"
-              >
+            >
               <app-shopping-cart
                 [delivery]="dbs.delivery"
                 [order]="dbs.order"
                 [modified]="false"
+                [change]="true"
               >
               </app-shopping-cart>
             </mat-card>
           </div>
         </div>
       </div>
-
+      <ng-template #load>
+        <div style="height: 70vh" class="w3-display-container">
+          <div class="w3-display-middle">
+            <div class="lds-ring">
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
       <p *ngIf="init$ | async"></p>
     </div>
     <div class="w3-col s0 m1 l1">
