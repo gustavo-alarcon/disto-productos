@@ -1,0 +1,78 @@
+<div class="w3-section w3-margin-left w3-margin-right">
+  <div class="w3-row">
+    <div class="w3-col s0 m1 l1">
+      <p class="w3-hide-small"></p>
+    </div>
+    <div class="w3-col s12 m10 l10">
+      <div style="max-width: 400px">
+        <div class="ms-flex ms-flex--center">
+          <button
+            mat-icon-button
+            class="w3-hide-small"
+            style="margin-left: -10px; margin-top: -10px"
+            (click)="back(false)"
+          >
+            <mat-icon>keyboard_backspace</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            class="w3-hide-large w3-hide-medium"
+            style="margin-left: -10px; margin-top: -10px"
+            (click)="back(true)"
+          >
+            <mat-icon>keyboard_backspace</mat-icon>
+          </button>
+          <h2 class="title2 w3-margin-left">Lista de compras 🛒</h2>
+        </div>
+        <div *ngIf="loadCart$ | async; else load">
+          <app-shopping-cart
+            [delivery]="dbs.delivery"
+            [order]="dbs.order"
+            [modified]="true"
+            [change]="true"
+          ></app-shopping-cart>
+        </div>
+
+        <button
+          *ngIf="auth.user$ | async; else register"
+          mat-raised-button
+          color="accent"
+          class="w3-block"
+          style="font-weight: bold"
+          routerLink="/main/products/compra"
+          [disabled]="dbs.order.length == 0"
+        >
+          Continuar con la compra
+          <mat-icon class="w3-margin-left">arrow_forward</mat-icon>
+        </button>
+        <ng-template #register>
+          <button
+            mat-raised-button
+            color="accent"
+            class="w3-block"
+            (click)="login()"
+            style="font-weight: bold"
+          >
+            Continuar con la compra
+            <mat-icon class="w3-margin-left">arrow_forward</mat-icon>
+          </button>
+        </ng-template>
+      </div>
+    </div>
+    <ng-template #load>
+      <div style="height: 70vh" class="w3-display-container">
+        <div class="w3-display-middle">
+          <div class="lds-ring">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+    <div class="w3-col s0 m1 l1">
+      <p class="w3-hide-small"></p>
+    </div>
+  </div>
+</div>

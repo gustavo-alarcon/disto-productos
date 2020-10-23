@@ -2,7 +2,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { User } from "src/app/core/models/user.model";
 import { AuthService } from "src/app/core/services/auth.service";
 import { MatDialog } from "@angular/material/dialog";
-import { map, startWith, filter, tap } from "rxjs/operators";
+import { map, startWith, filter, tap, switchMap } from "rxjs/operators";
 import { FormControl } from "@angular/forms";
 import { DatabaseService } from "src/app/core/services/database.service";
 import { Observable, combineLatest, BehaviorSubject } from "rxjs";
@@ -16,7 +16,7 @@ import {
 import { Product } from "src/app/core/models/product.model";
 import { LoginDialogComponent } from "../login-dialog/login-dialog.component";
 import { ScrollDispatcher } from "@angular/cdk/overlay";
-import { ChangeStockComponent } from './change-stock/change-stock.component';
+import { ChangeStockComponent } from "./change-stock/change-stock.component";
 @Component({
   selector: "app-products",
   templateUrl: "./products.component.html",
@@ -36,40 +36,23 @@ export class ProductsComponent implements OnInit {
 
   searchForm: FormControl = new FormControl("");
 
-  public loadCart = new BehaviorSubject<boolean>(false);
-  public loadCart$ = this.loadCart.asObservable();
-
   defaultImage = "../../../assets/images/default-image.jpg";
 
   user: User = null;
-  scroll$: Observable<any>;
 
   p: number = 1;
-
-  @ViewChild("scroll", { static: false }) scrollbar: ElementRef;
 
   constructor(
     public dbs: DatabaseService,
     private dialog: MatDialog,
     public auth: AuthService,
     private router: Router,
-    public scroll: ScrollDispatcher,
-    private renderer: Renderer2,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.dbs.delivery = 0;
-    this.scroll$ = this.scroll.scrolled().pipe(
-      tap((data) => {
-        const scrollTop = data.getElementRef().nativeElement.scrollTop || 0;
-        if (scrollTop >= 120) {
-          this.renderer.addClass(this.scrollbar.nativeElement, "shadow");
-        } else {
-          this.renderer.removeClass(this.scrollbar.nativeElement, "shadow");
-        }
-      })
-    );
+
     this.categoryList$ = combineLatest(
       this.route.fragment,
       this.dbs.getProductsListCategoriesValueChanges()
@@ -85,47 +68,47 @@ export class ProductsComponent implements OnInit {
       })
     );
 
-    this.products$ = combineLatest(
-      this.route.fragment,
-      this.dbs.getProductsList(),
-      this.dbs.getPackagesList(),
-      this.searchForm.valueChanges.pipe(
-        filter((input) => input !== null),
-        startWith<any>(""),
-        map((value) => value.toLowerCase())
-      )
-    ).pipe(
-      map(([route, products, packages, search]) => {
-        let publish = products
-          .filter((el) => (route ? el.category == route : true))
-          .filter((el) => !el.published);
-        let packPublish = [...packages]
-          .filter((el) => !el.published)
-          .filter((el) => (route ? el.category == route : true));
-
-        let any = [].concat(packPublish, publish);
-        if (
-          this.dbs.order.length == 0 &&
-          localStorage.getItem("order") &&
-          localStorage.getItem("dbsorder")
-        ) {
-          let guardado = localStorage.getItem("dbsorder");
-          let neworder = JSON.parse(guardado);
-          this.dbs.order = neworder;
-          if (this.dbs.order.length) {
-            this.dbs.view.next(2);
-            this.dbs.total = this.dbs.order
-              .map((el) => this.giveProductPrice(el))
-              .reduce((a, b) => a + b, 0);
-            this.dbs.sum.next(this.dbs.total);
-          }
-        }
-
-        return any.filter((el) =>
-          search ? el.description.toLowerCase().includes(search) : true
+    this.products$ = this.route.fragment.pipe(
+      switchMap(route=>{
+        return combineLatest(
+          this.dbs.getProductsListCategory(route),
+          this.dbs.getPackagesListCategory(route),
+          this.searchForm.valueChanges.pipe(
+            filter((input) => input !== null),
+            startWith<any>(""),
+            map((value) => value.toLowerCase())
+          )
+        ).pipe(
+          map(([products, packages, search]) => {
+            this.dbs.productView = route ? route : "";
+            let publish = products.filter((el) => el.published)
+            let packPublish = [...packages].filter((el) => el.published)
+    
+            let any = [].concat(packPublish, publish).sort((a,b)=>b.priority - a.priority);
+            if (
+              this.dbs.order.length == 0 &&
+              localStorage.getItem("order") &&
+              localStorage.getItem("dbsorder")
+            ) {
+              let guardado = localStorage.getItem("dbsorder");
+              let neworder = JSON.parse(guardado);
+              this.dbs.order = neworder;
+              this.dbs.orderObs.next(this.dbs.order)
+              if (this.dbs.order.length) {
+                this.dbs.total = this.dbs.order
+                  .map((el) => this.giveProductPrice(el))
+                  .reduce((a, b) => a + b, 0);
+                this.dbs.sum.next(this.dbs.total);
+              }
+            }
+    
+            return any.filter((el) =>
+              search ? el.description.toLowerCase().includes(search) : true
+            );
+          })
         );
       })
-    );
+    )
 
     this.init$ = combineLatest(
       this.auth.user$,
@@ -143,18 +126,6 @@ export class ProductsComponent implements OnInit {
       tap((res) => {
         if (res) {
           this.user = res;
-          if (res["salesCount"]) {
-            this.firstSale = false;
-          } else {
-            this.firstSale = true;
-          }
-
-          if (res["contact"]) {
-            this.name = res.name.split(" ")[0];
-            if (this.compareDistricts(res.contact.district)) {
-              this.dbs.delivery = res.contact.district.delivery;
-            }
-          }
         }
       })
     );
@@ -162,10 +133,6 @@ export class ProductsComponent implements OnInit {
     this.dbs.total = this.dbs.order
       .map((el) => this.giveProductPrice(el))
       .reduce((a, b) => a + b, 0);
-  }
-
-  compareDistricts(district) {
-    return this.districts.find((el) => el["name"] == district["name"]);
   }
 
   getdiscount(item: Product) {
@@ -198,23 +165,11 @@ export class ProductsComponent implements OnInit {
 
   shoppingCart() {
     //aqui comprobamos stock
-    let check = this.checkStock()
-    this.dbs.view.next(2);
-  }
-
-  back(route) {
-    if (route) {
-      this.router.navigate(["/main"]);
-    }
-    this.dbs.view.next(1);
-    this.p = 1;
-    this.dbs.total = this.dbs.order
-      .map((el) => this.giveProductPrice(el))
-      .reduce((a, b) => a + b, 0);
+    let check = this.checkStock();
+    this.router.navigate(["/main/products/carrito"]);
   }
 
   finish() {
-    this.dbs.view.next(3);
     //aqui también comprobamos stock
     this.p = 1;
     localStorage.removeItem("dbsorder");
@@ -227,10 +182,10 @@ export class ProductsComponent implements OnInit {
     this.router.navigate(["/main/products"], { fragment: name });
   }
 
-  checkStock(){
+  checkStock() {
     let reduceOrder = this.dbs.getneworder(this.dbs.order);
     this.dbs.saveTransaction(reduceOrder).then((res) => {
-      this.loadCart.next(true)
+      //this.loadCart.next(true)
       let failedItems = [];
       let rightItems = [];
       res.forEach((el) => {
@@ -243,32 +198,30 @@ export class ProductsComponent implements OnInit {
       if (failedItems.length) {
         let mess = [];
         failedItems.forEach((el) => {
-
           if (el.stock >= 0) {
             mess.push({
               product: reduceOrder[el.index]["product"],
               stock: el["stock"],
             });
           }
-          this.dbs.changeStock.next(mess)
+          this.dbs.changeStock.next(mess);
           this.dialog.open(ChangeStockComponent, {
             data: {
-              productos:mess.map(pr=>{
+              productos: mess.map((pr) => {
                 return {
-                  product:pr.product.description,
-                  stock:pr.stock
-                }
-              })
-            }
-          })
-          return false
+                  product: pr.product.description,
+                  stock: pr.stock,
+                };
+              }),
+            },
+          });
+          return false;
         });
       } else {
-        return true
-        
+        return true;
       }
-      return false
+      return false;
     });
-    
   }
+
 }

@@ -140,12 +140,14 @@ export class ValidatedReturnDialogComponent implements OnInit {
       this.af.firestore.runTransaction((transaction) => {
         return transaction.get(ref).then((prodDoc) => {
           let newStock = prodDoc.data().realStock + this.getStock();
+          let newVirtualStock = prodDoc.data().virtualStock + this.getStock();
           let newMerma = prodDoc.data().mermaStock + this.validatedFormGroup.value['mermaStock'];
           let discount = this.getStock() + this.validatedFormGroup.get('mermaStock').value
           let records = []
           transaction.update(ref, {
             mermaStock: newMerma,
-            realStock: newStock
+            realStock: newStock,
+            virtualStock:newVirtualStock
           })
 
           if (this.data.item.returnedRecord) {

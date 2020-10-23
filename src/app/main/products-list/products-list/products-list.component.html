@@ -42,7 +42,9 @@
     <button mat-raised-button style="height: 45px;" (click)="downloadXls()" color="accent">
       Descargar Excel
     </button>
-
+    <button mat-raised-button style="height: 45px;" (click)="virtualStock()" color="accent">
+      stock
+    </button>
   </div>
 
   <!-- Table -->
@@ -183,7 +185,7 @@
               Stock Virtual
             </th>
             <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.virtualStock$ | async}}
+              {{raw.virtualStock}}
             </td>
           </ng-container>
 

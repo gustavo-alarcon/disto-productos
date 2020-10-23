@@ -40,65 +40,75 @@ export class ProductDivComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    
     if (this.package) {
-      this.product$ = this.dbs.getPackage(this.id).pipe(
-        switchMap((pack) => {
-          let reduce = pack["items"]
-            .map((item) => item["productsOptions"].map((prd) => prd["id"]))
-            .reduce((a, b) => a.concat(b), []);
-
-          return this.dbs.getItemsPackage(reduce).pipe(
-            map((items) => {
-
-              pack["items"] = pack["items"].map((el) => {
-                let options = [...el.productsOptions].map((ul) => {
-                  let productOp = items
-                    .filter((lo) => lo.id == ul.id)
-                    .map((lu) => {
-                      return this.inOrder(lu);
-                    })[0];
-                  if (productOp) {
-                    ul["realStock"] = productOp["realStock"];
-                    ul["sellMinimum"] = productOp["sellMinimum"];
-                  }
-                  return ul;
-                });
-
-                // let select = options.filter(lu => (lu.realStock >= lu.sellMinimum) && lu.published)[0]
-                let select = options.filter(
-                  (lu) => lu?.realStock >= lu?.sellMinimum
-                )[0];
-                return {
-                  productsOptions: options,
-                  choose: select,
-                };
-              });
-              return pack;
+      this.product$ = this.dbs.orderObs$.pipe(
+        switchMap(ord=>{
+          return this.dbs.getPackage(this.id).pipe(
+            switchMap((pack) => {
+             
+              return this.dbs.getProductsListValueChanges().pipe(
+                map(items => {
+                  
+                  pack["items"] = pack["items"].map((el) => {
+                    let options = [...el.productsOptions].map((ul) => {
+                      let productOp = items
+                        .filter((lo) => lo.id == ul.id).map(lu=>{
+                
+                          return this.inOrder(lu,[...ord])
+                        })[0]
+                      if (productOp) {
+                        ul["virtualStock"] = productOp["virtualStock"];
+                        ul["sellMinimum"] = productOp["sellMinimum"];
+                      }
+                      return ul;
+                    });
+    
+                    // let select = options.filter(lu => (lu.virtualStock >= lu.sellMinimum) && lu.published)[0]
+                    let select = options.filter(
+                      (lu) => lu?.virtualStock > lu?.sellMinimum
+                    )[0];
+                    return {
+                      productsOptions: options,
+                      choose: select,
+                    };
+                  });
+                  return pack;
+                })
+              );
             })
           );
         }),
         tap((res) => {
-
+          
           this.product = res;
         })
-      );
+      )
     } else {
-      this.product$ = this.dbs.getProduct(this.id).pipe(
+      this.product$ = this.dbs.orderObs$.pipe(
+        switchMap(ord=>{
+          return this.dbs.getProduct(this.id).pipe(
+            map(prod=>{
+             
+              return this.inOrder(prod,[...ord])
+            })
+          )
+        }),
         tap(prod=>{
-          this.product = this.inOrder(prod);
+          this.product = prod;
         })
       );
     }
   }
 
-  inOrder(res) {
-    let index = this.dbs.order.findIndex(
+  inOrder(res,ord) {
+    let index = [...ord].findIndex(
       (el) => el["product"]["id"] == res["id"]
     );
     if (index != -1) {
-      res["realStock"] -= this.dbs.order[index]["quantity"];
+      res["virtualStock"] -= [...ord][index]["quantity"];
     }
-    let inPackage = this.dbs.order.filter((li) => {
+    let inPackage = [...ord].filter((li) => {
       if (li.product.package) {
         return li.chosenOptions.filter((lo) => lo["id"] == res["id"]);
       } else {
@@ -106,17 +116,17 @@ export class ProductDivComponent implements OnInit {
       }
     });
     if (inPackage.length) {
-      res["realStock"]-= inPackage.length;
+      res["virtualStock"]-= inPackage.length;
     }
     return res;
   }
 
   add(item) {
-    /*
+    
     if (!this.dbs.isOpen && !this.dbs.isAdmin) {
       this.dialog.open(StoreClosedDialogComponent);
       return;
-    }*/
+    }
 
     if (this.package) {
       let newpackage = {
@@ -124,27 +134,8 @@ export class ProductDivComponent implements OnInit {
         quantity: 1,
         chosenOptions: item["items"].map((el) => el["choose"]),
       };
-      let change = false;
-      this.product["items"] = this.product["items"].map((el) => {
-        el["productsOptions"] = el["productsOptions"].map((lo) => {
-          if (lo["id"] == el["choose"]["id"]) {
-            lo["realStock"]--;
-            change = change || lo["realStock"] <= el["choose"]["sellMinimum"];
-          }
-          return lo;
-        });
-
-        if (change) {
-          el["choose"] = el["productsOptions"].filter(
-            (lu) => lu?.realStock >= lu?.sellMinimum
-          )[0];
-        }
-
-        return el;
-      });
       this.dbs.order.push(newpackage);
     } else {
-      this.product.realStock--
       let index = this.dbs.order.findIndex(
         (el) => el["product"]["id"] == item["id"]
       );
@@ -253,7 +244,7 @@ export class ProductDivComponent implements OnInit {
   }
 
   optionDisabled(product: Product): boolean {
-    let stock = product.realStock <= product.sellMinimum;
+    let stock = product.virtualStock <= product.sellMinimum;
     return stock;
   }
 

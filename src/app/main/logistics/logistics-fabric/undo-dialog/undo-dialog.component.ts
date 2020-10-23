@@ -67,11 +67,13 @@ export class UndoDialogComponent implements OnInit {
     this.af.firestore.runTransaction((transaction) => {
       return transaction.get(ref).then((prodDoc) => {
         let newStock = prodDoc.data().realStock - item.quantity
+        let newVirtualStock = prodDoc.data().virtualStock - item.quantity
         let newMerma = prodDoc.data().mermaStock - item.merma
 
         transaction.update(ref, {
           mermaStock: newMerma,
-          realStock: newStock
+          realStock: newStock,
+          virtualStock:newVirtualStock
         })
 
         if (item.merma != 0) {
@@ -175,6 +177,7 @@ export class UndoDialogComponent implements OnInit {
       this.af.firestore.runTransaction((transaction) => {
         return transaction.get(productRef).then((prodDoc) => {
           let newStock = prodDoc.data().realStock - quantity;
+          let newVirtualStock = prodDoc.data().virtualStock - quantity;
           let newMerma = prodDoc.data().mermaStock - product.validationData.mermaStock;
 
           if (product.validationData.mermaStock != 0) {
@@ -192,7 +195,8 @@ export class UndoDialogComponent implements OnInit {
 
           transaction.update(productRef, {
             realStock: newStock,
-            mermaStock: newMerma
+            mermaStock: newMerma,
+            virtualStock:newVirtualStock
           });
 
           transaction.update(requestRef, {

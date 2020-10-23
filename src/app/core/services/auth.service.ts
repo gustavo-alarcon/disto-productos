@@ -112,7 +112,6 @@ export class AuthService {
   public logout(): void {
     this.afAuth.signOut().finally(() => {
       this.router.navigateByUrl('/login');
-      this.dbs.view.next(1)
     });
   }
 

@@ -20,6 +20,7 @@ import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmat
 import { Category } from 'src/app/core/models/category.model';
 import { User } from 'src/app/core/models/user.model';
 import { ProductTransferMermaComponent } from '../product-transfer-merma/product-transfer-merma.component';
+import { AngularFirestore } from '@angular/fire/firestore';
 
 
 @Component({
@@ -39,7 +40,7 @@ export class ProductsListComponent implements OnInit {
   productsDisplayedColumns: string[] = [
     'index', 'photoURL', 'description', 'sku', 'category', 'price',
     'unitDescription', 'unitAbbreviation', 'unitWeight', 'sellMinimum', 'alertMinimum',
-    'realStock', /*'mermaStock', 'virtualStock', */'published', 'actions'
+    'realStock', /*'mermaStock',*/ 'virtualStock', 'published', 'actions'
   ]
 
   productsObservable$: Observable<Product[]>
@@ -67,7 +68,8 @@ export class ProductsListComponent implements OnInit {
     private dialog: MatDialog,
     public snackBar: MatSnackBar,
     private dbs: DatabaseService,
-    public auth: AuthService
+    public auth: AuthService,
+    private af: AngularFirestore
   ) { }
 
   ngOnInit(): void {
@@ -137,6 +139,7 @@ export class ProductsListComponent implements OnInit {
 
 
   }
+  
 
   showCategory(category: any): string | null {
     return category ? category.name : null
@@ -389,5 +392,23 @@ export class ProductsListComponent implements OnInit {
     /* save to file */
     const name = 'Lista_de_productos' + '.xlsx';
     XLSX.writeFile(wb, name);
+  }
+
+  virtualStock(){
+    const batch = this.af.firestore.batch()
+    this.productsTableDataSource.filteredData.forEach((product,ind) => {
+      const sfDocRef = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(product.id);
+      batch.update(sfDocRef,{
+        virtualStock: product.realStock
+      })
+      if(ind==this.productsTableDataSource.filteredData.length-1){
+        batch.commit().then(res=>{
+          console.log('all');
+          
+        })
+      }
+    })
+    
+
   }
 }

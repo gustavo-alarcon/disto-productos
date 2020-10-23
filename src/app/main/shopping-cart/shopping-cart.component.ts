@@ -39,9 +39,9 @@ export class ShoppingCartComponent implements OnInit {
         this.dbs.orderObs$
       ).pipe(
         map(([products,ord])=>{
-          console.log(products);
           
-          return ord.map(o=>{
+          
+          return [...ord].map(o=>{
             let pro = products.filter(el=>this.inProduct(el,o))[0]
             
             if(pro){
@@ -54,7 +54,6 @@ export class ShoppingCartComponent implements OnInit {
             
         }),
         tap(res=>{
-          console.log(res);
           
           this.total = res.map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
           
@@ -141,7 +140,6 @@ export class ShoppingCartComponent implements OnInit {
     localStorage.setItem('dbsorder', JSON.stringify(this.dbs.order));
     this.dbs.orderObs.next(this.order)
     if (this.order.length == 0) {
-      this.dbs.view.next(1)
       this.dbs.total = this.total
       localStorage.removeItem('order')
       localStorage.removeItem('length')

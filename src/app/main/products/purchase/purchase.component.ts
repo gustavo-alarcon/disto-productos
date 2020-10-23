@@ -10,7 +10,9 @@ import { Observable, BehaviorSubject, forkJoin, combineLatest } from 'rxjs';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, Renderer2 } from '@angular/core';
+import { ScrollDispatcher } from '@angular/cdk/overlay';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-purchase',
@@ -18,7 +20,6 @@ import { Component, OnInit, Input } from '@angular/core';
   styleUrls: ['./purchase.component.scss']
 })
 export class PurchaseComponent implements OnInit {
-
   user: User = null
 
   firstSale: boolean = false
@@ -35,7 +36,10 @@ export class PurchaseComponent implements OnInit {
 
   order: Array<any>
 
-  name: boolean = false
+  @ViewChild("scroll", { static: false }) scrollbar: ElementRef;
+  scroll$: Observable<any>;
+
+  name: string = ''
   total: number = 0
 
   firstFormGroup: FormGroup;
@@ -69,16 +73,30 @@ export class PurchaseComponent implements OnInit {
   constructor(
     private auth: AuthService,
     private snackbar: MatSnackBar,
+    public scroll: ScrollDispatcher,
+    private renderer: Renderer2,
     private fb: FormBuilder,
     private ng2ImgMax: Ng2ImgMaxService,
     private dialog: MatDialog,
     public dbs: DatabaseService,
-    private af: AngularFirestore
+    private af: AngularFirestore,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
     let date = new Date()
     this.now = new Date(date.getTime() + (345600000))
+
+    this.scroll$ = this.scroll.scrolled().pipe(
+      tap((data) => {
+        const scrollTop = data.getElementRef().nativeElement.scrollTop || 0;
+        if (scrollTop >= 120) {
+          this.renderer.addClass(this.scrollbar.nativeElement, "shadow");
+        } else {
+          this.renderer.removeClass(this.scrollbar.nativeElement, "shadow");
+        }
+      })
+    );
 
     this.init$ = this.dbs.getGeneralConfigDoc().pipe(
       tap(res => {
@@ -138,12 +156,28 @@ export class PurchaseComponent implements OnInit {
     this.userData$ = this.auth.user$.pipe(
       tap(res => {
         this.user = res
+        if (res["salesCount"]) {
+          this.firstSale = false;
+        } else {
+          this.firstSale = true;
+        }
+
+        if (res["contact"]) {
+          this.name = res.name.split(" ")[0];
+          if (this.compareDistricts(res.contact.district)) {
+            this.dbs.delivery = res.contact.district.delivery;
+          }
+        }
         this.getData()
 
       })
     )
 
 
+  }
+
+  compareDistricts(district) {
+    return this.districts.find((el) => el["name"] == district["name"]);
   }
 
   getData() {
@@ -190,9 +224,6 @@ export class PurchaseComponent implements OnInit {
 
         this.firstFormGroup.get('email').disable()
 
-        if (this.user['displayName']) {
-          this.name = true
-        }
       }
     }
   }
@@ -323,8 +354,7 @@ export class PurchaseComponent implements OnInit {
   }
 
   prueba() {
-    this.save()
-    /*this.updateUser()
+    this.updateUser()
     if (this.firstFormGroup.valid && this.secondFormGroup.valid) {
       if (this.payFormGroup.valid) {
         if (!this.payFormGroup.value['photoURL']) {
@@ -337,7 +367,7 @@ export class PurchaseComponent implements OnInit {
       }
     } else {
       this.snackbar.open('Parece que hubo un problema, complete todos los campos anteriores', 'cerrar')
-    }*/
+    }
 
   }
 
@@ -385,7 +415,7 @@ export class PurchaseComponent implements OnInit {
   }
 
   save() {
-    //this.loading.next(true)
+    this.loading.next(true)
     let reduceOrder = this.getneworder()
     this.af.firestore.runTransaction((transaction) => {
       let promises = []
@@ -394,18 +424,17 @@ export class PurchaseComponent implements OnInit {
 
         promises.push(transaction.get(sfDocRef).then((prodDoc) => {
 
-          let newStock = prodDoc.data().realStock - order.reduce;
+          let newStock = prodDoc.data().virtualStock - order.reduce;
+          transaction.update(sfDocRef, { virtualStock: newStock });
           if(newStock>=prodDoc.data().sellMinimum){
             return {
               isSave:true,
-              index:ind
+              product:prodDoc.data().description
             }
           }else{
             return {
               isSave:false,
-              id:prodDoc.data().id,
-              stock:prodDoc.data().realStock-prodDoc.data().sellMinimum,
-              index:ind
+              product:prodDoc.data().id
             }
           }
           
@@ -414,8 +443,7 @@ export class PurchaseComponent implements OnInit {
           console.log("Transaction failed: ", error);
           return {
             isSave:false,
-            stock:-1,
-            index:ind
+            product:null
           }
           
         }));
@@ -425,47 +453,8 @@ export class PurchaseComponent implements OnInit {
       return Promise.all(promises);
     }).then(res => {
       
-      let failedItems = [];
-      let rightItems = [];
-      res.forEach(el => {
-        if (!el.isSave) {
-          failedItems.push(el);
-        } else {
-          rightItems.push(el);
-        }
-      });
-      if(failedItems.length){
-        console.log('Hubo problemas de stock');
-        let mess=[]
-        failedItems.forEach(el=>{
-          console.log(el);
-          
-          if(el.stock >= 0){
-            mess.push({
-              product:reduceOrder[el.index]["product"],
-              stock:el['stock']
-            })
-            
-            let index = this.dbs.order.findIndex(
-              (lu) => lu["product"]["id"] == el.id
-            );
-            
-            if (index != -1) {
-              this.dbs.order[index]["quantity"] = el['stock'];
-            }
-          }
-          
-        })
-        console.log(this.dbs.order);
-        
-        this.save()
-        
-      }else{
-        console.log('todo bien');
-        
-      }
-      console.log(failedItems);
-      //this.savePurchase()
+      
+      this.savePurchase(res)
 
 
     }).catch(() => {
@@ -477,7 +466,7 @@ export class PurchaseComponent implements OnInit {
 
   }
   
-  savePurchase() {
+  savePurchase(list) {
     const saleCount = this.af.firestore.collection(`/db/distoProductos/config/`).doc('generalConfig');
     const saleRef = this.af.firestore.collection(`/db/distoProductos/sales`).doc();
 
@@ -506,7 +495,8 @@ export class PurchaseComponent implements OnInit {
       total: this.total,
       deliveryPrice: this.dbs.delivery,
       voucher: [],
-      voucherChecked: false
+      voucherChecked: false,
+      transactionCliente:list
     }
 
     const email = {
@@ -579,8 +569,10 @@ export class PurchaseComponent implements OnInit {
         })
 
         this.dbs.order = []
+        this.dbs.orderObs.next([])
         this.dbs.total = 0
-        this.dbs.view.next(1)
+        this.router.navigate(["/main/products"], { fragment: this.dbs.productView });
+        //this.dbs.view.next(1)
         this.loading.next(false)
       }).catch(function (error) {
         this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')

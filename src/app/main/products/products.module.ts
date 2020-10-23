@@ -33,6 +33,7 @@ import { Ng2ImgMaxModule } from 'ng2-img-max';
 import { SaleDialogComponent } from './sale-dialog/sale-dialog.component';
 import { MatStepperModule } from '@angular/material/stepper';
 import { ChangeStockComponent } from './change-stock/change-stock.component';
+import { ShoppingCartViewComponent } from './shopping-cart-view/shopping-cart-view.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import { ChangeStockComponent } from './change-stock/change-stock.component';
     CreateEditRecipeComponent,
     RecipesComponent,
     SaleDialogComponent,
-    ChangeStockComponent
+    ChangeStockComponent,
+    ShoppingCartViewComponent
   ],
   imports: [
     CommonModule,

@@ -4,7 +4,7 @@
       <p class="w3-hide-small"></p>
     </div>
     <div class="w3-col s12 m10 l10">
-      <div *ngIf="(dbs.view$ | async) == 1">
+      <div>
         <div class="ms-flex" style="align-items: baseline">
           <button mat-icon-button routerLink="/main">
             <mat-icon>keyboard_backspace</mat-icon>
@@ -93,100 +93,6 @@
           </ng-template>
         </div>
       </div>
-      <div *ngIf="(dbs.view$ | async) == 2" style="max-width: 400px">
-        <div class="ms-flex ms-flex--center">
-          <button
-            mat-icon-button
-            class="w3-hide-small"
-            style="margin-left: -10px; margin-top: -10px"
-            (click)="back(false)"
-          >
-            <mat-icon>keyboard_backspace</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            class="w3-hide-large w3-hide-medium"
-            style="margin-left: -10px; margin-top: -10px"
-            (click)="back(true)"
-          >
-            <mat-icon>keyboard_backspace</mat-icon>
-          </button>
-          <h2 class="title2 w3-margin-left">Lista de compras 🛒</h2>
-        </div>
-        <div *ngIf="loadCart$ | async; else load">
-          <app-shopping-cart
-            [delivery]="dbs.delivery"
-            [order]="dbs.order"
-            [modified]="true"
-            [change]="true"
-          ></app-shopping-cart>
-        </div>
-
-        <button
-          *ngIf="auth.user$ | async; else register"
-          mat-raised-button
-          color="accent"
-          class="w3-block"
-          (click)="finish()"
-          style="font-weight: bold"
-        >
-          Continuar con la compra
-          <mat-icon class="w3-margin-left">arrow_forward</mat-icon>
-        </button>
-        <ng-template #register>
-          <button
-            mat-raised-button
-            color="accent"
-            class="w3-block"
-            (click)="login()"
-            style="font-weight: bold"
-          >
-            Continuar con la compra
-            <mat-icon class="w3-margin-left">arrow_forward</mat-icon>
-          </button>
-        </ng-template>
-      </div>
-      <div *ngIf="(dbs.view$ | async) == 3">
-        <div class="ms-flex ms-flex--center">
-          <button
-            mat-icon-button
-            style="margin-left: -10px; margin-top: -10px"
-            (click)="shoppingCart()"
-          >
-            <mat-icon>keyboard_backspace</mat-icon>
-          </button>
-          <h2 *ngIf="firstSale" class="title2">Es tu primera compra 😊</h2>
-          <h2 *ngIf="!firstSale" class="title2">Hola, {{ name }} 😊</h2>
-        </div>
-        <p *ngIf="firstSale">
-          Hola cheese lover, gracias por tu preferencia. Comencemos anotando tus
-          datos
-        </p>
-        <p *ngIf="!firstSale">
-          Gracias por volver a comprar nuestros productos
-        </p>
-        <div class="container" style="align-items: baseline">
-          <div *ngIf="scroll$ | async"></div>
-          <div style="width: 100%; max-width: 420px">
-            <app-purchase></app-purchase>
-          </div>
-          <span class="ms-fill"></span>
-          <div #scroll>
-            <mat-card
-              style="min-width: 400px; padding: 10px 16px"
-              class="w3-hide-small w3-hide-medium"
-            >
-              <app-shopping-cart
-                [delivery]="dbs.delivery"
-                [order]="dbs.order"
-                [modified]="false"
-                [change]="true"
-              >
-              </app-shopping-cart>
-            </mat-card>
-          </div>
-        </div>
-      </div>
       <ng-template #load>
         <div style="height: 70vh" class="w3-display-container">
           <div class="w3-display-middle">
@@ -206,7 +112,7 @@
     </div>
   </div>
 </div>
-<div *ngIf="(dbs.view$ | async) == 1" class="w3-hide-large w3-hide-medium">
+<div class="w3-hide-large w3-hide-medium">
   <div class="fly-button" *ngIf="dbs.total > 0">
     <div class="shopping-button" (click)="shoppingCart()">
       <span class="shopping-button__icon">🛒</span>

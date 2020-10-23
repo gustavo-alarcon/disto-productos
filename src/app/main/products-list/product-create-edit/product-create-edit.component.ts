@@ -232,7 +232,9 @@ export class ProductCreateEditComponent implements OnInit {
       editedAt: this.data.edit ? new Date() : null,
       editedBy: this.data.edit ? user : null,
     }
-
+    if(!this.data.edit){
+      product['virtualStock']=this.productForm.get('realStock').value
+    }
     this.dbs.createEditProduct(this.data.edit, product, this.data.data, this.photos.data.photoURL)
       .subscribe(batch => {
         batch.commit().then(res => {

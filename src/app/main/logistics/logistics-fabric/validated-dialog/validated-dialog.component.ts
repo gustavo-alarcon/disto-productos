@@ -174,10 +174,12 @@ export class ValidatedDialogComponent implements OnInit {
         this.af.firestore.runTransaction((transaction) => {
           return transaction.get(ref).then((prodDoc) => {
             let newStock = prodDoc.data().realStock + difSt;
+            let newVirtualStock = prodDoc.data().virtualStock + difSt;
             let newMerma = prodDoc.data().mermaStock + difMerm;
             transaction.update(ref, {
               realStock: newStock,
-              mermaStock: newMerma
+              mermaStock: newMerma,
+              virtualStock:newVirtualStock
             });
 
             if (difMerm != 0) {

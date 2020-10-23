@@ -12,6 +12,9 @@
                     <sat-datepicker #picker [rangeMode]="true"></sat-datepicker>
                     <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
                 </mat-form-field>
+                <!--button *ngIf="prueba$ | async" mat-raised-button style="height: 45px;" (click)="downloadXls()" color="accent">
+                    Descargar Excel
+                  </button-->
                 <div *ngIf="init$ | async as sales">
                     <div class="w3-hide-small w3-hide-medium" style="display: flex;">
                         <div style="width: 70%">

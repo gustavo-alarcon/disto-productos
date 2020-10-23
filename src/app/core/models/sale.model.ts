@@ -123,4 +123,7 @@ export interface Sale {
 
   editedAt?: Date,
   editedBy?: User
+
+  transactionCliente?:any;
+  transactionSale?:any;
 }

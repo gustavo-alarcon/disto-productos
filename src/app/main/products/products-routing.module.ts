@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { ProductsComponent } from './products.component';
+import { ShoppingCartViewComponent } from './shopping-cart-view/shopping-cart-view.component';
+import { PurchaseComponent } from './purchase/purchase.component';
 
 const routes: Routes = [
   {
@@ -12,6 +14,14 @@ const routes: Routes = [
   {
     path: 'recetas/:id',
     component: RecipesComponent,
+  },
+  {
+    path: 'carrito',
+    component: ShoppingCartViewComponent
+  },
+  {
+    path: 'compra',
+    component: PurchaseComponent
   }
 ]
 

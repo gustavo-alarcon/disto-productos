@@ -40,8 +40,7 @@ export class CategoriesComponent implements OnInit {
   }
 
   shoppingCart() {
-    this.router.navigate(['/main/products']);
-    this.dbs.view.next(2)
+    this.router.navigate(['/main/products/carrito']);
   
   }
 }
