@@ -204,7 +204,7 @@ export class ProductsHistoryComponent implements OnInit {
   downloadXls(): void {
     let table_xlsx: any[] = [];
     let headersXlsx = [
-      'Name', 'Stock Inicial', 'Vendidos','Stock teorico','Stock real', 'ventas'
+      'Name', 'Stock Inicial', 'Vendidos','Stock teorico','Stock real','Stock virtual', 'ventas'
     ]
 
     table_xlsx.push(headersXlsx);
@@ -216,6 +216,7 @@ export class ProductsHistoryComponent implements OnInit {
         product.reduce,
         product.first - product.reduce,
         product.realStock,
+        product.virtualStock,
         product.sales.join(',')
       ];
 

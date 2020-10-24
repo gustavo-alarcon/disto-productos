@@ -380,13 +380,13 @@ export class SalesDetailComponent implements OnInit {
               if (newStatus == this.saleStatusOptions.cancelled) {
                 if(this.sale.status==this.saleStatusOptions.attended){
                   this.dbs.unsaveRealStock(this.sale.requestedProducts,true).then((res)=>{
-                    console.log('save');
+                    console.log('atendido-anulado');
                     list=res
                     save=true
                   })
                 }else{
                   this.dbs.unsaveRealStock(this.sale.requestedProducts,false).then((res)=>{
-                    console.log('save');
+                    console.log('solicitado-atendido');
                     list=res
                     save=true
                   })

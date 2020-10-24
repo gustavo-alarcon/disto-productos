@@ -371,52 +371,10 @@ export class PurchaseComponent implements OnInit {
 
   }
 
-  getneworder() {
-
-    let copy = [...this.order]
-    let newOrder: any = [...copy].map(order => {
-      if (order['chosenOptions']) {
-        return order['chosenOptions'].map(el => {
-          return {
-            product: el,
-            quantity: 1 * order.quantity
-          }
-        })
-      } else {
-        return [order]
-      }
-    })
-
-    let otherorder = [...newOrder].reduce((a, b) => a.concat(b), []).map((el, index, array) => {
-      let counter = 0
-      let others = []
-      let reduce = 0
-      array.forEach(al => {
-        if (al.product['id'] == el.product['id']) {
-          counter++
-          others.push(al.quantity)
-        }
-      })
-      if (counter > 1) {
-        reduce = others.reduce((d, e) => d + e, 0)
-      } else {
-        reduce = el.quantity
-      }
-
-      return {
-        product: el.product,
-        reduce: reduce
-      }
-    }).filter((dish, index, array) => array.findIndex(el => el.product['id'] === dish.product['id']) === index)
-
-    return otherorder
-
-
-  }
 
   save() {
     this.loading.next(true)
-    let reduceOrder = this.getneworder()
+    let reduceOrder = this.dbs.getneworder(this.dbs.order)
     this.af.firestore.runTransaction((transaction) => {
       let promises = []
       reduceOrder.forEach((order, ind) => {
@@ -425,7 +383,7 @@ export class PurchaseComponent implements OnInit {
         promises.push(transaction.get(sfDocRef).then((prodDoc) => {
 
           let newStock = prodDoc.data().virtualStock - order.reduce;
-          transaction.update(sfDocRef, { virtualStock: newStock });
+          transaction.update(sfDocRef,{ virtualStock: newStock })
           if(newStock>=prodDoc.data().sellMinimum){
             return {
               isSave:true,
@@ -434,7 +392,7 @@ export class PurchaseComponent implements OnInit {
           }else{
             return {
               isSave:false,
-              product:prodDoc.data().id
+              product:prodDoc.data().description
             }
           }
           
@@ -452,10 +410,8 @@ export class PurchaseComponent implements OnInit {
       })
       return Promise.all(promises);
     }).then(res => {
-      
-      
       this.savePurchase(res)
-
+      
 
     }).catch(() => {
       this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
