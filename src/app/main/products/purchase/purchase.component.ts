@@ -164,9 +164,7 @@ export class PurchaseComponent implements OnInit {
 
         if (res["contact"]) {
           this.name = res.name.split(" ")[0];
-          if (this.compareDistricts(res.contact.district)) {
-            this.dbs.delivery = res.contact.district.delivery;
-          }
+          this.dbs.delivery = res.contact.district.delivery;
         }
         this.getData()
 

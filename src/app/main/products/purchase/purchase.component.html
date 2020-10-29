@@ -25,9 +25,8 @@
         </p>
         <div class="container" style="align-items: baseline">
             <div *ngIf="scroll$ | async"></div>
-          <div style="width: 100%; max-width: 420px">
+          <div *ngIf="userData$ | async" style="width: 100%; max-width: 420px">
             <div >
-              <p *ngIf="userData$ | async"></p>
               <mat-horizontal-stepper linear #stepper class="ms-stepper">
                 <mat-step
                   label="📝"

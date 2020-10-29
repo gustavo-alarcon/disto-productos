@@ -1,4 +1,4 @@
-import { switchMap, map, startWith, tap } from "rxjs/operators";
+import { switchMap, map, startWith, tap, takeLast } from "rxjs/operators";
 import { Observable, combineLatest, BehaviorSubject } from "rxjs";
 import { Sale } from "./../../core/models/sale.model";
 import { DatabaseService } from "src/app/core/services/database.service";
@@ -86,6 +86,7 @@ export class ProductsHistoryComponent implements OnInit {
           )
         ).pipe(
           map(([products, sales2]) => {
+            
             return products.map((prod) => {
               let sales = sales2.filter((sale) => {
                 let ejem = sale.products.filter(

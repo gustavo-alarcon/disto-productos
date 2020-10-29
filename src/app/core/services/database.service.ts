@@ -31,7 +31,7 @@ import { AngularFireAuth } from "@angular/fire/auth";
   providedIn: "root",
 })
 export class DatabaseService {
-  public version: string = "V1.1.49r";
+  public version: string = "V1.1.50r";
   public isOpen: boolean = false;
   public isAdmin: boolean = false;
 
@@ -1220,5 +1220,14 @@ export class DatabaseService {
       });
       return Promise.all(promises);
     });
+  }
+
+  getProductsEntry(date: { begin: Date; end: Date }){
+    return this.afs
+      .collectionGroup<BuyRequestedProduct>("buyRequestedProducts", (ref) =>
+        ref.where("requestedDate", "<=", date.end)
+        .where("requestedDate", ">=", date.begin)
+      )
+      .valueChanges();
   }
 }

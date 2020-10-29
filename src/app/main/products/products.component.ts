@@ -51,7 +51,7 @@ export class ProductsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.dbs.delivery = 0;
+    this.dbs.delivery = 6;
 
     this.categoryList$ = combineLatest(
       this.route.fragment,
