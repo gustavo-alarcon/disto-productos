@@ -353,42 +353,20 @@ export class SalesDetailComponent implements OnInit {
         this.dbs.onSaveSale(sale).pipe(
           switchMap(
             batch => {
-              //If we are editting it (deshacer), and we are returning from
-              //confirmedDocument to confirmedRequest, we should refill the 
-              //lost stock
-              if (newStatus == this.saleStatusOptions.cancelled) {
-                this.onUpdateStock(this.getSaleRequestedProducts(), batch, false)
+              //Not editting. So normal flow
+              if(!edit){
+                //We are cancelling an order
+                if(newStatus == this.saleStatusOptions.cancelled){
+                  this.onUpdateStock(this.sale.requestedProducts, batch, false)
+                } else {
+                  //We are getting from attended to higher (confirmed request), we should edit stock
+                  if(this.sale.status == this.saleStatusOptions.attended){
+                    this.dbs.onDoubleUpdateStock(sale.requestedProducts, this.sale.requestedProducts, batch)
+                  }
+                }
               }
-              // //If we are editting it (deshacer), and we are returning from
-              // //confirmedDelivery to confirmedDocument, we should refill the 
-              // //lost stock
-              // if(edit){
-              //   if(downNewStatus == this.saleStatusOptions.confirmedDocument &&
-              //       newStatus != this.saleStatusOptions.cancelled){
-              //     this.onUpdateStock(this.getSaleRequestedProducts(), batch, false)
-              //   } else {
-              //     //If we are returning fron cancelled to any of the ones bellow,
-              //     //We should take out from stock
-              //     if( newStatus == this.saleStatusOptions.cancelled &&
-              //       ( downNewStatus == this.saleStatusOptions.confirmedDelivery ||
-              //         downNewStatus == this.saleStatusOptions.driverAssigned ||
-              //         downNewStatus == this.saleStatusOptions.finished)
-              //       ){
-              //         //Recall that when we edit (deshacer) newStatus will work as the past status
-              //         this.onUpdateStock(this.getSaleRequestedProducts(), batch, true)
-              //       }
-              //   }
-              // } else {
-              //   //WE are note editting, but we are confirming delivery, so we
-              //   //should take out stock
-              //   if(newStatus == this.saleStatusOptions.confirmedDelivery){
-              //     this.onUpdateStock(this.getSaleRequestedProducts(), batch, true)
-              //   } else {
-              //     if(newStatus == this.saleStatusOptions.cancelled){
-              //       this.onUpdateStock(this.getSaleRequestedProducts(), batch, false)
-              //     }
-              //   }
-              // }
+              
+              
               return batch.commit().then(
                 res => {
                   this.snackBar.open('El pedido fue editado satisfactoriamente', 'Aceptar');
