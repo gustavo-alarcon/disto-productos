@@ -50,8 +50,26 @@ export class AddUserComponent implements OnInit {
         map(value => typeof value === 'string' ? value.toLowerCase() : value.email.toLowerCase()))
     ).pipe(
       map(([users, name]) => {
-        let noAdmins = users.filter(el => !el['role'])
-        return name ? noAdmins.filter(option => option['email'].toLowerCase().includes(name)) : noAdmins;
+        let noAdmins = users.filter(el => !el['role']).map(user=>{
+          let name = '---'
+          let email = ""
+          if(user['completeName']){
+            name=user['completeName']
+          } else {
+            if(user['displayName']){
+              name=user['displayName']
+            }
+          }
+          user['completeName'] = name
+
+          if(user['email']){
+            email=user['email']
+          }
+
+          user['email'] = email
+          return user
+        })
+        return name ? noAdmins.filter(option => option['email'].toLowerCase().includes(name)||option['completeName'].toLowerCase().includes(name)) : noAdmins;
       })
     );
 

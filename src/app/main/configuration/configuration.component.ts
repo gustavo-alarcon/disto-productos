@@ -157,7 +157,15 @@ export class ConfigurationComponent implements OnInit {
         startWith<any>('Todos'))
     ).pipe(
       map(([users, name, role]) => {
-        return users.sort((a, b) => a['completeName'].localeCompare(b['completeName']))
+        let userMod = users.map(user=>{
+          let name = '---'
+          if(user['completeName']){
+            name=user['completeName']
+          } 
+          user['completeName'] = name
+          return user
+        })
+        return userMod.sort((a, b) => a['completeName'].localeCompare(b['completeName']))
           .filter(el => name ? el.completeName.toLowerCase().includes(name) : true)
           .filter(el => role != 'Todos' ? el.role == role : true)
           .map((el, i) => {
@@ -246,6 +254,7 @@ export class ConfigurationComponent implements OnInit {
 
 
   //Admins
+  
   addAdmin() {
     this.dialog.open(AddUserComponent)
   }

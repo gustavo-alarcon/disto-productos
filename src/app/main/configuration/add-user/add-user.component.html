@@ -9,12 +9,13 @@
     <mat-progress-bar mode='indeterminate' *ngIf="loading$ | async"></mat-progress-bar>
     <form [formGroup]="userForm">
         <mat-form-field class="w3-block" appearance="outline">
-            <input matInput type="text" formControlName="email" placeholder="Seleccione..."
+            <input matInput type="text" formControlName="email" placeholder="Escriba..."
                 [matAutocomplete]="autoSupervisor" autocomplete="off">
             <mat-icon matSuffix>arrow_drop_down</mat-icon>
             <mat-autocomplete #autoSupervisor="matAutocomplete" [displayWith]="showSelectedUser">
                 <mat-option *ngFor="let option of filteredUsers$ | async" [value]="option" (click)="selectUser(option)">
-                    <span>{{option['email']}}</span>
+                    <span class="text-hide">{{option['completeName'] | titlecase}}</span><br>
+                    <strong class="text-hide" style="font-size: 0.8em;">{{option['email']}}</strong>
                 </mat-option>
             </mat-autocomplete>
             <mat-error>

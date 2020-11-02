@@ -117,9 +117,7 @@
                             <br>
                             <ol style="margin: 0; padding-left: 14px;">
                                 <li *ngFor="let field of item.get('chosenOptions')['controls']; let i2=index">
-                                    <ng-container 
-                                        *ngIf="(item.get('product').value.items[i2].productsOptions.length == 1
-                                                || sale.status != saleStatusOptions.attended) else noSingle">
+                                    <ng-container>
                                         {{field.value.description | titlecase}}
                                         <mat-icon style="cursor: pointer; font-size:medium; width:auto"
                                             matTooltip="{{field.value.unit.abbreviation}}">
