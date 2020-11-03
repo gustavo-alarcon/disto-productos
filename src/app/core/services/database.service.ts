@@ -934,6 +934,56 @@ export class DatabaseService {
     return batch;
   }
 
+  onDoubleUpdateStock(requestedProductsToDecrease: Sale['requestedProducts'],
+    requestedProductsToIncrease: Sale['requestedProducts'],
+    batch: firebase.firestore.WriteBatch){
+      let requestedProductRef: DocumentReference;
+
+      let productList: {productId: string; amount: number}[] = [];
+      let foundProduct: {productId: string; amount: number} = null
+
+      let productId: string=null;
+
+      [...requestedProductsToDecrease.map(el => ({...el, decrease: true})), 
+        ...requestedProductsToIncrease.map(el => ({...el, decrease: false}))].forEach(product => {
+
+        if (!product.product.package) {
+
+          productId = product.product.id
+          foundProduct = productList.find(el => el.productId == productId)
+
+          if(foundProduct){
+            foundProduct.amount += product.decrease ? (-1)*product.quantity : product.quantity
+          } else {
+            productList.push({productId: productId, 
+              amount: product.decrease ? (-1)*product.quantity : product.quantity})
+          }
+
+        } else {
+          product.chosenOptions.forEach((opt, index) => {
+            
+            productId = opt.id
+            foundProduct = productList.find(el => el.productId == productId)
+
+            if(foundProduct){
+              foundProduct.amount += product.decrease ? (-1)*product.quantity : product.quantity
+            } else {
+              productList.push({productId: productId, 
+                amount: product.decrease ? (-1)*product.quantity : product.quantity})
+            }
+
+          })
+        }
+      })
+
+      productList.forEach(el => {
+        requestedProductRef = this.afs.firestore.collection(this.productsListRef).doc(el.productId)
+        batch.update(requestedProductRef, { realStock: firebase.firestore.FieldValue.increment(el.amount) });
+      })
+      console.log(productList);
+      return batch
+  }
+
   //configuracion
   getDistricts(): Observable<any> {
     return this.afs
