@@ -36,6 +36,9 @@ export interface Sale {
     name: string;
   },
   document?: string,             //tipo de comprobante
+  ruc?: string,                  // Datos de facturación
+  companyName?: string,
+  companyAddress?: string,
   location: {
     address: string,
     district: any,
@@ -123,4 +126,7 @@ export interface Sale {
 
   editedAt?: Date,
   editedBy?: User
+
+  transactionCliente?:any;
+  transactionSale?:any;
 }

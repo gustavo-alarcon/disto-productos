@@ -3,6 +3,27 @@
     border-radius: 20px;
 }
 
+.container {
+    display: flex;
+}
+
+.title2 {
+    width: fit-content;
+    border-bottom: 4px solid #5da92f;
+    font-weight: bold;
+    font-size: 1.4em;
+    line-height: 1.4em;
+    margin-top: 0;
+}
+
+.shadow {
+    position: fixed;
+    top: 80px;
+    padding-right: 26px;
+    right: 8.3333%;
+}
+
+
 .pay {
     justify-content: space-between;
     align-items: baseline;

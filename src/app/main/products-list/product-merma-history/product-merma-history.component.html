@@ -1,0 +1,113 @@
+<div class="w3-section w3-margin-left w3-margin-right animated fadeIn delay-2">
+  <h2 matDialogTitle class="ms-font-rubik" style="display:flex; flex-direction: row; justify-content: space-between;">
+    <span><mat-icon style="vertical-align: middle;">history</mat-icon> Historial</span>
+      <button (click)="downloadXls()" mat-raised-button
+                [disabled]="!dataSource.data.length"
+                color="primary" type="button">
+                <mat-icon style="vertical-align: middle;">cloud_download</mat-icon>
+                Descargar
+      </button>
+  </h2>
+  <mat-divider></mat-divider>
+
+  <p style="color: gray;">
+    <mat-icon style="vertical-align: middle;">info</mat-icon> Cada evento de transferencia de merma se encuentra
+    registrado en esta lista
+  </p>
+
+  <mat-progress-bar mode="indeterminate" *ngIf="loadingHistory$ | async"></mat-progress-bar>
+
+  <ng-container *ngIf="history$ | async as history">
+
+    <ng-container *ngIf="history.length; else default">
+
+      <div class="mat-elevation-z8 w3-margin-top w3-round-large w3-hide-small"
+        style="border-radius: 10px 10px 10px 10px; margin-bottom: 16px">
+        <div style="overflow:auto; border-radius: 10px 10px 10px 10px; max-height: 65vh">
+          <table mat-table [dataSource]="dataSource" matSort style="width:100%">
+
+            <ng-container matColumnDef="index">
+              <th mat-header-cell *matHeaderCellDef style="background:#eaeaea;padding: 0px 1em 0px 1em">N°
+              </th>
+              <td mat-cell *matCellDef="let request; let l = count; let i = index"
+                style="color:#2b2b2b; padding: 0px 1em 0px 1em">
+                {{i+1}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                style="background:#eaeaea;padding:0px 1em 0px 1em; border-left:1px solid lightgrey">Fecha/hora de
+                movimiento
+              </th>
+              <td mat-cell *matCellDef="let request" class="w3-center"
+                style="color:#2b2b2b; padding:0px 1em 0px 1em; border-left:1px solid lightgrey">
+                <span class="w3-small"
+                  style="font-weight:500">{{request.date['seconds'] * 1000 | date : 'dd/MM/yyyy'}}</span><br>
+                <span class="w3-small">({{request.date['seconds'] * 1000 | date : 'hh:mm:ss'}})</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                style="background:#eaeaea;padding:0px 1.5em 0px 1em; border-left:1px solid lightgrey">
+                Estado</th>
+              <td mat-cell *matCellDef="let request"
+                style="color:#2b2b2b; padding:0px 1.5em 0px 1em; border-left:1px solid lightgrey; min-width:200px">
+                {{request.toMerma ? "De stock a merma" : "De merma a stock"}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="quantity">
+              <th mat-header-cell *matHeaderCellDef 
+                style="background:#eaeaea;padding:0px 1.5em 0px 1em; border-left:1px solid lightgrey">Cant
+              </th>
+              <td mat-cell *matCellDef="let request;"
+                style="color:#2b2b2b; padding:0px 1.5em 0px 1em; border-left:1px solid lightgrey;">
+                {{request.quantity}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="createdBy">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                style="background:#eaeaea;padding:0px 1.5em 0px 1em; border-left:1px solid lightgrey">
+                Usuario</th>
+              <td mat-cell *matCellDef="let request"
+                style="color:#2b2b2b; padding:0px 1.5em 0px 1em; border-left:1px solid lightgrey; min-width:200px">
+                <span class="w3-small">{{request.user.displayName}}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="observations">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                style="background:#eaeaea;padding:0px 1.5em 0px 1em; border-left:1px solid lightgrey">
+                Observaciones</th>
+              <td mat-cell *matCellDef="let request"
+                style="color:#2b2b2b; padding:0px 1.5em 0px 1em; border-left:1px solid lightgrey; min-width:200px">
+                <span class="w3-small">{{request.observations}}</span>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          </table>
+        </div>
+        <mat-paginator class="w3-round-large" [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons>
+        </mat-paginator>
+      </div>
+    </ng-container>
+
+    <ng-template #default>
+      <div
+        class="w3-container w3-center ms-empty-container w3-round-large mat-elevation-z8 w3-margin-top w3-margin-bottom"
+        style="margin: 16px 0px">
+        <h2 class="ms-empty-list">
+          Parece que no hay resultados
+        </h2>
+      </div>
+    </ng-template>
+
+  </ng-container>
+
+</div>

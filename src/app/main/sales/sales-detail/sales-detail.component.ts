@@ -337,11 +337,12 @@ export class SalesDetailComponent implements OnInit {
     this.loading$.next(true);
     let downNewStatus = edit ? this.onEditSaleGetNewStatus(newStatus, user) : null;
     let sale = edit ? this.onGetUpdatedSale(downNewStatus, user) : this.onGetUpdatedSale(newStatus, user);
-
+    
     of(!!edit).pipe(
       switchMap(edit => {
         if (!edit) {
           return this.upgradeConfirmation(newStatus)
+          
         } else {
           return this.downgradeConfirmation(downNewStatus)
         }
@@ -353,11 +354,43 @@ export class SalesDetailComponent implements OnInit {
         this.dbs.onSaveSale(sale).pipe(
           switchMap(
             batch => {
+              let save = false
+              let list = []
               //If we are editting it (deshacer), and we are returning from
               //confirmedDocument to confirmedRequest, we should refill the 
               //lost stock
+              if(newStatus==this.saleStatusOptions.attended){
+                if(edit){
+                  this.dbs.saveRealStock(this.sale.requestedProducts,false).then((res)=>{
+                    console.log('deshacer');
+                    list=res
+                    save=true
+                  })
+                }else{
+                  this.dbs.saveRealStock(this.sale.requestedProducts,true).then((res)=>{
+                    console.log('atendido');
+                    list=res
+                    save=true
+                  })
+                }
+                
+              }
+
+              
               if (newStatus == this.saleStatusOptions.cancelled) {
-                this.onUpdateStock(this.getSaleRequestedProducts(), batch, false)
+                if(this.sale.status==this.saleStatusOptions.attended){
+                  this.dbs.unsaveRealStock(this.sale.requestedProducts,true).then((res)=>{
+                    console.log('atendido-anulado');
+                    list=res
+                    save=true
+                  })
+                }else{
+                  this.dbs.unsaveRealStock(this.sale.requestedProducts,false).then((res)=>{
+                    console.log('solicitado-atendido');
+                    list=res
+                    save=true
+                  })
+                }
               }
               // //If we are editting it (deshacer), and we are returning from
               // //confirmedDelivery to confirmedDocument, we should refill the 

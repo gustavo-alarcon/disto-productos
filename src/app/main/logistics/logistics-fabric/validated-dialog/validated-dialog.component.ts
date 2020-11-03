@@ -9,6 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DatabaseService } from './../../../../core/services/database.service';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
+import { MermaTransfer } from 'src/app/core/models/product.model';
 
 @Component({
   selector: 'app-validated-dialog',
@@ -140,9 +141,10 @@ export class ValidatedDialogComponent implements OnInit {
     this.loading.next(true)
     this.validatedFormGroup.markAsPending();
     this.validatedFormGroup.disable()
-    const requestRef = this.af.firestore.collection(`/db/minimarketBoom/buys`).doc(this.data.item.buyId);
-    const requestProductRef = this.af.firestore.collection(`/db/minimarketBoom/buys/${this.data.item.buyId}/buyRequestedProducts`).doc(this.data.item.id);
-    const ref = this.af.firestore.collection(`/db/minimarketBoom/productsList`).doc(this.data.item.id);
+    const requestRef = this.af.firestore.collection(`/db/distoProductos/buys`).doc(this.data.item.buyId);
+    const requestProductRef = this.af.firestore.collection(`/db/distoProductos/buys/${this.data.item.buyId}/buyRequestedProducts`).doc(this.data.item.id);
+    const ref = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(this.data.item.id);
+    const transferHistoryRef = this.af.firestore.collection(this.dbs.productsListRef + `/${this.data.item.id}/mermaTransfer`).doc();
 
     combineLatest(
       this.auth.user$,
@@ -172,11 +174,27 @@ export class ValidatedDialogComponent implements OnInit {
         this.af.firestore.runTransaction((transaction) => {
           return transaction.get(ref).then((prodDoc) => {
             let newStock = prodDoc.data().realStock + difSt;
+            let newVirtualStock = prodDoc.data().virtualStock + difSt;
             let newMerma = prodDoc.data().mermaStock + difMerm;
             transaction.update(ref, {
               realStock: newStock,
-              mermaStock: newMerma
+              mermaStock: newMerma,
+              virtualStock:newVirtualStock
             });
+
+            if (difMerm != 0) {
+              let mermaTransferData: MermaTransfer = {
+                date: new Date(),
+                id: transferHistoryRef.id,
+                productId: this.data.item.id,
+                quantity: difMerm > 0 ? -difMerm : difMerm,
+                toMerma: difMerm > 0,
+                user: null,
+                observations: 'editado desde logistica'
+              }
+              transaction.set(transferHistoryRef, mermaTransferData)
+            }
+
 
             if (this.validatedFormGroup.value['returned'] == 0) {
               transaction.update(requestProductRef, {
@@ -220,6 +238,7 @@ export class ValidatedDialogComponent implements OnInit {
 
           });
         }).then(() => {
+
           this.loading.next(false)
           this.dialogRef.close()
           this.snackBar.open(
@@ -234,7 +253,7 @@ export class ValidatedDialogComponent implements OnInit {
   }
 
   save() {
-    this.editSave(this.validatedFormGroup.value['mermaStock'],0 ,this.getStock())
+    this.editSave(this.validatedFormGroup.value['mermaStock'], 0, this.getStock())
   }
 
 }

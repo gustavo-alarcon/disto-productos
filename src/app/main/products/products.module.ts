@@ -32,6 +32,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { Ng2ImgMaxModule } from 'ng2-img-max';
 import { SaleDialogComponent } from './sale-dialog/sale-dialog.component';
 import { MatStepperModule } from '@angular/material/stepper';
+import { ChangeStockComponent } from './change-stock/change-stock.component';
+import { ShoppingCartViewComponent } from './shopping-cart-view/shopping-cart-view.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +41,9 @@ import { MatStepperModule } from '@angular/material/stepper';
     PurchaseComponent,
     CreateEditRecipeComponent,
     RecipesComponent,
-    SaleDialogComponent
+    SaleDialogComponent,
+    ChangeStockComponent,
+    ShoppingCartViewComponent
   ],
   imports: [
     CommonModule,
@@ -80,7 +84,8 @@ import { MatStepperModule } from '@angular/material/stepper';
   ],
   entryComponents: [
     CreateEditRecipeComponent,
-    SaleDialogComponent
+    SaleDialogComponent,
+    ChangeStockComponent
   ]
 })
 export class ProductsModule { }

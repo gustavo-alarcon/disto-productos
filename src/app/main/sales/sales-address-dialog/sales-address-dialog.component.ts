@@ -12,6 +12,7 @@ export class SalesAddressDialogComponent implements OnInit {
 
   adress: FormControl;
   reference: FormControl;
+  district: FormControl;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: Sale
@@ -24,5 +25,6 @@ export class SalesAddressDialogComponent implements OnInit {
   initForms(){
     this.adress = new FormControl(this.data.location.address);
     this.reference = new FormControl(this.data.location.reference);
+    this.district = new FormControl(this.data.location.district.name);
   }
 }

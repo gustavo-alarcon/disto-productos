@@ -1,7 +1,9 @@
 <div mat-dialog-title>
   <h2 class="ms-font-rubik ms-color-2b" style="font-size:1.2em">
-      <mat-icon style="vertical-align:middle" (click)="deb()">add_circle</mat-icon>
-      {{data.toMerma?'A merma':'Desde merma'}}
+      <mat-icon style="vertical-align:middle" (click)="deb()">
+        {{data.toMerma?'redo':'undo'}}
+      </mat-icon>
+      Transferir {{data.toMerma?'a merma':'desde merma'}}
   </h2>
   <mat-divider></mat-divider>
 </div>
@@ -9,27 +11,39 @@
   <form [formGroup]="mermaForm">
 
     <!-- Transferir a merma -->
-    <mat-form-field *ngIf="mermaForm.get('toMerma').valid" style="margin-bottom: 8px" appearance="outline">
-        <mat-label>Transferir a merma (Stock: {{data.data.realStock}})</mat-label>
+    <mat-form-field *ngIf="mermaForm.get('toMerma').enabled" 
+      style="margin-bottom: 8px; width: 100%" appearance="outline">
+        <mat-label>Transferir a merma (Stock: {{data.data.realStock}} x {{data.data.unit.abbreviation}})</mat-label>
         <input autocomplete="off"
-          [formControl]="toMerma" type="number" matInput>
+          formControlName="toMerma" type="number" matInput>
         <mat-error>
             <span *ngIf="mermaForm.get('toMerma').errors?.required">Campo requerido</span>
             <span *ngIf="mermaForm.get('toMerma').errors?.min">La cantidad no puede ser menor a 0.</span>
-            <span *ngIf="mermaForm.get('toMerma').errors?.min">La cantidad no puede ser mayor a {{data.data.realStock}}.</span>
+            <span *ngIf="mermaForm.get('toMerma').errors?.max">La cantidad no puede ser mayor a {{data.data.realStock}}.</span>
         </mat-error>
     </mat-form-field>
 
     <!-- Transferir desde merma -->
-    <mat-form-field *ngIf="mermaForm.get('fromMerma').valid" style="margin-bottom: 8px" appearance="outline">
-      <mat-label>Transferir desde merma</mat-label>
+    <mat-form-field *ngIf="mermaForm.get('fromMerma').enabled" 
+      style="margin-bottom: 8px; width: 100%" appearance="outline">
+      <mat-label>Transferir desde merma (Merma: {{data.data.mermaStock}} x {{data.data.unit.abbreviation}})</mat-label>
       <input autocomplete="off"
-        [formControl]="fromMerma" type="number" matInput>
+        formControlName="fromMerma" type="number" matInput>
       <mat-error>
           <span *ngIf="mermaForm.get('fromMerma').errors?.required">Campo requerido</span>
           <span *ngIf="mermaForm.get('fromMerma').errors?.min">La cantidad no puede ser menor a 0.</span>
-          <span *ngIf="mermaForm.get('fromMerma').errors?.min">La cantidad no puede ser mayor a {{data.data.mermaStock}}.</span>
+          <span *ngIf="mermaForm.get('fromMerma').errors?.max">La cantidad no puede ser mayor a {{data.data.mermaStock}}.</span>
       </mat-error>
+    </mat-form-field>
+
+    <!-- observations -->
+    <mat-form-field appearance="outline" style="margin-bottom: 8px; width: 100%">
+      <mat-label>Observaciones</mat-label>
+      <textarea #addDesc 
+        style="min-height: 100px;"
+        formControlName="observations" 
+        matInput maxlength="150"></textarea>
+      <mat-hint align="end">{{addDesc.value?.length || 0}}/150</mat-hint>
     </mat-form-field>
 
   </form>

@@ -17,51 +17,53 @@
         <form [formGroup]="dataFormGroup">
             <mat-form-field class="w3-block w3-small" appearance="outline">
                 <mat-label>Usuario</mat-label>
-                <input matInput type="text" formControlName="email" placeholder="Correo electrónico" autocomplete="off">
+                <input matInput type="email" autocapitalize="none"
+                    formControlName="email" placeholder="Correo electrónico" autocomplete="off">
                 <mat-error>
                     <span *ngIf="dataFormGroup.get('email').errors?.required">Usuario requerido</span>
                     <span *ngIf="dataFormGroup.get('email').errors?.email">Email no válido</span>
-                    <span
-                        *ngIf="dataFormGroup.get('email').hasError('emailRepeatedValidator') && !register">Usuario
-                        ya registrado.</span>
-                    <span
-                        *ngIf="dataFormGroup.get('email').hasError('emailRepeatedValidator') && register">Usuario
-                        no registrado.</span>
+                    <span *ngIf="dataFormGroup.get('email').errors?.googleLogin">
+                        Haga click en Ingresar con Google.</span>
+                        <span *ngIf="dataFormGroup.get('email').errors?.facebookLogin">
+                            Haga click en Ingresar con Facebook.</span>
                 </mat-error>
             </mat-form-field>
 
             <mat-form-field class="w3-block w3-small" appearance="outline">
                 <mat-label>Contraseña</mat-label>
-                <input matInput [type]="hidePass ? 'password' : 'text'" formControlName="pass" placeholder="***"
+                <input matInput [type]="hidePass ? 'password' : 'text'" 
+                    formControlName="pass" placeholder="***" autocapitalize="none"
                     autocomplete="off">
                 <button mat-icon-button matSuffix (click)="hidePass = !hidePass"
                     [attr.aria-label]="'Ocultar contraseña'" [attr.aria-pressed]="hidePass">
                     <mat-icon>{{hidePass ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </button>
-                <mat-error>
+                <mat-error style="display: flex; flex-direction: row; justify-content: space-between;">
                     <span *ngIf="dataFormGroup.get('pass').errors?.required">Contraseña requerido</span>
                     <span *ngIf="dataFormGroup.get('pass').hasError('minlength')">Mínimo 6 caracteres</span>
+                    <span *ngIf="registerLogin$ | async" class="password" (click)="passwordReset()"> Olvidé mi contraseña</span>
                 </mat-error>
+                <mat-hint *ngIf="registerLogin$ | async" align="end">
+                    <span class="password" (click)="passwordReset()"> Olvidé mi contraseña</span>
+                </mat-hint>
             </mat-form-field>
-            <div *ngIf="register" class="ms-flex w3-small">
-                <span class="ms-fill"></span>
-                <span class="password font--primary" (click)="passwordReset()"> Olvidé mi contraseña</span>
-            </div>
         </form>
-        <div class="w3-margin-bottom">
-            <mat-checkbox class="w3-small" color="primary" [(ngModel)]="register" (click)="reset()">
-                Ya estoy registrado
-            </mat-checkbox>
-        </div>
 
-        <button *ngIf="!register" mat-raised-button class="w3-block w3-margin-bottom social social--register"
-            [disabled]="!dataFormGroup.valid" (click)="registerUser()">
-            Registrarse
-        </button>
-        <button *ngIf="register" mat-raised-button class="w3-block w3-margin-bottom social--register"
+        <button *ngIf="(registerLogin$ | async) else loginButton" mat-raised-button 
+            color="accent"
+            class="w3-block w3-margin-bottom w3-margin-top"
             [disabled]="!dataFormGroup.valid" (click)="login()">
             Ingresar
         </button>
+        <ng-template #loginButton>
+            <button mat-raised-button 
+                color="basic"
+                class="w3-block w3-margin-bottom w3-margin-top"
+                [disabled]="!dataFormGroup.valid" (click)="registerUser()">
+                Registrarse
+            </button>
+        </ng-template>
+
         <div class="w3-margin-top">
             <button mat-raised-button class="w3-block w3-margin-bottom social social--google"
                 (click)="auth.signIn('google')">
@@ -70,8 +72,8 @@
             <!-- <button mat-raised-button class="w3-block w3-margin-bottom social social--facebook"
                 (click)="auth.signIn('facebook')">
                 Ingresar con <strong>Facebook</strong>
-            </button> -->
-            <p *ngIf="auth$ | async">Ingreso</p>
+            </button>
+            <p *ngIf="auth$ | async"></p>
 
         </div>
     </div>

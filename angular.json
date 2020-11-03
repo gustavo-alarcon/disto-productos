@@ -129,5 +129,8 @@
       }
     }
   },
-  "defaultProject": "minimarket-boom"
+  "defaultProject": "disto-productos",
+  "cli": {
+    "analytics": false
+  }
 }

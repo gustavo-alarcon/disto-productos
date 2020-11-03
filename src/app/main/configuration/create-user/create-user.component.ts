@@ -88,8 +88,8 @@ export class CreateUserComponent implements OnInit {
       const value = control.value.toLowerCase();
       return this.dbs.getUsersStatic().pipe(
         map(res => {
-
-          return res.find(el => el.email.toLowerCase() == value) ? { emailRepeatedValidator: true } : null
+          let emailFilter=res.filter(el=>el.email)
+          return emailFilter.find(el => el.email.toLowerCase() == value) ? { emailRepeatedValidator: true } : null
         }))
     }
   }

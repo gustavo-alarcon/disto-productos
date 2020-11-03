@@ -11,7 +11,7 @@ export interface Product {
   price: number;      //Should this price be with IGV?
   unit: Unit;       
   realStock: number;  //Real stock will be amounted here after accepting a product in the log sect
-                      //To check the virtual we will use another collection
+  virtualStock?: number;  //To check the virtual we will use another collection
   mermaStock: number;
   sellMinimum: number;    //The minimum by which, we should top selling to the public
   alertMinimum: number;   //Minimum by which one should get an alert to request more 
@@ -40,4 +40,7 @@ export interface MermaTransfer {
   quantity: number;
   date: Date;
   user: User;
+  observations: string;
 }
+
+export interface MermaTransferWithProduct extends MermaTransfer, Product {} 

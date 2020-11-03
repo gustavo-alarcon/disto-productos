@@ -1,212 +1,288 @@
-<mat-progress-bar *ngIf="loadingbar$ | async" mode="indeterminate"></mat-progress-bar>
-<div *ngIf="init$ | async">
-    <p *ngIf="userData$ | async"></p>
-    <mat-horizontal-stepper linear #stepper class="ms-stepper">
-        <mat-step label="📝" [stepControl]="firstFormGroup" [completed]="firstFormGroup.valid">
-            <h2 class="subtitle">Datos personales</h2>
-            <form [formGroup]="firstFormGroup">
-                <mat-form-field class="w3-block" appearance="outline">
-                    <mat-label>Correo</mat-label>
-                    <input autocomplete="off" formControlName="email" type="email" matInput
-                        placeholder="tucorreo@ejemplo.com">
-                </mat-form-field>
-                <mat-form-field class="w3-block" appearance="outline">
-                    <mat-label>DNI</mat-label>
-                    <input autocomplete="off" formControlName="dni" type="tel" matInput
-                        placeholder="DNI / Carnet de extranjeria">
-                    <mat-error *ngIf="firstFormGroup.get('dni').hasError('required')">Campo requerido</mat-error>
-                    <mat-error *ngIf="firstFormGroup.get('dni').hasError('minlength')">
+<div class="w3-section w3-margin-left w3-margin-right">
+  <div class="w3-row">
+    <div class="w3-col s0 m1 l1">
+      <p class="w3-hide-small"></p>
+    </div>
+    <div class="w3-col s12 m10 l10">
+      <mat-progress-bar *ngIf="loadingbar$ | async" mode="indeterminate"></mat-progress-bar>
+      <div *ngIf="init$ | async">
+        <div class="ms-flex ms-flex--center">
+          <button mat-icon-button routerLink="/main/products/carrito" style="margin-left: -10px; margin-top: -10px">
+            <mat-icon>keyboard_backspace</mat-icon>
+          </button>
+          <h2 *ngIf="firstSale" class="title2">Es tu primera compra 😊</h2>
+          <h2 *ngIf="!firstSale" class="title2">Hola, {{ name }} 😊</h2>
+        </div>
+        <p *ngIf="firstSale">
+          Hola cheese lover, gracias por tu preferencia. Comencemos anotando tus
+          datos
+        </p>
+        <p *ngIf="!firstSale">
+          Gracias por volver a comprar nuestros productos
+        </p>
+        <div class="container" style="align-items: baseline">
+          <div *ngIf="scroll$ | async"></div>
+          <div *ngIf="userData$ | async" style="width: 100%; max-width: 420px">
+            <div>
+              <mat-horizontal-stepper linear #stepper class="ms-stepper">
+                <mat-step label="📝" [stepControl]="firstFormGroup" [completed]="firstFormGroup.valid">
+                  <h2 class="subtitle">Datos personales</h2>
+                  <form [formGroup]="firstFormGroup">
+                    <mat-form-field class="w3-block" appearance="outline">
+                      <mat-label>Correo</mat-label>
+                      <input autocomplete="off" formControlName="email" type="email" matInput
+                        placeholder="tucorreo@ejemplo.com" />
+                    </mat-form-field>
+                    <mat-form-field class="w3-block" appearance="outline">
+                      <mat-label>DNI</mat-label>
+                      <input autocomplete="off" formControlName="dni" type="tel" matInput
+                        placeholder="DNI / Carnet de extranjeria" />
+                      <mat-error *ngIf="firstFormGroup.get('dni').hasError('required')">Campo requerido</mat-error>
+                      <mat-error *ngIf="firstFormGroup.get('dni').hasError('minlength')">
                         Número inválido
-                    </mat-error>
-                </mat-form-field>
-                <mat-hint *ngIf="name">Si, el nombre que figura con tu correo no es el indicado, puedes cambiarlo aquí.
-                    (Solo en la primera compra)</mat-hint>
-                <mat-form-field class="w3-block" appearance="outline">
-                    <mat-label>Nombre</mat-label>
-                    <input autocomplete="off" formControlName="name" type="text" matInput placeholder="Nombre">
-                    <mat-error>Campo requerido</mat-error>
-                </mat-form-field>
-                <mat-form-field class="w3-block" appearance="outline">
-                    <mat-label>Apellido Paterno</mat-label>
-                    <input autocomplete="off" formControlName="lastname1" type="text" matInput placeholder="Nombre">
-                    <mat-error>Campo requerido</mat-error>
-                </mat-form-field>
-                <mat-form-field class="w3-block" appearance="outline">
-                    <mat-label>Apellido Materno</mat-label>
-                    <input autocomplete="off" formControlName="lastname2" type="text" matInput placeholder="Nombre">
-                    <mat-error>Campo requerido</mat-error>
-                </mat-form-field>
-                <mat-form-field class="w3-block" appearance="outline">
-                    <mat-label>Celular</mat-label>
-                    <input autocomplete="off" formControlName="phone" type="tel" matInput placeholder="Celular">
-                    <mat-error *ngIf="firstFormGroup.get('phone').hasError('required')">Campo requerido</mat-error>
-                    <mat-error *ngIf="firstFormGroup.get('phone').hasError('minlength')">
+                      </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="w3-block" appearance="outline">
+                      <mat-label>Nombre</mat-label>
+                      <input autocomplete="off" formControlName="name" type="text" matInput placeholder="Nombre" />
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="w3-block" appearance="outline">
+                      <mat-label>Apellido Paterno</mat-label>
+                      <input autocomplete="off" formControlName="lastname1" type="text" matInput placeholder="Nombre" />
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="w3-block" appearance="outline">
+                      <mat-label>Apellido Materno</mat-label>
+                      <input autocomplete="off" formControlName="lastname2" type="text" matInput placeholder="Nombre" />
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="w3-block" appearance="outline">
+                      <mat-label>Celular</mat-label>
+                      <input autocomplete="off" formControlName="phone" type="tel" matInput placeholder="Celular" />
+                      <mat-error *ngIf="firstFormGroup.get('phone').hasError('required')">Campo requerido</mat-error>
+                      <mat-error *ngIf="
+                          firstFormGroup.get('phone').hasError('minlength')
+                        ">
                         Número inválido
-                    </mat-error>
-                </mat-form-field>
-            </form>
-            <div class="ms-flex">
-                <span class="ms-fill"></span>
-                <button mat-button matStepperNext class="font--primary">
-                    Siguiente <mat-icon color="primary">east</mat-icon>
-                </button>
-            </div>
-        </mat-step>
-        <mat-step label="📦" [stepControl]="secondFormGroup" [completed]="secondFormGroup.valid">
-            <h2 class="subtitle">Datos de envío</h2>
-            <form [formGroup]="secondFormGroup">
-                <mat-form-field class="w3-block" appearance="outline">
-                    <mat-label>Dirección</mat-label>
-                    <input autocomplete="off" formControlName="address" type="text" matInput
-                        placeholder="Dirección de entrega">
-                    <mat-error>Campo requerido</mat-error>
-                </mat-form-field>
-
-                <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
-                    <mat-select [compareWith]="compareObjects" formControlName="district" placeholder="Distrito">
-                        <mat-option *ngFor="let district of districts" [value]="district"
-                            (click)="changeDelivery(district)">
-                            {{district['name']}}
-                        </mat-option>
-                    </mat-select>
-                    <mat-hint>El precio de delivery dependerá del distrito de destino</mat-hint>
-                    <mat-error>Campo requerido</mat-error>
-                </mat-form-field>
-
-                <mat-form-field class="w3-block" appearance="outline">
-                    <mat-label>Referencia</mat-label>
-                    <input autocomplete="off" formControlName="ref" type="text" matInput placeholder="Referencia">
-                    <mat-error>Campo requerido</mat-error>
-                </mat-form-field>
-                <!-- <div class="w3-margin-bottom">
-                    <div style="display: flex; flex-wrap: wrap;justify-content: space-between;">
-                        <div style="width: 80%;">Especifica tu dirección en el mapa (Opcional)</div>
-                        <button mat-icon-button color="primary" (click)="findMe()">
-                            <mat-icon>gps_fixed</mat-icon>
-                        </button>
-                    </div>
-                    <br>
-                    <agm-map style="height: 280px;" [latitude]="latitud" [longitude]="longitud" [zoom]="15"
-                        (mapClick)="mapClicked($event)">
-                        <agm-marker [latitude]="latitud" [longitude]="longitud"></agm-marker>
-                    </agm-map>
-
-                </div> -->
-                <div class="ms-flex">
-                    <button mat-button matStepperPrevious class="font--primary">
-                        <mat-icon color="primary">keyboard_backspace</mat-icon> Anterior
-                    </button>
+                      </mat-error>
+                    </mat-form-field>
+                  </form>
+                  <div class="ms-flex">
                     <span class="ms-fill"></span>
                     <button mat-button matStepperNext class="font--primary">
-                        Siguiente <mat-icon color="primary">east</mat-icon>
+                      Siguiente <mat-icon color="primary">east</mat-icon>
                     </button>
-                </div>
-            </form>
-        </mat-step>
-        <mat-step label="💳">
-            <div *ngIf="!(loading$ | async)">
-                <h2 class="subtitle">Pago</h2>
-                <form [formGroup]="payFormGroup">
-                    <div class="pay ms-flex">
-                        <img src="../../../../assets/images/payment_list.jpg" alt="imagen de forma de compra y tipos de pagos" style="width: 100%; margin: 1em 0em">
-                    </div>
+                  </div>
+                </mat-step>
+                <mat-step label="📦" [stepControl]="secondFormGroup" [completed]="secondFormGroup.valid">
+                  <h2 class="subtitle">Datos de envío</h2>
+                  <form [formGroup]="secondFormGroup">
                     <mat-form-field class="w3-block" appearance="outline">
-                        <mat-label>Opciones de pago</mat-label>
-                        <mat-select formControlName="pay" placeholder='Seleccionar'>
-                            <mat-option *ngFor="let type of payType" [value]="type">
-                                <img class="example-option-img" aria-hidden [src]="type.photoURL" height="25">
-                                <span>{{type.name}}</span>
-                            </mat-option>
-                        </mat-select>
-                        <mat-error>Campo requerido</mat-error>
+                      <mat-label>Dirección</mat-label>
+                      <input autocomplete="off" formControlName="address" type="text" matInput
+                        placeholder="Dirección / Dpto. / Bloque" />
+                      <mat-error>Campo requerido</mat-error>
                     </mat-form-field>
-                    <div class="w3-margin-bottom account" *ngIf="payFormGroup.get('pay').value as pay">
-                        <img class="example-option-img" height="30" aria-hidden [src]="pay['photoURL']"
-                            alt="image:account">
-                        <span>{{pay['account']}}</span>
 
-                    </div>
-                    <div class="pay ms-flex">
-                        <div class="pay__total">
-                            Total a pagar
-                        </div>
-                        <div class="ticket__total">
-                            S/. {{total + delivery | number: '.2'}}
-                        </div>
-                    </div>
-                    
                     <mat-form-field class="w3-block" appearance="outline">
-                        <mat-select formControlName="typePay" placeholder='Boleta/Factura'>
-                            <mat-option *ngFor="let type of documents" [value]="type">
-                                {{type}}
-                            </mat-option>
+                      <mat-label>Referencia</mat-label>
+                      <input autocomplete="off" formControlName="ref" type="text" matInput placeholder="Referencia" />
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field class="w3-block w3-margin-bottom" appearance="outline">
+                      <mat-select [compareWith]="compareObjects" formControlName="district" placeholder="Distrito">
+                        <mat-option *ngFor="let district of districts" [value]="district"
+                          (click)="changeDelivery(district)">
+                          {{ district["name"] }}
+                        </mat-option>
+                      </mat-select>
+                      <mat-hint>El precio de delivery dependerá del distrito de
+                        destino</mat-hint>
+                      <mat-error>Campo requerido</mat-error>
+                    </mat-form-field>
+
+                    <div *ngIf="dbs.delivery > 0" class="w3-margin-bottom">
+                      <div class="ticket__separate"></div>
+                      <div class="ms-flex">
+                        <div style="width: 70%; text-align: right; padding: 0 20px">
+                          Total
+                        </div>
+                        <div style="width: 30%">
+                          S/. {{ total | number: ".2" }}
+                        </div>
+                      </div>
+                      <div class="ms-flex font--primary" style="font-weight: 900">
+                        <div style="width: 70%; text-align: right; padding: 0 20px">
+                          Delivery
+                        </div>
+                        <div style="width: 30%">
+                          S/. {{ dbs.delivery | number: ".2" }}
+                        </div>
+                      </div>
+                      <div class="ticket__separate"></div>
+                      <div class="ms-flex font--primary" style="font-weight: 900">
+                        <div style="width: 70%"></div>
+                        <div style="width: 30%">
+                          S/. {{ total + dbs.delivery | number: ".2" }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ms-flex">
+                      <button mat-button matStepperPrevious class="font--primary">
+                        <mat-icon color="primary">keyboard_backspace</mat-icon>
+                        Anterior
+                      </button>
+                      <span class="ms-fill"></span>
+                      <button mat-button matStepperNext class="font--primary">
+                        Siguiente <mat-icon color="primary">east</mat-icon>
+                      </button>
+                    </div>
+                  </form>
+                </mat-step>
+                <mat-step label="💳">
+                  <div *ngIf="!(loading$ | async)">
+                    <h2 class="subtitle">Pago</h2>
+                    <form [formGroup]="payFormGroup">
+                      <div class="pay ms-flex">
+                        <img src="../../../../assets/images/payment_list.jpg"
+                          alt="imagen de forma de compra y tipos de pagos" style="width: 100%; margin: 1em 0em" />
+                      </div>
+                      <mat-form-field class="w3-block" appearance="outline">
+                        <mat-label>Opciones de pago</mat-label>
+                        <mat-select formControlName="pay" placeholder="Seleccionar">
+                          <mat-option *ngFor="let type of payType" [value]="type">
+                            <img class="example-option-img" aria-hidden [src]="type.photoURL" height="25" />
+                            <span>{{ type.name }}</span>
+                          </mat-option>
                         </mat-select>
                         <mat-error>Campo requerido</mat-error>
-                    </mat-form-field>
-                    <div class="w3-margin-bottom">
-                        <div class="w3-margin-bottom" style="position: relative;"
-                            *ngFor="let image of photosList; let ind = index">
-                            <img class="voucher" style="object-fit: cover;" [src]="image.img" alt="fotografía">
-                            <div class="ms-flex w3-block" style="position: absolute; top: 0;">
-                                <span class="ms-fill"></span>
-                                <button type="button" *ngIf="!image.show" mat-icon-button (click)="image.show=true">
-                                    <mat-icon>zoom_in</mat-icon>
-                                </button>
-                                <button type="button" *ngIf="image.show" mat-icon-button (click)="image.show=false">
-                                    <mat-icon>zoom_out</mat-icon>
-                                </button>
-                                <button type="button" mat-icon-button (click)="eliminatedphoto(ind)">
-                                    <mat-icon>close</mat-icon>
-                                </button>
+                      </mat-form-field>
+                      <div class="w3-margin-bottom account" *ngIf="payFormGroup.get('pay').value as pay">
+                        <img class="example-option-img" height="30" aria-hidden [src]="pay['photoURL']"
+                          alt="image:account" />
+                        <span>{{ pay["account"] }}</span>
+                      </div>
+                      <div class="pay ms-flex">
+                        <div class="pay__total">Total a pagar</div>
+                        <div class="ticket__total">
+                          S/. {{ total + dbs.delivery | number: ".2" }}
+                        </div>
+                      </div>
+
+                      <mat-form-field class="w3-block" appearance="outline">
+                        <mat-select formControlName="typePay" placeholder="Boleta/Factura">
+                          <mat-option *ngFor="let type of documents" [value]="type">
+                            {{ type }}
+                          </mat-option>
+                        </mat-select>
+                        <mat-error>Campo requerido</mat-error>
+                      </mat-form-field>
+
+                      <ng-container *ngIf="invoice$ | async">
+                        <p style="color: #2b2b2b; font-weight: 600; margin-top: 0px">Datos de facturación</p>
+                        <mat-form-field class="w3-block" appearance="outline">
+                          <input matInput type="tel" placeholder="RUC" formControlName="ruc">
+                          <mat-error>Campo requerido</mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field class="w3-block" appearance="outline">
+                          <input matInput type="text" placeholder="Empresa" formControlName="companyName">
+                          <mat-error>Campo requerido</mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field class="w3-block" appearance="outline">
+                          <input matInput type="text" placeholder="Dirección" formControlName="companyAddress">
+                          <mat-error>Campo requerido</mat-error>
+                        </mat-form-field>
+                      </ng-container>
+
+
+
+                      <div class="w3-margin-bottom">
+                        <div class="w3-margin-bottom" style="position: relative"
+                          *ngFor="let image of photosList; let ind = index">
+                          <img class="voucher" style="object-fit: cover" [src]="image.img" alt="fotografía" />
+                          <div class="ms-flex w3-block" style="position: absolute; top: 0">
+                            <span class="ms-fill"></span>
+                            <button type="button" *ngIf="!image.show" mat-icon-button (click)="image.show = true">
+                              <mat-icon>zoom_in</mat-icon>
+                            </button>
+                            <button type="button" *ngIf="image.show" mat-icon-button (click)="image.show = false">
+                              <mat-icon>zoom_out</mat-icon>
+                            </button>
+                            <button type="button" mat-icon-button (click)="eliminatedphoto(ind)">
+                              <mat-icon>close</mat-icon>
+                            </button>
+                          </div>
+                          <div style="text-align: center; border: 1px solid silver" *ngIf="image.show">
+                            <div class="ms-flex w3-block">
+                              <span class="ms-fill"></span>
+                              <button mat-icon-button (click)="image.show = false">
+                                <mat-icon>close</mat-icon>
+                              </button>
                             </div>
-                            <div style="text-align: center; border: 1px solid silver;" *ngIf="image.show">
-                                <div class="ms-flex w3-block">
-                                    <span class="ms-fill"></span>
-                                    <button mat-icon-button (click)="image.show=false">
-                                        <mat-icon>close</mat-icon>
-                                    </button>
-                                </div>
-                                <img style="width:80%;" [src]="image.img" alt="fotografía grande">
-                            </div>
+                            <img style="width: 80%" [src]="image.img" alt="fotografía grande" />
+                          </div>
                         </div>
 
                         <div class="voucher" (click)="photoURL.click()">
-                            Agregar foto de voucher de pago
+                          Agregar foto de voucher de pago
                         </div>
                         <mat-hint>*Campo requerido</mat-hint>
 
-                        <mat-progress-bar *ngIf="photos?.resizing$.photoURL | async" style="width:100%"
-                            mode="indeterminate">
+                        <mat-progress-bar *ngIf="photos?.resizing$.photoURL | async" style="width: 100%"
+                          mode="indeterminate">
                         </mat-progress-bar>
                         <span *ngIf="photos.resizing$.photoURL | async" class="w3-small ms-color-11 ms-font-montserrat"
-                            style="width:100%">*comprimiendo</span>
-                        <input style="display: none" #photoURL type="file" accept='image/*'
-                            (change)="addNewPhoto('photoURL', photoURL.files)" />
+                          style="width: 100%">*comprimiendo</span>
+                        <input style="display: none" #photoURL type="file" accept="image/*"
+                          (change)="addNewPhoto('photoURL', photoURL.files)" />
+                      </div>
+                    </form>
+                    <div class="ms-flex">
+                      <button mat-button matStepperPrevious class="font--primary">
+                        <mat-icon color="primary">keyboard_backspace</mat-icon>
+                        Anterior
+                      </button>
+                      <span class="ms-fill"></span>
                     </div>
-                </form>
-                <div class="ms-flex">
-                    <button mat-button matStepperPrevious class="font--primary">
-                        <mat-icon color="primary">keyboard_backspace</mat-icon> Anterior
+                    <button mat-raised-button color="accent" type="submit" (click)="prueba()"
+                      class="w3-block w3-margin-top" style="font-weight: bold" [disabled]="dbs.order.length==0 || !payFormGroup.valid">
+                      Finalizar Compra
                     </button>
-                    <span class="ms-fill"></span>
-                </div>
-                <button mat-raised-button color="accent" type="submit" (click)="prueba()" class="w3-block w3-margin-top"
-                    style=" font-weight: bold;">
-                    Finalizar Compra
-                </button>
-            </div>
-            <div *ngIf="loading$ | async" style="padding-top: 14vh;">
-                <div class="w3-block w3-center">
-                    <div class="lds-ring">
+                  </div>
+                  <div *ngIf="loading$ | async" style="padding-top: 14vh">
+                    <div class="w3-block w3-center">
+                      <div class="lds-ring">
                         <div></div>
                         <div></div>
                         <div></div>
                         <div></div>
+                      </div>
+                      <p style="color: #5da92f">
+                        Espere, estamos procesando su compra
+                      </p>
                     </div>
-                    <p style="color: #5da92f;">Espere, estamos procesando su compra</p>
-                </div>
+                  </div>
+                </mat-step>
+              </mat-horizontal-stepper>
             </div>
-
-        </mat-step>
-    </mat-horizontal-stepper>
+          </div>
+          <span class="ms-fill"></span>
+          <div #scroll>
+            <mat-card style="min-width: 400px; padding: 10px 16px" class="w3-hide-small w3-hide-medium">
+              <app-shopping-cart [delivery]="dbs.delivery" [order]="dbs.order" [modified]="false" [change]="true">
+              </app-shopping-cart>
+            </mat-card>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="w3-col s0 m1 l1">
+      <p class="w3-hide-small"></p>
+    </div>
+  </div>
 </div>

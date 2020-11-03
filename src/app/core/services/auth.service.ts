@@ -68,7 +68,7 @@ export class AuthService {
     return this.afAuth.sendPasswordResetEmail(email)
   }
 
-  public signIn(type: string): Promise<void | firebase.auth.UserCredential> {
+  public signIn(type: 'facebook'|'google'): Promise<void | firebase.auth.UserCredential> {
     let provider = null;
 
     switch (type) {
@@ -112,7 +112,6 @@ export class AuthService {
   public logout(): void {
     this.afAuth.signOut().finally(() => {
       this.router.navigateByUrl('/login');
-      this.dbs.view.next(1)
     });
   }
 

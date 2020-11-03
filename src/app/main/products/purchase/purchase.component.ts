@@ -5,12 +5,14 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { Sale, SaleRequestedProducts } from './../../../core/models/sale.model';
 import { Ng2ImgMaxService } from 'ng2-img-max';
 import { DatabaseService } from 'src/app/core/services/database.service';
-import { tap, take, takeLast, map } from 'rxjs/operators';
-import { Observable, BehaviorSubject, forkJoin, combineLatest } from 'rxjs';
+import { tap, take, takeLast, map, distinctUntilChanged } from 'rxjs/operators';
+import { Observable, BehaviorSubject, forkJoin, combineLatest, observable } from 'rxjs';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, Renderer2 } from '@angular/core';
+import { ScrollDispatcher } from '@angular/cdk/overlay';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-purchase',
@@ -18,7 +20,6 @@ import { Component, OnInit, Input } from '@angular/core';
   styleUrls: ['./purchase.component.scss']
 })
 export class PurchaseComponent implements OnInit {
-
   user: User = null
 
   firstSale: boolean = false
@@ -35,9 +36,11 @@ export class PurchaseComponent implements OnInit {
 
   order: Array<any>
 
-  name: boolean = false
+  @ViewChild("scroll", { static: false }) scrollbar: ElementRef;
+  scroll$: Observable<any>;
+
+  name: string = ''
   total: number = 0
-  delivery: number = 6
 
   firstFormGroup: FormGroup;
   secondFormGroup: FormGroup;
@@ -67,19 +70,35 @@ export class PurchaseComponent implements OnInit {
       data: []
     }
 
+  invoice$: Observable<boolean>;
+
   constructor(
     private auth: AuthService,
     private snackbar: MatSnackBar,
+    public scroll: ScrollDispatcher,
+    private renderer: Renderer2,
     private fb: FormBuilder,
     private ng2ImgMax: Ng2ImgMaxService,
     private dialog: MatDialog,
-    private dbs: DatabaseService,
-    private af: AngularFirestore
+    public dbs: DatabaseService,
+    private af: AngularFirestore,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
     let date = new Date()
     this.now = new Date(date.getTime() + (345600000))
+
+    this.scroll$ = this.scroll.scrolled().pipe(
+      tap((data) => {
+        const scrollTop = data.getElementRef().nativeElement.scrollTop || 0;
+        if (scrollTop >= 120) {
+          this.renderer.addClass(this.scrollbar.nativeElement, "shadow");
+        } else {
+          this.renderer.removeClass(this.scrollbar.nativeElement, "shadow");
+        }
+      })
+    );
 
     this.init$ = this.dbs.getGeneralConfigDoc().pipe(
       tap(res => {
@@ -129,26 +148,66 @@ export class PurchaseComponent implements OnInit {
     this.payFormGroup = this.fb.group({
       pay: [null, [Validators.required]],
       typePay: [null, [Validators.required]],
-      photoURL: [null]
+      photoURL: [null],
+      ruc: [null],
+      companyName: [null],
+      companyAddress: [null]
     });
 
-    
-
-    this.delivery = this.dbs.delivery
     this.total = [...this.dbs.order].map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
 
+    this.order = [...this.dbs.order]
+
     this.userData$ = this.auth.user$.pipe(
-      tap(res=>{
-       this.user = res
+      tap(res => {
+        this.user = res
+        if (res["salesCount"]) {
+          this.firstSale = false;
+        } else {
+          this.firstSale = true;
+        }
+
+        if (res["contact"]) {
+          this.name = res.name.split(" ")[0];
+          this.dbs.delivery = res.contact.district.delivery;
+        }
         this.getData()
-        
+
       })
     )
 
+    this.invoice$ =
+      this.payFormGroup.get('typePay').valueChanges
+        .pipe(
+          distinctUntilChanged(),
+          map(res => {
+            if (res === 'Factura') {
+              this.payFormGroup.controls['ruc'].setValidators([Validators.required]);
+              this.payFormGroup.controls['companyName'].setValidators([Validators.required]);
+              this.payFormGroup.controls['companyAddress'].setValidators([Validators.required]);
+              this.payFormGroup.controls['ruc'].updateValueAndValidity();
+              this.payFormGroup.controls['companyName'].updateValueAndValidity();
+              this.payFormGroup.controls['companyAddress'].updateValueAndValidity();
+              return true;
+            } else {
+              this.payFormGroup.controls['ruc'].clearValidators();
+              this.payFormGroup.controls['companyName'].clearValidators();
+              this.payFormGroup.controls['companyAddress'].clearValidators();
+              this.payFormGroup.controls['ruc'].updateValueAndValidity();
+              this.payFormGroup.controls['companyName'].updateValueAndValidity();
+              this.payFormGroup.controls['companyAddress'].updateValueAndValidity();
+              return false;
+            }
+          })
+        )
 
   }
 
-  getData(){
+  compareDistricts(district) {
+    return this.districts.find((el) => el["name"] == district["name"]);
+  }
+
+  getData() {
     if (this.user) {
       if (this.user['contact']) {
         this.firstFormGroup = this.fb.group({
@@ -192,9 +251,6 @@ export class PurchaseComponent implements OnInit {
 
         this.firstFormGroup.get('email').disable()
 
-        if (this.user['displayName']) {
-          this.name = true
-        }
       }
     }
   }
@@ -214,7 +270,6 @@ export class PurchaseComponent implements OnInit {
 
   changeDelivery(district) {
     this.dbs.delivery = district['delivery']
-    this.delivery = district['delivery']
   }
 
   roundNumber(number) {
@@ -343,17 +398,69 @@ export class PurchaseComponent implements OnInit {
 
   }
 
+
   save() {
     this.loading.next(true)
+    let reduceOrder = this.dbs.getneworder(this.dbs.order)
+    this.af.firestore.runTransaction((transaction) => {
+      let promises = []
+      reduceOrder.forEach((order, ind) => {
+        const sfDocRef = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(order.product.id);
 
-    const saleCount = this.af.firestore.collection(`/db/minimarketBoom/config/`).doc('generalConfig');
-    const saleRef = this.af.firestore.collection(`/db/minimarketBoom/sales`).doc();
+        promises.push(transaction.get(sfDocRef).then((prodDoc) => {
+
+          let newStock = prodDoc.data().virtualStock - order.reduce;
+          transaction.update(sfDocRef, { virtualStock: newStock })
+          if (newStock >= prodDoc.data().sellMinimum) {
+            return {
+              isSave: true,
+              product: prodDoc.data().description
+            }
+          } else {
+            return {
+              isSave: false,
+              product: prodDoc.data().description
+            }
+          }
+
+
+        }).catch((error) => {
+          console.log("Transaction failed: ", error);
+          return {
+            isSave: false,
+            product: null
+          }
+
+        }));
+
+
+      })
+      return Promise.all(promises);
+    }).then(res => {
+      this.savePurchase(res)
+
+
+    }).catch(() => {
+      this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
+
+
+    })
+
+
+  }
+
+  savePurchase(list) {
+    const saleCount = this.af.firestore.collection(`/db/distoProductos/config/`).doc('generalConfig');
+    const saleRef = this.af.firestore.collection(`/db/distoProductos/sales`).doc();
 
     let newSale: Sale = {
       id: saleRef.id,
       correlative: 0,
       correlativeType: 'R',
       document: this.payFormGroup.get('typePay').value,
+      ruc: this.payFormGroup.get('ruc').value,
+      companyName: this.payFormGroup.get('companyName').value,
+      companyAddress: this.payFormGroup.get('companyAddress').value,
       payType: this.payFormGroup.get('pay').value,
       location: {
         address: this.secondFormGroup.get('address').value,
@@ -372,11 +479,19 @@ export class PurchaseComponent implements OnInit {
       requestedProducts: this.dbs.order,
       status: 'Solicitado',
       total: this.total,
-      deliveryPrice: this.delivery,
+      deliveryPrice: this.dbs.delivery,
       voucher: [],
-      voucherChecked: false
+      voucherChecked: false,
+      transactionCliente: list
     }
 
+    const email = {
+      to: this.user.email,
+      template: {
+        name: 'saleEmail'
+      }
+    }
+    const emailRef = this.af.firestore.collection(`/mail`).doc();
 
     let userCorrelative = 1
     const ref = this.af.firestore.collection(`/users`).doc(this.user.uid);
@@ -416,6 +531,8 @@ export class PurchaseComponent implements OnInit {
           newSale.correlative = newCorr
 
           transaction.set(saleRef, newSale);
+          //email
+          transaction.set(emailRef, email)
           //user
           transaction.update(ref, {
             contact: newSale.location,
@@ -429,63 +546,23 @@ export class PurchaseComponent implements OnInit {
         });
 
       }).then(() => {
-        let copy = [...this.dbs.order]
-        let newOrder: any = [...copy].map(order => {
-          if (order['chosenOptions']) {
-            return order['chosenOptions'].map(el => {
-              return {
-                product: el,
-                quantity: 1 * order.quantity
-              }
-            })
-          } else {
-            return [order]
+        this.dialog.open(SaleDialogComponent, {
+          data: {
+            name: this.firstFormGroup.value['name'],
+            number: newSale.correlative,
+            email: this.user.email
           }
         })
 
-        this.order = newOrder.reduce((a, b) => a.concat(b), []).map((el, index, array) => {
-          let counter = 0
-          array.forEach(al => {
-            if (al.product['id'] == el.product['id']) {
-              counter++
-            }
-          })
-
-          el['quantity'] = counter
-          return el
-        }).filter((dish, index, array) => array.findIndex(el => el.product['id'] === dish.product['id']) === index)
-
-        this.order.forEach((order, ind) => {
-          const ref = this.af.firestore.collection(`/db/minimarketBoom/productsList`).doc(order.product.id);
-          this.af.firestore.runTransaction((transaction) => {
-            return transaction.get(ref).then((prodDoc) => {
-              let newStock = prodDoc.data().realStock - order.quantity;
-              transaction.update(ref, { realStock: newStock });
-            });
-          }).then(() => {
-            if (ind == this.order.length - 1) {
-              this.dialog.open(SaleDialogComponent, {
-                data: {
-                  name: this.firstFormGroup.value['name'],
-                  number: newSale.correlative,
-                  email: this.user.email
-                }
-              })
-
-              this.dbs.order = []
-              this.dbs.total = 0
-              this.dbs.view.next(1)
-              this.loading.next(false)
-            }
-
-          })
-        })
+        this.dbs.order = []
+        this.dbs.orderObs.next([])
+        this.dbs.total = 0
+        this.router.navigate(["/main/products"], { fragment: this.dbs.productView });
+        //this.dbs.view.next(1)
+        this.loading.next(false)
       }).catch(function (error) {
-        console.log("Transaction failed: ", error);
+        this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
       });
     })
-
-
   }
-
 }

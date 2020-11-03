@@ -1,0 +1,21 @@
+<div style="max-width: 250px; position: relative;">
+    <div mat-dialog-title>
+        <div class="ms-flex ms-flex--center">
+            <h2 style="font-size: 1em;">
+                Problema en tu pedido
+            </h2>
+            <span class="ms-fill"></span>
+            <button mat-icon-button mat-dialog-close>
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <mat-divider></mat-divider>
+
+    </div>
+    <div mat-dialog-content>
+        <p>Los siguientes productos, se han quedado sin stock suficiente , considera cambiarlos, para continuar.</p>
+
+        <p *ngFor="let prod of data.productos" style="font-weight: bold;">{{prod.product}} - stocK: {{prod.stock}}</p>
+        
+    </div>
+</div>

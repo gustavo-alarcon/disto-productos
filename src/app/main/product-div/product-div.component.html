@@ -1,4 +1,4 @@
-<mat-card [ngClass]="package?'product product--package w3-margin-bottom':'product product--product w3-margin-bottom'">
+<mat-card *ngIf="product$ | async" [ngClass]="package?'product product--package w3-margin-bottom':'product product--product w3-margin-bottom'">
     <div class="ms-flex product__container">
         <div class="product__image-div">
             <img [defaultImage]="defaultImage" [lazyLoad]="product.photoURL" [offset]="100" class="product__image">
@@ -12,7 +12,7 @@
                 </button>
             </div>
             <div *ngIf="!package">
-                <div *ngIf="product.realStock <= product.sellMinimum" class="product__provision">
+                <div *ngIf="product.virtualStock <= product.sellMinimum" class="product__provision">
                     En abastecimiento</div>
             </div>
             <div *ngIf="package" style="margin-top: 8px;">
@@ -35,7 +35,7 @@
                                 {{status['description'] | titlecase}} ({{status.unit.abbreviation}})
                             </mat-option>
                         </mat-select>
-    
+
                     </div>
                 </div>
             </div>
@@ -60,7 +60,7 @@
                     </div>
                 </div>
                 <div *ngIf="!package">
-                    <button *ngIf="product.realStock > product.sellMinimum" mat-mini-fab color='accent'
+                    <button *ngIf="product.virtualStock > product.sellMinimum" mat-mini-fab color='accent'
                         [disabled]="!stopBuy(product)" (click)="add(product)">
                         <mat-icon>add</mat-icon>
                     </button>

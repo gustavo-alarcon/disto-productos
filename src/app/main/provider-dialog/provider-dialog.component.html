@@ -1,0 +1,34 @@
+<div mat-dialog-title>
+  <h2 class="title-dialog" style="font-size:1.2em">
+      <mat-icon style="vertical-align:middle">add_circle</mat-icon>
+      {{data.edit?'Editar':'Agregar'}} proveedor
+  </h2>
+  <mat-divider></mat-divider>
+</div>
+<mat-dialog-content>
+  <mat-progress-bar mode='indeterminate' *ngIf="loading$ | async"></mat-progress-bar>
+  <form [formGroup]="providerForm">
+      <mat-form-field appearance="outline" class="w3-block">
+          <mat-label>Nombre</mat-label>
+          <input autocomplete="off" formControlName="name" type="text" matInput placeholder="Nombre">
+          <mat-error>
+              <span *ngIf="providerForm.get('name').errors?.required">Campo requerido</span>
+              <span *ngIf="providerForm.get('name').hasError('repeatedValidator')">
+                  Nombre repetido
+              </span>
+          </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="w3-block">
+        <mat-label>RUC</mat-label>
+        <input autocomplete="off" formControlName="ruc" type="phone" matInput placeholder="RUC">
+    </mat-form-field>
+
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button class="w3-margin-right buttonNoRounded" mat-dialog-close>Cancelar</button>
+  <button mat-raised-button class="buttonNoRounded" color="accent" (click)="save()" type="button"
+      [disabled]="!providerForm.valid">Guardar</button>
+</mat-dialog-actions>

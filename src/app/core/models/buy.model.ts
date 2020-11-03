@@ -12,10 +12,15 @@ export interface Buy {
   totalAmount: number;     //in KG
   totalPrice: number;
 
-  //validated 
+  provider?: {
+    name: string;
+    ruc: string;
+  };
+
+  //validated
   validated: boolean;       //True only when all products are validated
   validatedDate: Date;
-  status:string;
+  status: string;
 
   //returned
   returned?: boolean;
@@ -26,8 +31,8 @@ export interface Buy {
 
   requestedDate: Date;      //When the request was submitted
   requestedBy: User;
-  
-  
+
+
   editedDate: Date;
   editedBy: User;
 }
@@ -65,7 +70,7 @@ export interface BuyRequestedProduct {               //How many products should 
   returnedStatus?: string;
   returnDate?: Date;
 
-  
+
   requestedDate: Date;      //When the request was submitted
   requestedBy: User
 }

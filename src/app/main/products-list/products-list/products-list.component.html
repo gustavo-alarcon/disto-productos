@@ -44,7 +44,9 @@
     <button class="toolbar_item" mat-raised-button style="height: 45px;" (click)="downloadXls()" color="accent">
       Descargar Excel
     </button>
-
+    <!--button mat-raised-button style="height: 45px;" (click)="virtualStock()" color="accent">
+      stock
+    </button-->
   </div>
 
   <!-- Table -->
@@ -184,8 +186,8 @@
               class="w3-center w3-padding  ">
               Stock Virtual
             </th>
-            <td style="font-size:10px; padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
-              {{raw.virtualStock$ | async}}
+            <td style="padding:0px 8px; font-weight: bold;" *matCellDef="let raw">
+              {{raw.virtualStock}}
             </td>
           </ng-container> -->
 

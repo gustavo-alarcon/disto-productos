@@ -1,0 +1,16 @@
+::ng-deep .mat-autocomplete-panel mat-option.mat-option {
+    height: unset;
+    line-height: 1.2em;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+::ng-deep .mat-option-text.mat-option-text {
+    white-space: normal;
+}
+
+.text-hide{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
