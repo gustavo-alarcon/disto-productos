@@ -93,9 +93,10 @@
                             <br>
                             <ul style="margin: 0; padding-left: 14px;">
                                 <li *ngFor="let packageItems of item.get('product').value.items; let i2=index">
-                                    <ng-container *ngIf="(packageItems.productsOptions.length == 1
+                                    <ng-container 
+                                        *ngIf="(packageItems.productsOptions.length == 1
                                             || sale.status != saleStatusOptions.attended) else noSingle">
-
+                                        
                                         <!-- First case... only one option -->
                                         <ng-container *ngIf="packageItems.productsOptions.length == 1">
                                             {{packageItems.productsOptions[0].description | titlecase}}
@@ -116,16 +117,17 @@
                                         </ng-container>
 
                                     </ng-container>
-
+                                        
 
                                     <ng-template #noSingle>
-                                        <select [formControl]="item.get('chosenOptions')['controls'][i2]">
-                                            <option [ngValue]="item.get('chosenOptions')['controls'][i2].value">
-                                                {{item.get('chosenOptions')['controls'][i2].value.description | titlecase}}
-                                                ({{item.get('chosenOptions')['controls'][i2].value.unit.abbreviation}})
+                                            <select [formControl]="item.get('chosenOptions')['controls'][i2]">
+                                            <option
+                                                [ngValue]="item.get('chosenOptions')['controls'][i2].value">
+                                                {{item.get('chosenOptions')['controls'][i2].value.description | titlecase}} ({{item.get('chosenOptions')['controls'][i2].value.unit.abbreviation}})
                                             </option>
-                                            <ng-container *ngFor="let product of packageItems.productsOptions">
-                                                <option
+                                            <ng-container 
+                                                *ngFor="let product of packageItems.productsOptions">
+                                                <option 
                                                     *ngIf="item.get('chosenOptions')['controls'][i2].value.id != product.id"
                                                     [ngValue]="product">
                                                     {{product.description | titlecase}} ({{product.unit.abbreviation}})
