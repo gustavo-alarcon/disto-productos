@@ -5,8 +5,8 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { Sale, SaleRequestedProducts } from './../../../core/models/sale.model';
 import { Ng2ImgMaxService } from 'ng2-img-max';
 import { DatabaseService } from 'src/app/core/services/database.service';
-import { tap, take, takeLast, map } from 'rxjs/operators';
-import { Observable, BehaviorSubject, forkJoin, combineLatest } from 'rxjs';
+import { tap, take, takeLast, map, distinctUntilChanged } from 'rxjs/operators';
+import { Observable, BehaviorSubject, forkJoin, combineLatest, observable } from 'rxjs';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -69,6 +69,8 @@ export class PurchaseComponent implements OnInit {
       },
       data: []
     }
+
+  invoice$: Observable<boolean>;
 
   constructor(
     private auth: AuthService,
@@ -146,7 +148,10 @@ export class PurchaseComponent implements OnInit {
     this.payFormGroup = this.fb.group({
       pay: [null, [Validators.required]],
       typePay: [null, [Validators.required]],
-      photoURL: [null]
+      photoURL: [null],
+      ruc: [null],
+      companyName: [null],
+      companyAddress: [null]
     });
 
     this.total = [...this.dbs.order].map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
@@ -171,6 +176,30 @@ export class PurchaseComponent implements OnInit {
       })
     )
 
+    this.invoice$ =
+      this.payFormGroup.get('typePay').valueChanges
+        .pipe(
+          distinctUntilChanged(),
+          map(res => {
+            if (res === 'Factura') {
+              this.payFormGroup.controls['ruc'].setValidators([Validators.required]);
+              this.payFormGroup.controls['companyName'].setValidators([Validators.required]);
+              this.payFormGroup.controls['companyAddress'].setValidators([Validators.required]);
+              this.payFormGroup.controls['ruc'].updateValueAndValidity();
+              this.payFormGroup.controls['companyName'].updateValueAndValidity();
+              this.payFormGroup.controls['companyAddress'].updateValueAndValidity();
+              return true;
+            } else {
+              this.payFormGroup.controls['ruc'].clearValidators();
+              this.payFormGroup.controls['companyName'].clearValidators();
+              this.payFormGroup.controls['companyAddress'].clearValidators();
+              this.payFormGroup.controls['ruc'].updateValueAndValidity();
+              this.payFormGroup.controls['companyName'].updateValueAndValidity();
+              this.payFormGroup.controls['companyAddress'].updateValueAndValidity();
+              return false;
+            }
+          })
+        )
 
   }
 
@@ -381,27 +410,27 @@ export class PurchaseComponent implements OnInit {
         promises.push(transaction.get(sfDocRef).then((prodDoc) => {
 
           let newStock = prodDoc.data().virtualStock - order.reduce;
-          transaction.update(sfDocRef,{ virtualStock: newStock })
-          if(newStock>=prodDoc.data().sellMinimum){
+          transaction.update(sfDocRef, { virtualStock: newStock })
+          if (newStock >= prodDoc.data().sellMinimum) {
             return {
-              isSave:true,
-              product:prodDoc.data().description
+              isSave: true,
+              product: prodDoc.data().description
             }
-          }else{
+          } else {
             return {
-              isSave:false,
-              product:prodDoc.data().description
+              isSave: false,
+              product: prodDoc.data().description
             }
           }
-          
 
-        }).catch((error)=> {
+
+        }).catch((error) => {
           console.log("Transaction failed: ", error);
           return {
-            isSave:false,
-            product:null
+            isSave: false,
+            product: null
           }
-          
+
         }));
 
 
@@ -409,7 +438,7 @@ export class PurchaseComponent implements OnInit {
       return Promise.all(promises);
     }).then(res => {
       this.savePurchase(res)
-      
+
 
     }).catch(() => {
       this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
@@ -419,7 +448,7 @@ export class PurchaseComponent implements OnInit {
 
 
   }
-  
+
   savePurchase(list) {
     const saleCount = this.af.firestore.collection(`/db/distoProductos/config/`).doc('generalConfig');
     const saleRef = this.af.firestore.collection(`/db/distoProductos/sales`).doc();
@@ -429,6 +458,9 @@ export class PurchaseComponent implements OnInit {
       correlative: 0,
       correlativeType: 'R',
       document: this.payFormGroup.get('typePay').value,
+      ruc: this.payFormGroup.get('ruc').value,
+      companyName: this.payFormGroup.get('companyName').value,
+      companyAddress: this.payFormGroup.get('companyAddress').value,
       payType: this.payFormGroup.get('pay').value,
       location: {
         address: this.secondFormGroup.get('address').value,
@@ -450,7 +482,7 @@ export class PurchaseComponent implements OnInit {
       deliveryPrice: this.dbs.delivery,
       voucher: [],
       voucherChecked: false,
-      transactionCliente:list
+      transactionCliente: list
     }
 
     const email = {
