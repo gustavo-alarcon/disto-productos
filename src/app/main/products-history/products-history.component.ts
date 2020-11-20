@@ -83,11 +83,22 @@ export class ProductsHistoryComponent implements OnInit {
                 };
               });
             })
+          ),
+          this.dbs.getProductsEntry(res).pipe(
+            map(buys=>{
+              return buys.map(buy=>{
+                return {
+                  id:buy.id,
+                  quantity:buy.validationData?buy.quantity - buy.validationData.mermaStock - buy.validationData.returned:buy.quantity
+                }
+              })
+            })
           )
         ).pipe(
-          map(([products, sales2]) => {
+          map(([products, sales2,buys]) => {
             
             return products.map((prod) => {
+              let buyStock = buys.filter(buy=>buy.id==prod.id).reduce((a, b) => a + b["quantity"], 0);
               let sales = sales2.filter((sale) => {
                 let ejem = sale.products.filter(
                   (ol) => ol["product"]["id"] == prod.id
@@ -108,6 +119,7 @@ export class ProductsHistoryComponent implements OnInit {
                 virtualStock:prod.virtualStock,
                 sales: sales.map((di) => di.name),
                 quantity: quant,
+                entries:buyStock,
                 reduce:quant.reduce((a,b)=>b+a,0),
                 first:sales.length?first[0]['realStock']:null,
                 firstV:sales.length?first[0]['virtualStock']:null
@@ -205,7 +217,7 @@ export class ProductsHistoryComponent implements OnInit {
   downloadXls(): void {
     let table_xlsx: any[] = [];
     let headersXlsx = [
-      'Name', 'Stock Inicial', 'Vendidos','Stock teorico','Stock real','Stock virtual', 'ventas'
+      'Name', 'Stock Inicial', 'Ingresos', 'Vendidos','Stock teorico','Stock real','Stock virtual', 'ventas'
     ]
 
     table_xlsx.push(headersXlsx);
@@ -214,6 +226,7 @@ export class ProductsHistoryComponent implements OnInit {
       const temp = [
         product.name,
         product.first,
+        product.entries,
         product.reduce,
         product.first - product.reduce,
         product.realStock,
