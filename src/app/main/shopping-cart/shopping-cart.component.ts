@@ -32,7 +32,7 @@ export class ShoppingCartComponent implements OnInit {
 
   ngOnInit(): void {
     
-    if(this.change){
+    /*if(this.change){
       
       this.order$ = combineLatest(
         this.dbs.changeStock$,
@@ -63,7 +63,8 @@ export class ShoppingCartComponent implements OnInit {
     }else{
       this.order$ = of(this.order)
       
-    }
+    }*/
+    this.order$ = of(this.order)
     this.total = this.order.map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
 
   }
@@ -140,6 +141,7 @@ export class ShoppingCartComponent implements OnInit {
     localStorage.setItem('dbsorder', JSON.stringify(this.dbs.order));
     this.dbs.orderObs.next(this.order)
     if (this.order.length == 0) {
+      
       this.dbs.total = this.total
       localStorage.removeItem('order')
       localStorage.removeItem('length')
